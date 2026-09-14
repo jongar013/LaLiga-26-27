@@ -1,0 +1,1258 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Álbum LaLiga 2026-27</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
+<style>
+  :root{
+    --paper:#F1ECDD;
+    --paper-dark:#E4DCC6;
+    --ink:#1E1B16;
+    --ink-soft:#5C564A;
+    --laliga-red:#C8102E;
+    --laliga-red-dark:#970B22;
+    --gold:#C79A2E;
+    --line:#C9BFA3;
+    --card-bg:#FFFDF6;
+    --shadow:rgba(30,27,22,0.18);
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:
+      radial-gradient(circle at 1px 1px, rgba(30,27,22,0.05) 1px, transparent 0) 0 0/14px 14px,
+      var(--paper);
+    color:var(--ink);
+    font-family:'Inter',system-ui,sans-serif;
+    -webkit-font-smoothing:antialiased;
+    padding-bottom:60px;
+  }
+  h1,h2,h3, .num, .tabbtn, .chip .count, .stat-num{
+    font-family:'Oswald',system-ui,sans-serif;
+  }
+
+  header{
+    background:var(--laliga-red);
+    background-image:linear-gradient(160deg, var(--laliga-red) 0%, var(--laliga-red-dark) 100%);
+    color:#fff;
+    padding:22px 18px 16px;
+    border-bottom:6px solid var(--gold);
+  }
+  header .title-row{display:flex; align-items:baseline; justify-content:space-between; gap:10px; flex-wrap:wrap;}
+  header h1{margin:0; font-size:22px; letter-spacing:0.3px; font-weight:700; text-transform:uppercase;}
+  header .season{font-size:13px; opacity:0.85; font-weight:500;}
+  .progress-wrap{margin-top:14px;}
+  .progress-labels{display:flex; justify-content:space-between; font-size:12.5px; margin-bottom:5px; opacity:0.92;}
+  .progress-bar{height:9px; background:rgba(255,255,255,0.28); border-radius:5px; overflow:hidden;}
+  .progress-fill{height:100%; background:var(--gold); border-radius:5px; transition:width .5s ease;}
+
+  .tabs{display:flex; gap:0; margin:16px 18px 0; border-bottom:2px solid var(--line);}
+  .tabbtn{
+    flex:1; text-align:center; padding:11px 6px 10px; background:none; border:none;
+    font-size:14.5px; font-weight:600; letter-spacing:0.3px; text-transform:uppercase;
+    color:var(--ink-soft); cursor:pointer; border-bottom:3px solid transparent; margin-bottom:-2px;
+  }
+  .tabbtn.active{color:var(--laliga-red); border-bottom-color:var(--laliga-red);}
+
+  .chip-row{
+    display:flex; gap:8px; overflow-x:auto; padding:14px 18px; -webkit-overflow-scrolling:touch;
+  }
+  .chip-row::-webkit-scrollbar{display:none;}
+  .chip{
+    flex:0 0 auto; display:flex; align-items:center; gap:7px;
+    background:var(--card-bg); border:1.5px solid var(--line); border-radius:20px;
+    padding:7px 12px 7px 8px; cursor:pointer; white-space:nowrap; font-size:13px; font-weight:600;
+    color:var(--ink); transition:border-color .15s, box-shadow .15s;
+  }
+  .chip .dot{width:10px; height:10px; border-radius:50%; flex:0 0 auto;}
+  .chip.active{border-color:var(--laliga-red); box-shadow:0 0 0 1.5px var(--laliga-red) inset;}
+  .chip .count{font-size:11.5px; color:var(--ink-soft); font-weight:500;}
+
+  main{padding:6px 18px 30px;}
+  .section-head{
+    display:flex; align-items:center; justify-content:space-between; gap:10px;
+    padding:14px 16px; border-radius:10px 10px 0 0; color:#fff; margin-top:8px;
+  }
+  .section-head h2{margin:0; font-size:19px; text-transform:uppercase; letter-spacing:0.4px;}
+  .section-head .sub{font-size:12.5px; opacity:0.9; margin-top:2px; font-weight:500; font-family:'Inter';}
+
+  .sticker-grid{
+    display:grid; grid-template-columns:repeat(auto-fill, minmax(150px,1fr)); gap:10px;
+    background:var(--paper-dark); padding:14px; border-radius:0 0 10px 10px; border:1px solid var(--line); border-top:none;
+  }
+  .empty-msg{
+    grid-column:1/-1; text-align:center; padding:26px 10px; color:var(--ink-soft); font-size:14px;
+  }
+
+  .sticker{
+    position:relative; background:var(--card-bg); border-radius:8px; padding:12px 10px 10px;
+    cursor:pointer; user-select:none; box-shadow:0 2px 5px var(--shadow);
+    border:1px dashed var(--line);
+    display:flex; flex-direction:column; gap:6px; min-height:78px;
+    transition:transform .12s ease, box-shadow .12s ease;
+  }
+  .sticker:active{transform:scale(0.96);}
+  .sticker .num{font-size:12px; font-weight:600; color:var(--ink-soft); letter-spacing:0.5px;}
+  .sticker .pname{font-size:14px; font-weight:600; line-height:1.28; word-break:break-word;}
+  .tag-badge{
+    display:inline-block; margin-left:2px; padding:1px 7px; border-radius:9px;
+    font-family:'Oswald',system-ui,sans-serif; font-size:10px; font-weight:600;
+    text-transform:uppercase; letter-spacing:0.4px; vertical-align:middle; white-space:nowrap;
+  }
+  .tag-colocas{background:var(--laliga-red); color:#fff;}
+  .tag-kromix{background:#8E44AD; color:#fff;}
+  .tag-bronce{background:#8C6239; color:#fff;}
+  .tag-plata{background:#8E9AAF; color:#1E1B16;}
+  .tag-oro{background:var(--gold); color:#1E1B16;}
+  .tag-2ed{background:#9C9284; color:#fff;}
+  .tag-num{background:#fff; border:1px solid var(--line); color:var(--ink-soft);}
+  .sticker.has{opacity:0.5;}
+
+  .stamp{
+    position:absolute; inset:0; display:flex; align-items:center; justify-content:center;
+    pointer-events:none; opacity:0; transform:scale(1.4) rotate(-14deg);
+  }
+  .sticker.pop .stamp{
+    animation:stampIn .45s ease forwards;
+  }
+  @keyframes stampIn{
+    0%{opacity:0; transform:scale(1.6) rotate(-14deg);}
+    55%{opacity:1; transform:scale(0.95) rotate(-14deg);}
+    100%{opacity:1; transform:scale(1.05) rotate(-14deg);}
+  }
+  .stamp span{
+    border:3px solid var(--laliga-red); color:var(--laliga-red); font-family:'Oswald';
+    font-weight:700; font-size:13px; letter-spacing:1px; text-transform:uppercase;
+    padding:3px 8px; border-radius:4px; background:rgba(255,253,246,0.85);
+  }
+
+  .collection .sticker .stamp{opacity:1; transform:scale(1) rotate(-10deg);}
+  .collection .sticker{cursor:default;}
+  .collection .sticker .undo{
+    margin-top:auto; align-self:flex-start; font-size:11.5px; background:none; border:none;
+    color:var(--laliga-red-dark); font-weight:600; cursor:pointer; padding:0; text-decoration:underline;
+  }
+
+  .collection-empty{
+    text-align:center; padding:60px 20px; color:var(--ink-soft);
+  }
+  .collection-empty .big{font-size:40px; margin-bottom:8px;}
+
+  /* Pantalla de inicio de sesión */
+  #loginScreen{
+    position:fixed; inset:0; background:var(--paper); z-index:100;
+    display:flex; align-items:center; justify-content:center; padding:24px;
+  }
+  #loginScreen.hidden{display:none;}
+  .hidden{display:none !important;}
+  .login-box{width:100%; max-width:340px;}
+  .login-box h1{
+    font-size:22px; text-transform:uppercase; margin:0 0 4px; color:var(--laliga-red);
+  }
+  .login-box p.sub{color:var(--ink-soft); font-size:13.5px; margin:0 0 20px;}
+  .login-box input{
+    width:100%; border:1.5px solid var(--line); border-radius:6px; padding:12px;
+    font-size:15px; font-family:'Inter'; margin-bottom:10px; background:#fff; color:var(--ink);
+  }
+  .login-box .btn-row{display:flex; gap:8px; margin-top:4px;}
+  .login-box button{
+    flex:1; border:none; border-radius:6px; padding:12px; font-weight:600; font-size:14px; cursor:pointer;
+  }
+  .login-box .btn-primary{background:var(--laliga-red); color:#fff;}
+  .login-box .btn-secondary{background:var(--paper-dark); color:var(--ink);}
+  .login-box .login-error{color:var(--laliga-red-dark); font-size:13px; margin-top:10px; min-height:16px;}
+  .login-box .login-loading{color:var(--ink-soft); font-size:13px; margin-top:10px;}
+  .logout-btn{
+    background:rgba(255,255,255,0.22); border:none; color:#fff; padding:5px 11px; border-radius:14px;
+    font-size:11.5px; font-weight:600; cursor:pointer;
+  }
+
+  @media (max-width:420px){
+    header h1{font-size:19px;}
+    .sticker-grid{grid-template-columns:repeat(auto-fill, minmax(130px,1fr));}
+  }
+</style>
+</head>
+<body>
+
+<div id="loginScreen">
+  <div class="login-box">
+    <h1>Álbum LaLiga</h1>
+    <p class="sub">Inicia sesión con la cuenta compartida del álbum para ver y marcar los cromos junto a tu amigo, en tiempo real.</p>
+    <input type="email" id="loginEmail" placeholder="Email" autocomplete="username">
+    <input type="password" id="loginPassword" placeholder="Contraseña" autocomplete="current-password">
+    <div class="btn-row">
+      <button class="btn-primary" id="loginBtn">Iniciar sesión</button>
+      <button class="btn-secondary" id="signupBtn">Crear cuenta</button>
+    </div>
+    <div class="login-error" id="loginError"></div>
+    <div class="login-loading" id="loginLoading" style="display:none;">Conectando…</div>
+  </div>
+</div>
+
+<div id="appRoot" class="hidden">
+<header>
+  <div class="title-row">
+    <h1>Álbum LaLiga</h1>
+    <button class="logout-btn" id="logoutBtn">Cerrar sesión</button>
+    <span class="season">Temporada 2026-27 · 2ª edición · Panini</span>
+  </div>
+  <div class="progress-wrap">
+    <div class="progress-labels">
+      <span id="progressLabel">0 de 0 cromos</span>
+      <span id="progressPct">0%</span>
+    </div>
+    <div class="progress-bar"><div class="progress-fill" id="progressFill" style="width:0%"></div></div>
+  </div>
+</header>
+
+<div class="tabs">
+  <button class="tabbtn active" data-tab="album">Álbum</button>
+  <button class="tabbtn" data-tab="collection">Mi colección</button>
+</div>
+
+<div class="chip-row" id="chipRow"></div>
+
+<main id="mainArea"></main>
+</div>
+
+<script>
+const STORAGE_KEY = 'laliga_2627_album_v5';
+
+/* Orden exacto de equipos indicado por el usuario */
+const TEAM_COLORS = {
+  "Deportivo Alavés": "#1F4E8C",
+  "Athletic Club": "#EE2523",
+  "Atlético de Madrid": "#CB3524",
+  "FC Barcelona": "#A50044",
+  "Real Betis": "#00954C",
+  "RC Celta de Vigo": "#57A6DC",
+  "RC Deportivo": "#0072CE",
+  "Elche CF": "#00A650",
+  "RCD Espanyol": "#0A5CA8",
+  "Getafe CF": "#005DAA",
+  "Levante UD": "#B4122B",
+  "Real Madrid": "#1B3A6B",
+  "Málaga CF": "#1B69B6",
+  "CA Osasuna": "#D2001C",
+  "Real Racing Club": "#00A650",
+  "Rayo Vallecano": "#E30613",
+  "Real Sociedad": "#0067B1",
+  "Sevilla FC": "#D80027",
+  "Valencia CF": "#EE8300",
+  "Villarreal CF": "#005187"
+};
+const DEFAULT_TEAMS = Object.keys(TEAM_COLORS);
+
+/* number|name|role|tag  (tag: "2" -> "2ª ed.", texto libre -> se muestra tal cual, BIS en el número -> siempre "COLOCA") */
+const TEAMS_RAW = {
+"Deportivo Alavés": `
+1|Escudo
+2|Quique Sánchez Flores|entrenador
+3|Sivera|portero
+5|Jonny|defensa
+6|Koski|defensa
+7|Tenaglia|defensa
+8|Parada|defensa
+9|Yusi|defensa
+11|Benavidez|medio
+12|Blanco|medio
+13|Guevara|medio
+14|Aleñá|medio
+15|Pablo Ibáñez|medio
+16|Denis Suárez|medio
+17|Ángel Pérez|delantero
+18A|Abde|delantero
+18B|Mañas|delantero
+19|Toni Martínez|delantero
+20|Boyé|delantero`,
+"Athletic Club": `
+1|Escudo
+2|Edin Terzic|entrenador
+3|Unai Simón|portero
+4|Padilla|portero
+5|Areso|defensa
+6A|Paredes|defensa
+6B|Yeray|defensa
+7|Vivian|defensa
+8|Laporte|defensa
+9A|Yuri|defensa
+9B|Adama Boiro|defensa
+10|Jauregizar|medio
+11|Ruiz de Galarreta|medio
+12|Rego|medio
+13|Unai Gómez|medio
+13BIS|Prados|medio|2
+14|Sancet|medio
+15|Nico Serrano|medio
+16|Berenguer|delantero
+17A|Robert Navarro|delantero
+17B|Maroan|delantero
+18|Nico Williams|delantero
+19|Williams|delantero
+20|Guruzeta|delantero`,
+"Atlético de Madrid": `
+1|Escudo
+2|Cholo Simeone|entrenador
+3|Oblak|portero
+4|Musso|portero
+5|Marcos Llorente|defensa
+6|Nahuel Molina|defensa
+7|Pubill|defensa
+8A|Le Normand|defensa
+8B|Giménez|defensa
+9|Hancko|defensa
+10|Ruggeri|defensa
+11|Koke|medio
+12|Barrios|medio
+13|Johnny Cardoso|medio
+14A|Rodri Mendoza|medio
+14B|Obed Vargas|medio
+15|Álex Baena|medio
+16|Almada|medio
+17|Giuliano|delantero
+18|Lookman|delantero
+19|Sorloth|delantero
+20|Julián Alvarez|delantero`,
+"FC Barcelona": `
+1|Escudo
+2|Hansi Flick|entrenador
+3|Joan García|portero
+4|Szczesny|portero
+5|Koundé|defensa
+6A|Araujo|defensa
+6B|Christensen|defensa
+7|Cubarsí|defensa
+8|Gerard Martín|defensa
+9|Joao Cancelo|defensa
+10|Balde|defensa
+11|Eric García|defensa
+12|De Jong|medio
+13|Gavi|medio
+14|Bernal|medio
+15|Pedri|medio
+16|Fermín|medio
+17|Dani Olmo|delantero
+18|Ferran Torres|delantero
+19|Raphinha|delantero
+20|Lamine Yamal|delantero`,
+"Real Betis": `
+1|Escudo
+2|Manuel Pellegrini|entrenador
+3|Valles|portero
+4|Pau López|portero
+4BIS|Diego Conde|portero|2
+5A|Aitor Ruibal|defensa
+5B|Bellerín|defensa
+6|Diego Llorente|defensa
+7|Bartra|defensa
+8|Natan|defensa
+9|Valentín Gómez|defensa
+10|Marc Roca|medio
+11|Amrabat|medio
+12|Fidalgo|medio
+13|Facundo Bernal|medio|2
+14|Lo Celso|medio
+15|Pablo Fornals|medio
+16|Isco|medio
+17|Riquelme|delantero
+18|Antony|delantero
+19|Cucho Hernández|delantero
+20|Abde|delantero`,
+"RC Celta de Vigo": `
+1|Escudo
+2|Claudio Giráldez|entrenador
+3|Radu|portero
+4|Iván Villar|portero
+5|Álvaro Núñez|defensa
+6|Javi Rueda|defensa
+7|Javi Rodríguez|defensa
+8|Starfelt|defensa
+9A|Marcos Alonso|defensa
+9B|Yoel Lago|defensa
+10|Carreira|defensa
+11|Ilaix Moriba|medio
+12|Miguel Román|medio
+13|Hugo Álvarez|medio
+14|Sotelo|medio
+14BIS|Vecino|medio|2
+15|Fer López|medio
+16|Swedberg|medio
+17|Iago Aspas|delantero
+18A|Pablo Durán|delantero
+18B|El-Abdellaoui|delantero
+19|Jutglà|delantero
+20|Borja Iglesias|delantero`,
+"RC Deportivo": `
+1|Escudo
+2|Antonio Hidalgo|entrenador
+3|Álvaro Fernández|portero
+4|Germán Parreño|portero
+5|Adrià Altimira|defensa
+6|Loureiro|defensa
+7|Noubi|defensa
+8|Dani Barcia|defensa
+9A|Ximo Navarro|defensa
+9B|Arnau Comas|defensa
+10|Quagliata|defensa
+11|Villares|medio
+12|Riki|medio
+13|Mario Soriano|medio
+14|José Ángel|medio
+15|Luismi Cruz|medio
+16|Mella|medio
+18|Yeremay|delantero
+19|Eddahchouri|delantero
+20|Nsongo|delantero`,
+"Elche CF": `
+1|Escudo
+2|Martín Anselmi|entrenador|2
+3|Dituro|portero
+4|Iturbe|portero|2
+5|Pétrot|defensa
+6|Chust|defensa
+7|Bigas|defensa
+8|Affengruber|defensa
+9A|Pedrosa|defensa
+9B|Sangaré|defensa
+10|Germán Valera|medio
+11|Martim Neto|medio
+12|Gonzalo Villar|medio
+13A|Fede Redondo|medio
+13B|Jon Chetauya|medio
+14|Marc Aguado|medio
+15|Josan|medio
+16|Morente|medio
+17|Ali Houary|delantero|2
+18|Cepeda|delantero
+19|Diangana|delantero
+20|Yago Santiago|delantero`,
+"RCD Espanyol": `
+1|Escudo
+2|Manolo González|entrenador
+3|Dmitrovic|portero
+4|Fortuño|portero
+5|El Hilali|defensa
+6|Rubén Sánchez|defensa
+7|Riedel|defensa
+8|Cabrera|defensa
+9|Miguel Rubio|defensa
+10|Hartman|defensa|2
+11|Pol Lozano|medio
+12|Urko|medio
+13|Edu Expósito|medio
+14|Jofre|medio
+15|Marcos Fernández|delantero|2
+16|Dolan|delantero
+17|Pere Milla|delantero
+18|Puado|delantero
+19|Kike García|delantero
+20|Roberto Fernández|delantero`,
+"Getafe CF": `
+1|Escudo
+2|Jose Bordalás|entrenador
+3|David Soria|portero
+4|Letacek|portero
+5|Kiko Femenía|defensa
+6|Djené|defensa
+7|Boselli|defensa
+8|Abqar|defensa
+9|Zaid Romero|defensa
+10|Davinchi|defensa
+11|Mario Martín|medio
+12|Javi Muñoz|medio
+14|Terrats|medio|2
+16|Juanmi|delantero|2
+17|Álex Sancris|delantero
+18|Borja Mayoral|delantero
+19|Luis Vázquez|delantero
+20|Satriano|delantero`,
+"Levante UD": `
+1|Escudo
+2|Luís Castro|entrenador
+3|Ryan|portero
+4|Pablo Campos|portero
+5|Toljan|defensa
+6|Elgezabal|defensa
+7|Dela|defensa
+8|Mandi|defensa|2
+9|Manu Sánchez|defensa
+10|Arriaga|medio
+11|Oriol Rey|medio
+12|Olasagasti|medio
+13|Dani Requena|medio|2
+14A|Victor García|medio
+14B|Paco Cortés|medio
+15|Carlos Álvarez|medio
+16|Tunde|delantero
+17|Brugué|delantero
+18|Iván Romero|delantero
+19|Etta Eyong|delantero
+20|Carlos Espí|delantero
+20BIS|Musuayi|delantero|2`,
+"Real Madrid": `
+1|Escudo
+2|José Mourinho|entrenador
+3|Courtois|portero
+4|Lunin|portero
+5|Trent|defensa
+6|Militao|defensa
+7|Asencio|defensa
+8|Rüdiger|defensa
+9|Huijsen|defensa
+10A|Carreras|defensa
+10B|Mendy|defensa
+11|Tchouaméni|medio
+12|Fede Valverde|medio
+13|Camavinga|medio
+14|Bellingham|medio
+15A|Güler|medio
+15B|Thiago Pitarch|medio
+16A|Mastantuono|medio
+16B|Brahim Díaz|delantero
+17|Gonzalo|delantero
+17BIS|Carlos Espí|delantero|2
+18|Rodrygo|delantero
+19|Vinícius|delantero
+20|Mbappé|delantero`,
+"Málaga CF": `
+1|Escudo
+2|Juan Francisco Funes|entrenador
+3|Alfonso Herrero|portero
+4|Carlos López|portero
+5|Puga|defensa
+6|Murillo|defensa
+7|Calero|defensa|2
+8|Einar Galilea|defensa
+9|Rafita|defensa
+10|Salinas|defensa|2
+11|Izan Mérino|medio
+12|Dani Lorenzo|medio
+13A|Rafa Rodríguez|medio
+13B|Juanpe|medio
+14|Dotor|medio
+15|Aarón Ochoa|medio
+16|Larrubia|delantero
+17|Lobete|delantero
+18|Adrián Niño|delantero
+19|Joaquín|delantero
+20|Chupe|delantero`,
+"CA Osasuna": `
+1|Escudo
+2|Luis Miguel Ramis|entrenador
+3|Sergio Herrera|portero
+4|Aitor Fernández|portero
+5A|Rosier|defensa
+5B|Arguibide|defensa
+6|Boyomo|defensa
+7|Herrando|defensa
+8|Catena|defensa
+9|Abel Bretones|defensa
+10|Osambela|medio
+11|Torró|medio
+12|Moncayola|medio
+13A|Moi Gómez|medio
+13B|Iker Muñoz|medio
+14|Rubén García|medio
+15|Aimar Oroz|medio
+16|Iker Benito|medio
+17|Raúl Moro|delantero
+18|Raúl García|delantero
+19|Kike Barja|delantero
+20|Budimir|delantero`,
+"Real Racing Club": `
+1|Escudo
+2|José Alberto López|entrenador
+4|Eriksson|portero
+5|Mantilla|defensa
+6|Sangalli|defensa
+6BIS|Pablo Ramón|defensa|2
+7|Facu González|defensa
+8|Javi Castro|defensa
+9A|Manu Hernando|defensa
+9B|Mario García|defensa
+10|Jorge Salinas|defensa
+11A|Maguette|medio
+11B|Nteka|medio
+12|Gustavo Puerta|medio
+13|Íñigo|medio
+14|Aldasoro|medio
+15|Suleiman|delantero
+16|Andrés Martín|delantero
+17|Guliashvili|delantero
+18|Íñigo Vicente|delantero
+19|Arana|delantero
+20|Villalibre|delantero`,
+"Rayo Vallecano": `
+1|Escudo
+2|Beñat San José|entrenador
+3|Batalla|portero
+4|Cárdenas|portero
+5|Ratiu|defensa
+6|Balliu|defensa
+7|Nobel Mendy|defensa
+8|Lejeune|defensa
+9|Luiz Felipe|defensa
+10|Pep Chavarría|defensa
+11|Pedro Díaz|medio
+12|Pathé Ciss|medio
+13|Óscar Valentín|medio
+14|Unai López|medio
+15|Isi|medio
+16|De Frutos|delantero
+17|Fran Pérez|delantero
+18|Álvaro García|delantero
+19|Camello|delantero
+20|Alemao|delantero`,
+"Real Sociedad": `
+1|Escudo
+2|Pellegrino Matarazzo|entrenador
+3|Remiro|portero
+4|Marrero|portero
+5|Aramburu|defensa
+6|Zubeldia|defensa
+7|Jon Martín|defensa
+8|Sergio Gómez|defensa
+9|Aihen Muñoz|defensa
+10|Gorrotxategi|medio
+11|Pablo Marín|medio
+12|Turrientes|medio
+13A|Yangel Herrera|medio
+13B|Zakharyan|medio|2
+14|Carlos Soler|medio
+15|Sucic|medio
+16|Barrenetxea|delantero
+17|Kubo|delantero
+18|Guedes|delantero
+19|Oskarsson|delantero
+20|Oyarzabal|delantero`,
+"Sevilla FC": `
+1|Escudo
+2|Luis García|entrenador
+3|Vlachodimos|portero
+5|Carmona|defensa
+6|Juanlu|defensa
+6BIS|Iglesias|defensa|2
+7|Kike Salas|defensa
+8|Nianzou|defensa
+9A|Castrín|defensa
+9B|Marcao|defensa
+10|Suazo|defensa
+11|Oso|medio
+12|Agoumé|medio
+13|Guridi|medio|2
+14|Sow|medio
+15|Vargas|medio
+16|Manu Bueno|medio
+17|Peque|delantero
+18|Ejuke|delantero
+19|Akor Adams|delantero
+20|Isaac Romero|delantero`,
+"Valencia CF": `
+1|Escudo
+2|Carlos Corberán|entrenador
+3|Dimitrievski|portero
+4|Rivero|portero
+5|Foulquier|defensa
+6|Copete|defensa
+7|Tárrega|defensa
+8A|Cömert|defensa
+8B|Diakhaby|defensa
+9|Gayà|defensa
+10|Jesús Vázquez|defensa
+11|Pepelu|medio
+12|Guido Rodríguez|medio
+13|Javi Guerra|medio
+14|Luis Rioja|medio
+15|Ugrinic|medio
+16|André Almeida|medio
+16BIS|Dieng|medio|2
+17|Hugo Duro|delantero
+18|Diego López|delantero
+19|Ramazani|delantero
+19BIS|Danjuma|delantero|2
+20A|Sadiq|delantero
+20B|Lucas Beltrán|delantero`,
+"Villarreal CF": `
+1|Escudo
+2|Íñigo Pérez|entrenador
+3|Luiz Júnior|portero
+4|Arnau Tenas|portero
+4BIS|Gulácsi|portero|2
+5|Mouriño|defensa
+6A|Pau Navarro|defensa
+6B|Logan Costa|defensa
+7A|Foyth|defensa
+7B|Freeman|defensa
+8A|Kambwala|defensa
+8B|Rafa Marín|defensa
+9|Renato Veiga|defensa
+10|Sergi Cardona|defensa
+11|Pape Gueye|medio
+12|Santi Comesaña|medio
+13|Maciá|medio
+14|Moleiro|medio
+15|Buchanan|delantero
+16|Oluwaseyi|delantero
+17|Ayoze|delantero
+18|Pépé|delantero
+19|Mikautadze|delantero
+20|Gerard Moreno|delantero`
+};
+
+/* Secciones especiales, en el orden pedido. Draft 23 incluye ambas variantes
+   (numérica y Kromix) y Extra Sticker junta Bronce/Plata/Oro, diferenciados con una etiqueta. */
+const SPECIALS_RAW = [
+{ name:"ADN / LaLiga Prime", color:"#4C3B87", raw:`
+1|Antony (Betis)|delantero
+2|Bellingham (Real Madrid)|medio
+3|Courtois (Real Madrid)|portero
+4|Fermín (Barcelona)|medio
+5|Julián Alvarez (Atlético)|delantero
+6|Lamine Yamal (Barcelona)|delantero
+7|Lookman (Atlético)|delantero
+8|Mbappé (Real Madrid)|delantero
+9|Moleiro (Villarreal)|medio
+10|Nico Williams (Athletic)|delantero
+11|Oyarzabal (Real Sociedad)|delantero
+12|Pedri (Barcelona)|medio
+13|Raphinha (Barcelona)|delantero
+14|Unai Simón (Athletic)|portero
+15|Vinícius (Real Madrid)|delantero`},
+{ name:"LaLiga Fantasy", color:"#3F51B5", raw:`
+1|Hansi Flick (Barcelona)|entrenador
+2|Joan García (Barcelona)|portero
+3|Lejeune (Rayo Vallecano)|defensa
+4|Fornals (Betis)|medio
+5|Lamine Yamal (Barcelona)|delantero
+6|Luis Milla (Getafe)|medio
+7|Pedri (Barcelona)|medio
+8|Luis Milla (Getafe)|medio
+9|Mbappé (Real Madrid)|delantero`},
+{ name:"Draft 23", color:"#8E44AD", raw:`
+1|Asencio (Real Madrid)|defensa
+2|Balde (Barcelona)|defensa
+3|Barrios (Atlético de Madrid)|medio
+4|Carlos Espí (Levante)|delantero
+5|Carreras (Real Madrid)|defensa
+6|Cubarsí (Barcelona)|defensa
+7|Fer López (Celta)|medio
+8|Gavi (Barcelona)|medio
+9|Gonzalo (Real Madrid)|delantero
+10|Huijsen (Real Madrid)|defensa
+11|Jauregizar (Athletic)|medio
+12|Javi Guerra (Valencia)|medio
+13|Jon Martín (Real Sociedad)|defensa
+14|Juanlu (Sevilla)|defensa
+15|Marc Bernal (Barcelona)|medio
+16|Mastantuono (Real Madrid)|medio
+17|Oso (Sevilla)|medio
+18|Pau Navarro (Villarreal)|defensa
+19|Pubill (Atlético de Madrid)|defensa
+20|Renato Veiga (Villarreal)|defensa
+21|Rodri Mendoza (Atlético de Madrid)|medio
+22|Thiago Pitarch (Real Madrid)|medio
+23|Yeremay (Deportivo)|delantero
+K1|Asencio (Real Madrid)|defensa|Kromix
+K2|Balde (Barcelona)|defensa|Kromix
+K3|Barrios (Atlético de Madrid)|medio|Kromix
+K4|Carlos Espí (Levante)|delantero|Kromix
+K5|Carreras (Real Madrid)|defensa|Kromix
+K6|Cubarsí (Barcelona)|defensa|Kromix
+K7|Fer López (Celta)|medio|Kromix
+K8|Gavi (Barcelona)|medio|Kromix
+K9|Gonzalo (Real Madrid)|delantero|Kromix
+K10|Huijsen (Real Madrid)|defensa|Kromix
+K11|Jauregizar (Athletic)|medio|Kromix
+K12|Javi Guerra (Valencia)|medio|Kromix
+K13|Jon Martín (Real Sociedad)|defensa|Kromix
+K14|Juanlu (Sevilla)|defensa|Kromix
+K15|Marc Bernal (Barcelona)|medio|Kromix
+K16|Mastantuono (Real Madrid)|medio|Kromix
+K17|Oso (Sevilla)|medio|Kromix
+K18|Pau Navarro (Villarreal)|defensa|Kromix
+K19|Pubill (Atlético de Madrid)|defensa|Kromix
+K20|Renato Veiga (Villarreal)|defensa|Kromix
+K21|Rodri Mendoza (Atlético de Madrid)|medio|Kromix
+K22|Thiago Pitarch (Real Madrid)|medio|Kromix
+K23|Yeremay (Deportivo)|delantero|Kromix`},
+{ name:"Últimos Fichajes", color:"#6B4FA0", raw:`
+UF1|CANALES (Racing de Santander)|medio|2
+UF2|CALATRAVA (Espanyol)|medio|2
+UF3|DUMFRIES (Real Madrid)|defensa|2
+UF4|CARLOS ROMERO (Espanyol)|defensa|2
+UF5|HJULMAND (Atlético de Madrid)|medio|2
+UF6|FRAN GARCÍA (Real Madrid)|defensa|2
+UF7|BARDELLI (Levante)|medio|2
+UF8|LEO ROMÁN (Deportivo)|portero|2
+UF9|DE HAAS (Valencia)|defensa|2
+UF10|FEBAS (Celta)|medio|2
+UF11|JUAN CRUZ (Málaga)|delantero|2
+UF12|AUBAMEYANG (Deportivo)|delantero|2
+UF13|SOTELO (Celta)|medio|2
+UF14|SATO (Valencia)|delantero|2
+UF15|FER NIÑO (Elche)|delantero|2
+UF16|MOSCARDO (Espanyol)|medio|2
+UF17|SANGANTE (Sevilla)|defensa|2
+UF18|ANDRÉS GARCÍA (Getafe)|defensa|2
+UF19|ADEYEMI (Barcelona)|delantero|2
+UF20|KANG-IN LEE (Atlético de Madrid)|medio|2`},
+{ name:"Chicles", color:"#E85D9E", raw:`
+1|Escudo (D. Alavés)
+2|Boyé (D. Alavés)|Masterclass
+3|Blanco (D. Alavés)|Box to Box
+4|Escudo (Athletic Club)
+5|Nico Williams (Athletic Club)|Masterclass
+6|Jauregizar (Athletic Club)|Box to Box
+7|Escudo (Atlético de Madrid)
+8|Lookman (Atlético de Madrid)|Masterclass
+9|Barrios (Atlético de Madrid)|Box to Box
+10|Escudo (FC Barcelona)
+11|Lamine Yamal (FC Barcelona)|Masterclass
+12|Pedri (FC Barcelona)|Box to Box
+13|Escudo (Real Betis)
+14|Antony (Real Betis)|Masterclass
+15|Pablo Fornals (Real Betis)|Box to Box
+16|Escudo (RC Celta)
+17|Borja Iglesias (RC Celta)|Masterclass
+18|Miguel Román (RC Celta)|Box to Box
+19|Escudo (RC Deportivo)
+20|Yeremay (RC Deportivo)|Masterclass
+21|Mario Soriano (RC Deportivo)|Box to Box
+22|Escudo (Elche CF)
+23|Álvaro Rodríguez (Elche CF)|Masterclass
+24|Marc Aguado (Elche CF)|Box to Box
+25|Escudo (RCD Espanyol)
+26|Puado (RCD Espanyol)|Masterclass
+27|Edu Expósito (RCD Espanyol)|Box to Box
+28|Escudo (Getafe CF)
+29|Satriano (Getafe CF)|Masterclass
+30|Mario Martín (Getafe CF)|Box to Box
+31|Escudo (Levante UD)
+32|Carlos Álvarez (Levante UD)|Masterclass
+33|Olasagasti (Levante UD)|Box to Box
+34|Escudo (Real Madrid)
+35|Mbappé (Real Madrid)|Masterclass
+36|Fede Valverde (Real Madrid)|Box to Box
+37|Escudo (Málaga CF)
+38|Chupe (Málaga CF)|Masterclass
+39|Dani Lorenzo (Málaga CF)|Box to Box
+40|Escudo (CA Osasuna)
+41|Budimir (CA Osasuna)|Masterclass
+42|Moncayola (CA Osasuna)|Box to Box
+43|Escudo (R. Racing Club)
+44|Andrés Martín (R. Racing Club)|Masterclass
+45|Gustavo Puerta (R. Racing Club)|Box to Box
+46|Escudo (Rayo Vallecano)
+47|De Frutos (Rayo Vallecano)|Masterclass
+48|Óscar Valentín (Rayo Vallecano)|Box to Box
+49|Escudo (Real Sociedad)
+50|Guedes (Real Sociedad)|Masterclass
+51|Carlos Soler (Real Sociedad)|Box to Box
+52|Escudo (Sevilla FC)
+53|Akor Adams (Sevilla FC)|Masterclass
+54|Sow (Sevilla FC)|Box to Box
+55|Escudo (Valencia CF)
+56|Hugo Duro (Valencia CF)|Masterclass
+57|Pepelu (Valencia CF)|Box to Box
+58|Escudo (Villarreal CF)
+59|Moleiro (Villarreal CF)|Masterclass
+60|Pape Gueye (Villarreal CF)|Box to Box`},
+{ name:"Extra Sticker", color:"#B8860B", raw:`
+B1|Lamine Yamal (Barcelona)|delantero|Bronce
+B2|Mbappé (Real Madrid)|delantero|Bronce
+B3|Nico Williams (Athletic)|delantero|Bronce
+B4|Pedri (Barcelona)|medio|Bronce
+B5|Oblak (Atlético de Madrid)|portero|Bronce
+P1|Lamine Yamal (Barcelona)|delantero|Plata
+P2|Mbappé (Real Madrid)|delantero|Plata
+P3|Nico Williams (Athletic)|delantero|Plata
+P4|Pedri (Barcelona)|medio|Plata
+P5|Oblak (Atlético de Madrid)|portero|Plata
+O1|Lamine Yamal (Barcelona)|delantero|Oro
+O2|Mbappé (Real Madrid)|delantero|Oro
+O3|Nico Williams (Athletic)|delantero|Oro
+O4|Pedri (Barcelona)|medio|Oro
+O5|Oblak (Atlético de Madrid)|portero|Oro`}
+];
+
+function buildBaseName(name, role){
+  let out = name;
+  if(role) out += ' — ' + role.charAt(0).toUpperCase() + role.slice(1);
+  return out;
+}
+
+function parseRaw(raw){
+  return raw.trim().split('\n').map(l => l.trim()).filter(Boolean).map(line => {
+    const parts = line.split('|');
+    const number = parts[0].trim();
+    const name = (parts[1]||'').trim();
+    const role = (parts[2]||'').trim();
+    const rawTag = (parts[3]||'').trim();
+    let tag = '';
+    if(number.includes('BIS')) tag = 'COLOCA';
+    else if(rawTag === '2') tag = '2ª ed.';
+    else if(rawTag) tag = rawTag;
+    return { number, name: buildBaseName(name, role), tag };
+  });
+}
+
+function uid(){
+  return 's' + Date.now() + Math.floor(Math.random()*100000);
+}
+
+/* Cuando varios cromos de una misma sección comparten nombre (p. ej. la versión
+   normal y la Kromix de Draft 23, o Bronce/Plata/Oro de Extra Sticker), si ninguno
+   trae ya una etiqueta que los diferencie, se les añade su propio número como
+   distintivo para poder identificarlos y, si hace falta, eliminar el que sobre. */
+function markDuplicates(stickers){
+  const groups = {};
+  stickers.forEach(s => {
+    const key = s.name.toLowerCase();
+    (groups[key] = groups[key] || []).push(s);
+  });
+  Object.values(groups).forEach(group => {
+    if(group.length > 1){
+      const anyTagged = group.some(s => s.tag);
+      if(!anyTagged){
+        group.forEach(s => { s.tag = 'Nº ' + s.number; });
+      }
+    }
+  });
+}
+
+const CONMEMORATIVOS_RAW = `
+1|Conmemorativo
+2|Conmemorativo`;
+
+function buildSections(){
+  const sections = [];
+  const conmemStickers = parseRaw(CONMEMORATIVOS_RAW).map(s => ({ id: uid(), number: s.number, name: s.name, tag: s.tag, obtained:false }));
+  sections.push({ id:'conmemorativos', name:'Conmemorativos', type:'special', color:'#7A1F3D', stickers: conmemStickers });
+  DEFAULT_TEAMS.forEach((teamName, i) => {
+    const raw = TEAMS_RAW[teamName] || '';
+    const stickers = parseRaw(raw).map(s => ({ id: uid(), number: s.number, name: s.name, tag: s.tag, obtained:false }));
+    markDuplicates(stickers);
+    sections.push({ id:'team-'+i, name:teamName, type:'team', color:TEAM_COLORS[teamName], stickers });
+  });
+  SPECIALS_RAW.forEach((sp, i) => {
+    const stickers = parseRaw(sp.raw).map(s => ({ id: uid(), number: s.number, name: s.name, tag: s.tag, obtained:false }));
+    markDuplicates(stickers);
+    sections.push({ id:'special-'+i, name:sp.name, type:'special', color:sp.color, stickers });
+  });
+  return sections;
+}
+
+let data = null;
+let activeTab = 'album';
+
+/* ======================= FIREBASE (cuenta compartida + sincronización) =======================
+   1. Ve a https://console.firebase.google.com y crea un proyecto gratis.
+   2. Build > Authentication > Sign-in method > habilita "Correo electrónico/contraseña".
+   3. Build > Firestore Database > Crear base de datos (elige una región de Europa).
+   4. Configuración del proyecto (icono engranaje) > Tus apps > Web (</>) > registra la app
+      y copia aquí abajo los valores que te da (apiKey, authDomain, projectId, etc.).
+   5. En Firestore > pestaña "Reglas", pega esto y publica:
+        rules_version = '2';
+        service cloud.firestore {
+          match /databases/{database}/documents {
+            match /albums/{albumId} {
+              allow read, write: if request.auth != null && request.auth.uid == albumId;
+            }
+          }
+        }
+   ================================================================================================ */
+const firebaseConfig = {
+  apiKey: "AIzaSyD3cZ6fEKWWrOJ1c7Jp90Xp2B3x66wq_pk",
+  authDomain: "album-26-27-f8105.firebaseapp.com",
+  projectId: "album-26-27-f8105",
+  storageBucket: "album-26-27-f8105.firebasestorage.app",
+  messagingSenderId: "783786036356",
+  appId: "1:783786036356:web:d993fe88a2650e674606d1"
+};
+firebase.initializeApp(firebaseConfig);
+const auth = firebase.auth();
+const db = firebase.firestore();
+
+let unsubscribeDoc = null;
+let suppressSave = false;
+
+function docRefFor(uid){
+  return db.collection('albums').doc(uid);
+}
+
+function save(){
+  if(!data || !auth.currentUser || suppressSave) return;
+  docRefFor(auth.currentUser.uid).set(data).catch(err => console.error('Error guardando:', err));
+}
+
+function startSync(uid){
+  if(unsubscribeDoc) unsubscribeDoc();
+  unsubscribeDoc = docRefFor(uid).onSnapshot(snap => {
+    suppressSave = true;
+    if(snap.exists){
+      data = snap.data();
+    } else {
+      const sections = buildSections();
+      data = { sections, activeId: sections[0].id };
+      docRefFor(uid).set(data);
+    }
+    if(!activeTab) activeTab = 'album';
+    renderAll();
+    suppressSave = false;
+  }, err => {
+    console.error('Error de sincronización:', err);
+  });
+}
+
+function stopSync(){
+  if(unsubscribeDoc){ unsubscribeDoc(); unsubscribeDoc = null; }
+  data = null;
+}
+
+function showLoginError(msg){
+  document.getElementById('loginError').textContent = msg;
+}
+function setLoginLoading(on){
+  document.getElementById('loginLoading').style.display = on ? 'block' : 'none';
+}
+
+document.getElementById('loginBtn').onclick = () => {
+  const email = document.getElementById('loginEmail').value.trim();
+  const password = document.getElementById('loginPassword').value;
+  showLoginError('');
+  if(!email || !password){ showLoginError('Escribe email y contraseña.'); return; }
+  setLoginLoading(true);
+  auth.signInWithEmailAndPassword(email, password)
+    .catch(err => showLoginError(traducirErrorAuth(err)))
+    .finally(() => setLoginLoading(false));
+};
+
+document.getElementById('signupBtn').onclick = () => {
+  const email = document.getElementById('loginEmail').value.trim();
+  const password = document.getElementById('loginPassword').value;
+  showLoginError('');
+  if(!email || !password){ showLoginError('Escribe email y contraseña.'); return; }
+  if(password.length < 6){ showLoginError('La contraseña debe tener al menos 6 caracteres.'); return; }
+  setLoginLoading(true);
+  auth.createUserWithEmailAndPassword(email, password)
+    .catch(err => showLoginError(traducirErrorAuth(err)))
+    .finally(() => setLoginLoading(false));
+};
+
+document.getElementById('logoutBtn').onclick = () => {
+  auth.signOut();
+};
+
+function traducirErrorAuth(err){
+  const map = {
+    'auth/invalid-email': 'Ese email no es válido.',
+    'auth/user-not-found': 'No existe ninguna cuenta con ese email. Usa "Crear cuenta" la primera vez.',
+    'auth/wrong-password': 'Contraseña incorrecta.',
+    'auth/invalid-credential': 'Email o contraseña incorrectos.',
+    'auth/email-already-in-use': 'Ya existe una cuenta con ese email. Usa "Iniciar sesión".',
+    'auth/weak-password': 'La contraseña debe tener al menos 6 caracteres.',
+    'auth/network-request-failed': 'Sin conexión a internet.'
+  };
+  return map[err.code] || 'No se pudo completar la operación. Inténtalo de nuevo.';
+}
+
+auth.onAuthStateChanged(user => {
+  const loginScreen = document.getElementById('loginScreen');
+  const appRoot = document.getElementById('appRoot');
+  if(user){
+    loginScreen.classList.add('hidden');
+    appRoot.classList.remove('hidden');
+    startSync(user.uid);
+  } else {
+    stopSync();
+    appRoot.classList.add('hidden');
+    loginScreen.classList.remove('hidden');
+  }
+});
+/* ================================================================================================ */
+
+function getSection(id){
+  return data.sections.find(s => s.id === id);
+}
+
+function totalCounts(){
+  let total = 0, have = 0;
+  data.sections.forEach(s => {
+    total += s.stickers.length;
+    have += s.stickers.filter(st => st.obtained).length;
+  });
+  return {total, have};
+}
+
+function renderHeader(){
+  const {total, have} = totalCounts();
+  const pct = total ? Math.round((have/total)*100) : 0;
+  document.getElementById('progressLabel').textContent = `${have} de ${total} cromos`;
+  document.getElementById('progressPct').textContent = pct + '%';
+  document.getElementById('progressFill').style.width = pct + '%';
+}
+
+function renderChips(){
+  const row = document.getElementById('chipRow');
+  row.innerHTML = '';
+  data.sections.forEach(s => {
+    const have = s.stickers.filter(st=>st.obtained).length;
+    const chip = document.createElement('button');
+    chip.className = 'chip' + (s.id === data.activeId ? ' active' : '');
+    chip.innerHTML = `<span class="dot" style="background:${s.color}"></span>${s.name} <span class="count">${have}/${s.stickers.length}</span>`;
+    chip.onclick = () => { data.activeId = s.id; save(); renderAll(); };
+    row.appendChild(chip);
+  });
+}
+
+const TAG_CLASSES = {
+  'COLOCA':'tag-colocas',
+  'Kromix':'tag-kromix',
+  'Bronce':'tag-bronce',
+  'Plata':'tag-plata',
+  'Oro':'tag-oro',
+  '2ª ed.':'tag-2ed'
+};
+function tagClass(tag){
+  return TAG_CLASSES[tag] || 'tag-num';
+}
+
+/* Coloca juntos, uno al lado del otro, los cromos que comparten hueco/numeración
+   (p. ej. el Nº1 normal junto a su K1 Kromix, o Lamine Yamal en Bronce/Plata/Oro),
+   conservando el orden general para el resto de cromos. */
+function groupBySlot(stickers){
+  const seen = new Set();
+  const ordered = [];
+  stickers.forEach(s => {
+    const key = s.name.toLowerCase();
+    if(seen.has(key)) return;
+    seen.add(key);
+    stickers.filter(x => x.name.toLowerCase() === key).forEach(x => ordered.push(x));
+  });
+  return ordered;
+}
+
+function stickerCardHTML(section, st, collectionMode){
+  const cls = 'sticker' + (st.obtained ? ' has' : '') + (st._justAdded ? ' pop' : '');
+  const badge = st.tag ? `<span class="tag-badge ${tagClass(st.tag)}">${escapeHTML(st.tag)}</span>` : '';
+  return `
+    <div class="${cls}" data-id="${st.id}">
+      <div class="num">Nº ${st.number}</div>
+      <div class="pname">${escapeHTML(st.name)} ${badge}</div>
+      <div class="stamp"><span>Tengo</span></div>
+      ${collectionMode ? `<button class="undo" data-undo="${st.id}">Marcar como que falta</button>` : ''}
+    </div>`;
+}
+
+function escapeHTML(str){
+  const d = document.createElement('div');
+  d.textContent = str;
+  return d.innerHTML;
+}
+
+function renderAlbum(){
+  const section = getSection(data.activeId) || data.sections[0];
+  const missing = groupBySlot(section.stickers).filter(st => !st.obtained);
+  const have = section.stickers.filter(st => st.obtained).length;
+
+  const main = document.getElementById('mainArea');
+  main.innerHTML = `
+    <div class="section-head" style="background:${section.color}">
+      <div>
+        <h2>${escapeHTML(section.name)}</h2>
+        <div class="sub">${have}/${section.stickers.length} conseguidos</div>
+      </div>
+    </div>
+    <div class="sticker-grid" id="stickerGrid">
+      ${missing.length ? missing.map(st => stickerCardHTML(section, st, false)).join('') :
+        `<div class="empty-msg">${section.stickers.length ? '¡Los tienes todos de esta sección! 🎉' : 'No hay cromos en esta sección.'}</div>`}
+    </div>
+  `;
+
+  document.getElementById('stickerGrid').querySelectorAll('.sticker').forEach(card => {
+    card.addEventListener('click', (e) => {
+      const id = card.dataset.id;
+      markObtained(section, id, card);
+    });
+  });
+}
+
+function renderCollection(){
+  const main = document.getElementById('mainArea');
+  main.className = 'collection';
+  const sectionsWithCards = data.sections.filter(s => s.stickers.some(st => st.obtained));
+
+  if(!sectionsWithCards.length){
+    main.innerHTML = `<div class="collection-empty"><div class="big">📗</div>Aún no tienes cromos marcados.<br>Ve a "Álbum" y toca un cromo cuando lo consigas.</div>`;
+    return;
+  }
+
+  main.innerHTML = sectionsWithCards.map(section => {
+    const obtained = groupBySlot(section.stickers).filter(st => st.obtained);
+    return `
+      <div class="section-head" style="background:${section.color}">
+        <div>
+          <h2>${escapeHTML(section.name)}</h2>
+          <div class="sub">${obtained.length} cromo${obtained.length===1?'':'s'}</div>
+        </div>
+      </div>
+      <div class="sticker-grid">
+        ${obtained.map(st => stickerCardHTML(section, st, true)).join('')}
+      </div>
+    `;
+  }).join('<div style="height:14px"></div>');
+
+  main.querySelectorAll('[data-undo]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const id = btn.dataset.undo;
+      const section = data.sections.find(s => s.stickers.some(st => st.id === id));
+      const st = section.stickers.find(s => s.id === id);
+      st.obtained = false;
+      save();
+      renderAll();
+    });
+  });
+}
+
+function markObtained(section, id, cardEl){
+  const st = section.stickers.find(s => s.id === id);
+  cardEl.classList.add('has','pop');
+  cardEl.querySelector('.del')?.remove();
+  setTimeout(() => {
+    st.obtained = true;
+    save();
+    renderAll();
+  }, 480);
+}
+
+document.querySelectorAll('.tabbtn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    activeTab = btn.dataset.tab;
+    document.querySelectorAll('.tabbtn').forEach(b => b.classList.toggle('active', b === btn));
+    renderAll();
+  });
+});
+
+function renderAll(){
+  if(!data) return;
+  renderHeader();
+  renderChips();
+  const main = document.getElementById('mainArea');
+  main.className = '';
+  if(activeTab === 'album'){
+    renderAlbum();
+  } else {
+    renderCollection();
+  }
+}
+
+</script>
+</body>
+</html>
