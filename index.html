@@ -81,6 +81,22 @@
   }
   .section-head h2{margin:0; font-size:19px; text-transform:uppercase; letter-spacing:0.4px;}
   .section-head .sub{font-size:12.5px; opacity:0.9; margin-top:2px; font-weight:500; font-family:'Inter';}
+  .head-main{display:flex; align-items:center; gap:12px; min-width:0;}
+  .crest{width:46px; height:46px; object-fit:contain; flex:0 0 auto; background:rgba(255,255,255,0.92); border-radius:10px; padding:4px;}
+  .chip-row{position:relative;}
+  .chip-crest{width:20px; height:20px; object-fit:contain; flex:0 0 auto;}
+  .section-nav{display:flex; gap:10px; margin-top:14px;}
+  .nav-btn{
+    flex:1; min-width:0; display:flex; align-items:center; gap:10px; text-align:left;
+    background:var(--card-bg); border:1.5px solid var(--line); border-radius:10px; padding:12px;
+    font-family:'Inter',system-ui,sans-serif; color:var(--ink); cursor:pointer;
+  }
+  .nav-btn.next{flex-direction:row-reverse; text-align:right;}
+  .nav-btn:active{transform:scale(0.97);}
+  .nav-btn .arrow{font-family:'Oswald',system-ui,sans-serif; font-size:24px; line-height:1; color:var(--laliga-red); flex:0 0 auto;}
+  .nav-label{min-width:0; display:block;}
+  .nav-label small{display:block; font-size:10.5px; color:var(--ink-soft); text-transform:uppercase; letter-spacing:0.5px;}
+  .nav-name{display:block; font-size:13.5px; font-weight:600; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;}
 
   .sticker-grid{
     display:grid; grid-template-columns:repeat(auto-fill, minmax(150px,1fr)); gap:10px;
@@ -202,7 +218,7 @@
   <div class="title-row">
     <h1>Álbum LaLiga</h1>
     <button class="logout-btn" id="logoutBtn">Cerrar sesión</button>
-    <span class="season">Temporada 2026-27 · 2ª edición · Panini</span>
+    <span class="season">Temporada 2026-27 · 3ª edición · Panini</span>
   </div>
   <div class="progress-wrap">
     <div class="progress-labels">
@@ -956,8 +972,14 @@ function parseRaw(raw){
   });
 }
 
-function uid(){
-  return 's' + Date.now() + Math.floor(Math.random()*100000);
+/* Id estable: sección + número del cromo. Antes se generaba al azar y a veces dos
+   cromos recibían el mismo id, por lo que al tocar uno se marcaba el otro. */
+function makeId(sectionId, number, used){
+  let id = sectionId + '_' + String(number).replace(/\s+/g, '');
+  let k = 2;
+  while(used.has(id)){ id = sectionId + '_' + String(number).replace(/\s+/g, '') + '_' + k++; }
+  used.add(id);
+  return id;
 }
 
 /* Cuando varios cromos de una misma sección comparten nombre (p. ej. la versión
@@ -984,20 +1006,39 @@ const CONMEMORATIVOS_RAW = `
 1|Conmemorativo
 2|Conmemorativo`;
 
+const CREST_SLUGS = {
+  "Deportivo Alavés":"alaves", "Athletic Club":"athletic", "Atlético de Madrid":"atletico",
+  "FC Barcelona":"barcelona", "Real Betis":"betis", "RC Celta de Vigo":"celta",
+  "RC Deportivo":"deportivo", "Elche CF":"elche", "RCD Espanyol":"espanyol",
+  "Getafe CF":"getafe", "Levante UD":"levante", "Real Madrid":"real-madrid",
+  "Málaga CF":"malaga", "CA Osasuna":"osasuna", "Real Racing Club":"racing",
+  "Rayo Vallecano":"rayo", "Real Sociedad":"real-sociedad", "Sevilla FC":"sevilla",
+  "Valencia CF":"valencia", "Villarreal CF":"villarreal"
+};
+
+function stickersFor(sectionId, raw){
+  const used = new Set();
+  const stickers = parseRaw(raw).map(s => ({
+    id: makeId(sectionId, s.number, used), number: s.number, name: s.name, tag: s.tag, obtained:false
+  }));
+  markDuplicates(stickers);
+  return stickers;
+}
+
 function buildSections(){
   const sections = [];
-  const conmemStickers = parseRaw(CONMEMORATIVOS_RAW).map(s => ({ id: uid(), number: s.number, name: s.name, tag: s.tag, obtained:false }));
-  sections.push({ id:'conmemorativos', name:'Conmemorativos', type:'special', color:'#7A1F3D', stickers: conmemStickers });
+  sections.push({ id:'conmemorativos', name:'Conmemorativos', type:'special', color:'#7A1F3D', crest:null,
+                  stickers: stickersFor('conmemorativos', CONMEMORATIVOS_RAW) });
   DEFAULT_TEAMS.forEach((teamName, i) => {
-    const raw = TEAMS_RAW[teamName] || '';
-    const stickers = parseRaw(raw).map(s => ({ id: uid(), number: s.number, name: s.name, tag: s.tag, obtained:false }));
-    markDuplicates(stickers);
-    sections.push({ id:'team-'+i, name:teamName, type:'team', color:TEAM_COLORS[teamName], stickers });
+    const id = 'team-' + i;
+    sections.push({ id, name:teamName, type:'team', color:TEAM_COLORS[teamName],
+                    crest: 'escudos/' + CREST_SLUGS[teamName] + '.png',
+                    stickers: stickersFor(id, TEAMS_RAW[teamName] || '') });
   });
   SPECIALS_RAW.forEach((sp, i) => {
-    const stickers = parseRaw(sp.raw).map(s => ({ id: uid(), number: s.number, name: s.name, tag: s.tag, obtained:false }));
-    markDuplicates(stickers);
-    sections.push({ id:'special-'+i, name:sp.name, type:'special', color:sp.color, stickers });
+    const id = 'special-' + i;
+    sections.push({ id, name:sp.name, type:'special', color:sp.color, crest:null,
+                    stickers: stickersFor(id, sp.raw) });
   });
   return sections;
 }
@@ -1051,21 +1092,26 @@ function save(){
 function mergeWithFresh(existingData){
   let changed = false;
   const freshSections = buildSections();
+  const oldSections = (existingData && existingData.sections) || [];
+  if(oldSections.length !== freshSections.length) changed = true;
+
   freshSections.forEach(freshSection => {
-    const existingSection = existingData && existingData.sections &&
-      existingData.sections.find(s => s.id === freshSection.id);
-    if(!existingSection){ changed = true; return; }
+    const old = oldSections.find(s => s.id === freshSection.id);
+    if(!old){ changed = true; return; }
+    if(old.name !== freshSection.name || old.color !== freshSection.color ||
+       (old.crest || null) !== (freshSection.crest || null)) changed = true;
+    if((old.stickers || []).length !== freshSection.stickers.length) changed = true;
+
     freshSection.stickers = freshSection.stickers.map(freshSt => {
-      const existingSt = existingSection.stickers.find(s => s.number === freshSt.number);
-      if(existingSt){
-        return { ...existingSt, name: freshSt.name, tag: freshSt.tag };
-      }
-      changed = true;
-      return freshSt;
+      const olds = (old.stickers || []).filter(s => String(s.number) === String(freshSt.number));
+      if(!olds.length){ changed = true; return freshSt; }
+      const obtained = olds.some(s => s.obtained);
+      const o = olds[0];
+      if(o.id !== freshSt.id || o.name !== freshSt.name || (o.tag || '') !== (freshSt.tag || '')) changed = true;
+      return { ...freshSt, obtained };
     });
   });
-  const activeId = (existingData && existingData.activeId) || freshSections[0].id;
-  return { merged: { sections: freshSections, activeId }, changed };
+  return { merged: { sections: freshSections }, changed };
 }
 
 function startSync(uid){
@@ -1078,7 +1124,7 @@ function startSync(uid){
       if(changed) docRefFor(uid).set(data);
     } else {
       const sections = buildSections();
-      data = { sections, activeId: sections[0].id };
+      data = { sections };
       docRefFor(uid).set(data);
     }
     if(!activeTab) activeTab = 'album';
@@ -1177,16 +1223,86 @@ function renderHeader(){
   document.getElementById('progressFill').style.width = pct + '%';
 }
 
+/* La sección que estás viendo es solo tuya (no se guarda en la nube), así que si tu
+   amigo cambia de equipo a ti no te mueve la pantalla. */
+let currentSectionId = null;
+try { currentSectionId = localStorage.getItem('laliga_2627_section'); } catch(e) {}
+
+function currentSection(){
+  return getSection(currentSectionId) || data.sections[0];
+}
+function setCurrentSection(id){
+  currentSectionId = id;
+  try { localStorage.setItem('laliga_2627_section', id); } catch(e) {}
+}
+function goToSection(offset){
+  const n = data.sections.length;
+  const idx = data.sections.findIndex(s => s.id === currentSection().id);
+  setCurrentSection(data.sections[(idx + offset + n) % n].id);
+  renderAll();
+  window.scrollTo(0, 0);
+}
+
 function renderChips(){
   const row = document.getElementById('chipRow');
   row.innerHTML = '';
+  const cur = currentSection();
+  let activeChip = null;
   data.sections.forEach(s => {
     const have = s.stickers.filter(st=>st.obtained).length;
     const chip = document.createElement('button');
-    chip.className = 'chip' + (s.id === data.activeId ? ' active' : '');
-    chip.innerHTML = `<span class="dot" style="background:${s.color}"></span>${s.name} <span class="count">${have}/${s.stickers.length}</span>`;
-    chip.onclick = () => { data.activeId = s.id; save(); renderAll(); };
+    const isActive = s.id === cur.id;
+    chip.className = 'chip' + (isActive ? ' active' : '');
+    const marker = s.crest
+      ? `<img class="chip-crest" src="${s.crest}" alt="" onerror="this.outerHTML='<span class=&quot;dot&quot; style=&quot;background:${s.color}&quot;></span>'">`
+      : `<span class="dot" style="background:${s.color}"></span>`;
+    chip.innerHTML = `${marker}${escapeHTML(s.name)} <span class="count">${have}/${s.stickers.length}</span>`;
+    chip.onclick = () => { setCurrentSection(s.id); renderAll(); };
     row.appendChild(chip);
+    if(isActive) activeChip = chip;
+  });
+  if(activeChip){
+    row.scrollLeft = activeChip.offsetLeft - (row.clientWidth - activeChip.offsetWidth) / 2;
+  }
+}
+
+function sectionHeadHTML(section, subText){
+  const crest = section.crest
+    ? `<img class="crest" src="${section.crest}" alt="" onerror="this.remove()">`
+    : '';
+  return `
+    <div class="section-head" style="background:${section.color}">
+      <div class="head-main">
+        ${crest}
+        <div>
+          <h2>${escapeHTML(section.name)}</h2>
+          <div class="sub">${subText}</div>
+        </div>
+      </div>
+    </div>`;
+}
+
+function sectionNavHTML(){
+  const n = data.sections.length;
+  const idx = data.sections.findIndex(s => s.id === currentSection().id);
+  const prev = data.sections[(idx - 1 + n) % n];
+  const next = data.sections[(idx + 1) % n];
+  return `
+    <div class="section-nav">
+      <button class="nav-btn" data-nav="-1">
+        <span class="arrow">←</span>
+        <span class="nav-label"><small>Anterior</small><span class="nav-name">${escapeHTML(prev.name)}</span></span>
+      </button>
+      <button class="nav-btn next" data-nav="1">
+        <span class="arrow">→</span>
+        <span class="nav-label"><small>Siguiente</small><span class="nav-name">${escapeHTML(next.name)}</span></span>
+      </button>
+    </div>`;
+}
+
+function bindSectionNav(main){
+  main.querySelectorAll('[data-nav]').forEach(btn => {
+    btn.addEventListener('click', () => goToSection(parseInt(btn.dataset.nav, 10)));
   });
 }
 
@@ -1237,60 +1353,52 @@ function escapeHTML(str){
 }
 
 function renderAlbum(){
-  const section = getSection(data.activeId) || data.sections[0];
+  const section = currentSection();
   const missing = groupBySlot(section.stickers).filter(st => !st.obtained);
   const have = section.stickers.filter(st => st.obtained).length;
 
   const main = document.getElementById('mainArea');
   main.innerHTML = `
-    <div class="section-head" style="background:${section.color}">
-      <div>
-        <h2>${escapeHTML(section.name)}</h2>
-        <div class="sub">${have}/${section.stickers.length} conseguidos</div>
-      </div>
-    </div>
+    ${sectionHeadHTML(section, `${have}/${section.stickers.length} conseguidos`)}
     <div class="sticker-grid" id="stickerGrid">
       ${missing.length ? missing.map(st => stickerCardHTML(section, st, false)).join('') :
         `<div class="empty-msg">${section.stickers.length ? '¡Los tienes todos de esta sección! 🎉' : 'No hay cromos en esta sección.'}</div>`}
     </div>
+    ${sectionNavHTML()}
   `;
 
   document.getElementById('stickerGrid').querySelectorAll('.sticker').forEach(card => {
-    card.addEventListener('click', (e) => {
-      const id = card.dataset.id;
-      markObtained(section, id, card);
+    card.addEventListener('click', () => {
+      markObtained(section, card.dataset.id, card);
     });
   });
+  bindSectionNav(main);
 }
 
 function renderCollection(){
-  const section = getSection(data.activeId) || data.sections[0];
+  const section = currentSection();
   const obtained = groupBySlot(section.stickers).filter(st => st.obtained);
 
   const main = document.getElementById('mainArea');
   main.className = 'collection';
   main.innerHTML = `
-    <div class="section-head" style="background:${section.color}">
-      <div>
-        <h2>${escapeHTML(section.name)}</h2>
-        <div class="sub">${obtained.length} cromo${obtained.length===1?'':'s'}</div>
-      </div>
-    </div>
+    ${sectionHeadHTML(section, `${obtained.length} cromo${obtained.length===1?'':'s'}`)}
     <div class="sticker-grid">
       ${obtained.length ? obtained.map(st => stickerCardHTML(section, st, true)).join('') :
         `<div class="empty-msg">Todavía no tienes cromos conseguidos en esta sección.</div>`}
     </div>
+    ${sectionNavHTML()}
   `;
 
   main.querySelectorAll('[data-undo]').forEach(btn => {
     btn.addEventListener('click', () => {
-      const id = btn.dataset.undo;
-      const st = section.stickers.find(s => s.id === id);
+      const st = section.stickers.find(s => s.id === btn.dataset.undo);
       st.obtained = false;
       save();
       renderAll();
     });
   });
+  bindSectionNav(main);
 }
 
 function markObtained(section, id, cardEl){
