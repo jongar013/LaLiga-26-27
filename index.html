@@ -9,6 +9,7 @@
 <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <style>
   :root{
     --paper:#F1ECDD;
@@ -31,7 +32,7 @@
     color:var(--ink);
     font-family:'Inter',system-ui,sans-serif;
     -webkit-font-smoothing:antialiased;
-    padding-bottom:60px;
+    padding-bottom:calc(90px + env(safe-area-inset-bottom, 0px));
   }
   h1,h2,h3, .num, .tabbtn, .chip .count, .stat-num{
     font-family:'Oswald',system-ui,sans-serif;
@@ -52,13 +53,21 @@
   .progress-bar{height:9px; background:rgba(255,255,255,0.28); border-radius:5px; overflow:hidden;}
   .progress-fill{height:100%; background:var(--gold); border-radius:5px; transition:width .5s ease;}
 
-  .tabs{display:flex; gap:0; margin:16px 18px 0; border-bottom:2px solid var(--line);}
-  .tabbtn{
-    flex:1; text-align:center; padding:11px 6px 10px; background:none; border:none;
-    font-size:14.5px; font-weight:600; letter-spacing:0.3px; text-transform:uppercase;
-    color:var(--ink-soft); cursor:pointer; border-bottom:3px solid transparent; margin-bottom:-2px;
+  /* Barra de pestañas fija abajo, como en las apps de móvil */
+  .tabs{
+    position:fixed; left:0; right:0; bottom:0; z-index:50; display:flex;
+    background:var(--card-bg); border-top:1.5px solid var(--line);
+    padding:6px 6px calc(6px + env(safe-area-inset-bottom, 0px));
+    box-shadow:0 -3px 12px rgba(30,27,22,0.10);
   }
-  .tabbtn.active{color:var(--laliga-red); border-bottom-color:var(--laliga-red);}
+  .tabbtn{
+    flex:1; display:flex; flex-direction:column; align-items:center; gap:3px;
+    padding:6px 4px; background:none; border:none; border-radius:10px;
+    font-size:11.5px; font-weight:600; letter-spacing:0.3px; text-transform:uppercase;
+    color:var(--ink-soft); cursor:pointer;
+  }
+  .tabbtn svg{width:24px; height:24px; fill:none; stroke:currentColor; stroke-width:2; stroke-linecap:round; stroke-linejoin:round;}
+  .tabbtn.active{color:var(--laliga-red); background:rgba(200,16,46,0.08);}
 
   .chip-row{
     display:flex; gap:8px; overflow-x:auto; padding:14px 18px; -webkit-overflow-scrolling:touch;
@@ -85,18 +94,13 @@
   .crest{width:46px; height:46px; object-fit:contain; flex:0 0 auto; background:rgba(255,255,255,0.92); border-radius:10px; padding:4px;}
   .chip-row{position:relative;}
   .chip-crest{width:20px; height:20px; object-fit:contain; flex:0 0 auto;}
-  .section-nav{display:flex; gap:10px; margin-top:14px;}
-  .nav-btn{
-    flex:1; min-width:0; display:flex; align-items:center; gap:10px; text-align:left;
-    background:var(--card-bg); border:1.5px solid var(--line); border-radius:10px; padding:12px;
-    font-family:'Inter',system-ui,sans-serif; color:var(--ink); cursor:pointer;
+  .head-arrow{
+    flex:0 0 auto; width:38px; height:38px; border-radius:50%; border:none; cursor:pointer;
+    background:rgba(255,255,255,0.22); color:#fff; font-family:'Oswald',system-ui,sans-serif;
+    font-size:22px; line-height:1; display:flex; align-items:center; justify-content:center;
   }
-  .nav-btn.next{flex-direction:row-reverse; text-align:right;}
-  .nav-btn:active{transform:scale(0.97);}
-  .nav-btn .arrow{font-family:'Oswald',system-ui,sans-serif; font-size:24px; line-height:1; color:var(--laliga-red); flex:0 0 auto;}
-  .nav-label{min-width:0; display:block;}
-  .nav-label small{display:block; font-size:10.5px; color:var(--ink-soft); text-transform:uppercase; letter-spacing:0.5px;}
-  .nav-name{display:block; font-size:13.5px; font-weight:600; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;}
+  .head-arrow:active{transform:scale(0.92); background:rgba(255,255,255,0.35);}
+  .section-head .head-main{flex:1;}
 
   .sticker-grid{
     display:grid; grid-template-columns:repeat(auto-fill, minmax(150px,1fr)); gap:10px;
@@ -155,6 +159,31 @@
     margin-top:auto; align-self:flex-start; font-size:11.5px; background:none; border:none;
     color:var(--laliga-red-dark); font-weight:600; cursor:pointer; padding:0; text-decoration:underline;
   }
+
+  /* Repetidos */
+  .repes-bar{
+    display:flex; align-items:center; justify-content:space-between; gap:10px; flex-wrap:wrap;
+    background:var(--card-bg); border:1.5px solid var(--line); border-radius:10px; padding:10px 12px; margin-top:8px;
+  }
+  .repes-bar .total{font-size:13.5px; font-weight:600;}
+  .repes-bar .total small{display:block; font-weight:500; color:var(--ink-soft); font-size:11.5px;}
+  .pdf-btn{
+    background:var(--laliga-red); color:#fff; border:none; border-radius:6px; padding:9px 14px;
+    font-weight:600; font-size:13px; cursor:pointer;
+  }
+  .pdf-btn:active{transform:scale(0.97);}
+  .pdf-btns{display:flex; gap:8px; flex-wrap:wrap;}
+  .pdf-btn.alt{background:var(--card-bg); color:var(--laliga-red); border:1.5px solid var(--laliga-red);}
+  .repes .sticker{cursor:default;}
+  .repes .sticker.dupe{border:1.5px solid var(--gold); background:#FFF6DA;}
+  .repe-ctrl{display:flex; align-items:center; gap:8px; margin-top:auto;}
+  .repe-ctrl button{
+    width:32px; height:32px; border-radius:50%; border:1.5px solid var(--line); background:#fff;
+    font-family:'Oswald',system-ui,sans-serif; font-size:18px; line-height:1; cursor:pointer; color:var(--ink);
+  }
+  .repe-ctrl button:disabled{opacity:0.35; cursor:default;}
+  .repe-ctrl .plus{border-color:var(--laliga-red); color:var(--laliga-red);}
+  .repe-ctrl .n{font-family:'Oswald',system-ui,sans-serif; font-size:17px; font-weight:600; min-width:26px; text-align:center;}
 
   .collection-empty{
     text-align:center; padding:60px 20px; color:var(--ink-soft);
@@ -230,8 +259,12 @@
 </header>
 
 <div class="tabs">
-  <button class="tabbtn active" data-tab="album">Álbum</button>
-  <button class="tabbtn" data-tab="collection">Mi colección</button>
+  <button class="tabbtn active" data-tab="album">
+    <svg viewBox="0 0 24 24"><path d="M4 5a2 2 0 0 1 2-2h13v16H6a2 2 0 0 0-2 2z"/><path d="M4 21V5"/><path d="M9 8h6"/></svg>Álbum</button>
+  <button class="tabbtn" data-tab="collection">
+    <svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="3"/><path d="m8 12 3 3 5-6"/></svg>Mi colección</button>
+  <button class="tabbtn" data-tab="repes">
+    <svg viewBox="0 0 24 24"><rect x="8" y="8" width="13" height="13" rx="2"/><path d="M16 8V5a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h3"/></svg>Repetidos</button>
 </div>
 
 <div class="chip-row" id="chipRow"></div>
@@ -758,7 +791,7 @@ const TEAMS_RAW = {
 /* Secciones especiales, en el orden pedido. Draft 23 incluye ambas variantes
    (numérica y Kromix) y Extra Sticker junta Bronce/Plata/Oro, diferenciados con una etiqueta. */
 const SPECIALS_RAW = [
-{ name:"ADN / LaLiga Prime", color:"#4C3B87", raw:`
+{ name:"ADN / LaLiga Prime", crest:"escudos/adn.png", color:"#4C3B87", raw:`
 1|Antony (Betis)|delantero
 2|Bellingham (Real Madrid)|medio
 3|Courtois (Real Madrid)|portero
@@ -774,7 +807,7 @@ const SPECIALS_RAW = [
 13|Raphinha (Barcelona)|delantero
 14|Unai Simón (Athletic)|portero
 15|Vinícius (Real Madrid)|delantero`},
-{ name:"LaLiga Fantasy", color:"#3F51B5", raw:`
+{ name:"LaLiga Fantasy", crest:"escudos/fantasy.png", color:"#3F51B5", raw:`
 1|Hansi Flick (Barcelona)|entrenador
 2|Joan García (Barcelona)|portero
 3|Lejeune (Rayo Vallecano)|defensa
@@ -784,7 +817,7 @@ const SPECIALS_RAW = [
 7|Pedri (Barcelona)|medio
 8|Luis Milla (Getafe)|medio
 9|Mbappé (Real Madrid)|delantero`},
-{ name:"Draft 23", color:"#8E44AD", raw:`
+{ name:"Draft 23", crest:"escudos/draft-23.png", color:"#8E44AD", raw:`
 1|Asencio (Real Madrid)|defensa
 2|Balde (Barcelona)|defensa
 3|Barrios (Atlético de Madrid)|medio
@@ -831,7 +864,7 @@ K20|Renato Veiga (Villarreal)|defensa|Kromix
 K21|Rodri Mendoza (Atlético de Madrid)|medio|Kromix
 K22|Thiago Pitarch (Real Madrid)|medio|Kromix
 K23|Yeremay (Deportivo)|delantero|Kromix`},
-{ name:"Últimos Fichajes", color:"#6B4FA0", raw:`
+{ name:"Últimos Fichajes", crest:"escudos/ultimos-fichajes.png", color:"#6B4FA0", raw:`
 UF1|CANALES (Racing de Santander)|medio|2
 UF2|CALATRAVA (Espanyol)|medio|2
 UF3|DUMFRIES (Real Madrid)|defensa|2
@@ -872,7 +905,7 @@ UF37|GALÁN (Celta)|defensa|3ª ed.
 UF38|PARROTT (Betis)|delantero|3ª ed.
 UF39|DIOMANDE (Real Madrid)|delantero|3ª ed.
 UF40|RODRI (Barcelona)|medio|3ª ed.`},
-{ name:"Chicles", color:"#E85D9E", raw:`
+{ name:"Chicles", crest:"escudos/chicles.png", color:"#E85D9E", raw:`
 1|Escudo (D. Alavés)
 2|Boyé (D. Alavés)|Masterclass
 3|Blanco (D. Alavés)|Box to Box
@@ -933,7 +966,7 @@ UF40|RODRI (Barcelona)|medio|3ª ed.`},
 58|Escudo (Villarreal CF)
 59|Moleiro (Villarreal CF)|Masterclass
 60|Pape Gueye (Villarreal CF)|Box to Box`},
-{ name:"Extra Sticker", color:"#B8860B", raw:`
+{ name:"Extra Sticker", crest:"escudos/extra-sticker.png", color:"#B8860B", raw:`
 B1|Lamine Yamal (Barcelona)|delantero|Bronce
 B2|Mbappé (Real Madrid)|delantero|Bronce
 B3|Nico Williams (Athletic)|delantero|Bronce
@@ -1037,7 +1070,7 @@ function buildSections(){
   });
   SPECIALS_RAW.forEach((sp, i) => {
     const id = 'special-' + i;
-    sections.push({ id, name:sp.name, type:'special', color:sp.color, crest:null,
+    sections.push({ id, name:sp.name, type:'special', color:sp.color, crest:sp.crest || null,
                     stickers: stickersFor(id, sp.raw) });
   });
   return sections;
@@ -1106,9 +1139,10 @@ function mergeWithFresh(existingData){
       const olds = (old.stickers || []).filter(s => String(s.number) === String(freshSt.number));
       if(!olds.length){ changed = true; return freshSt; }
       const obtained = olds.some(s => s.obtained);
+      const dupes = Math.max(0, ...olds.map(s => s.dupes || 0));
       const o = olds[0];
       if(o.id !== freshSt.id || o.name !== freshSt.name || (o.tag || '') !== (freshSt.tag || '')) changed = true;
-      return { ...freshSt, obtained };
+      return { ...freshSt, obtained, dupes };
     });
   });
   return { merged: { sections: freshSections }, changed };
@@ -1272,6 +1306,7 @@ function sectionHeadHTML(section, subText){
     : '';
   return `
     <div class="section-head" style="background:${section.color}">
+      <button class="head-arrow" data-nav="-1" aria-label="Equipo anterior">←</button>
       <div class="head-main">
         ${crest}
         <div>
@@ -1279,24 +1314,7 @@ function sectionHeadHTML(section, subText){
           <div class="sub">${subText}</div>
         </div>
       </div>
-    </div>`;
-}
-
-function sectionNavHTML(){
-  const n = data.sections.length;
-  const idx = data.sections.findIndex(s => s.id === currentSection().id);
-  const prev = data.sections[(idx - 1 + n) % n];
-  const next = data.sections[(idx + 1) % n];
-  return `
-    <div class="section-nav">
-      <button class="nav-btn" data-nav="-1">
-        <span class="arrow">←</span>
-        <span class="nav-label"><small>Anterior</small><span class="nav-name">${escapeHTML(prev.name)}</span></span>
-      </button>
-      <button class="nav-btn next" data-nav="1">
-        <span class="arrow">→</span>
-        <span class="nav-label"><small>Siguiente</small><span class="nav-name">${escapeHTML(next.name)}</span></span>
-      </button>
+      <button class="head-arrow" data-nav="1" aria-label="Equipo siguiente">→</button>
     </div>`;
 }
 
@@ -1364,7 +1382,6 @@ function renderAlbum(){
       ${missing.length ? missing.map(st => stickerCardHTML(section, st, false)).join('') :
         `<div class="empty-msg">${section.stickers.length ? '¡Los tienes todos de esta sección! 🎉' : 'No hay cromos en esta sección.'}</div>`}
     </div>
-    ${sectionNavHTML()}
   `;
 
   document.getElementById('stickerGrid').querySelectorAll('.sticker').forEach(card => {
@@ -1387,18 +1404,157 @@ function renderCollection(){
       ${obtained.length ? obtained.map(st => stickerCardHTML(section, st, true)).join('') :
         `<div class="empty-msg">Todavía no tienes cromos conseguidos en esta sección.</div>`}
     </div>
-    ${sectionNavHTML()}
   `;
 
   main.querySelectorAll('[data-undo]').forEach(btn => {
     btn.addEventListener('click', () => {
       const st = section.stickers.find(s => s.id === btn.dataset.undo);
       st.obtained = false;
+      st.dupes = 0;
       save();
       renderAll();
     });
   });
   bindSectionNav(main);
+}
+
+function totalDupes(){
+  let n = 0;
+  data.sections.forEach(s => s.stickers.forEach(st => { n += st.dupes || 0; }));
+  return n;
+}
+
+/* Pestaña Repetidos: de cada cromo que ya tienes puedes apuntar cuántas copias
+   de más te han salido, para cambiarlas. */
+function renderRepes(){
+  const section = currentSection();
+  const obtained = groupBySlot(section.stickers).filter(st => st.obtained);
+  const sectionDupes = section.stickers.reduce((n, st) => n + (st.dupes || 0), 0);
+  const total = totalDupes();
+
+  const main = document.getElementById('mainArea');
+  main.className = 'repes';
+  main.innerHTML = `
+    <div class="repes-bar">
+      <div class="total">${total} repetido${total===1?'':'s'} en total
+        <small>Descarga las listas para vender o cambiar</small></div>
+      <div class="pdf-btns">
+        <button class="pdf-btn" id="pdfBtn">PDF repetidos</button>
+        <button class="pdf-btn alt" id="pdfFaltanBtn">PDF me faltan</button>
+      </div>
+    </div>
+    ${sectionHeadHTML(section, `${sectionDupes} repetido${sectionDupes===1?'':'s'}`)}
+    <div class="sticker-grid">
+      ${obtained.length ? obtained.map(st => `
+        <div class="sticker${st.dupes ? ' dupe' : ''}">
+          <div class="num">Nº ${st.number}</div>
+          <div class="pname">${escapeHTML(st.name)} ${st.tag ? `<span class="tag-badge ${tagClass(st.tag)}">${escapeHTML(st.tag)}</span>` : ''}</div>
+          <div class="repe-ctrl">
+            <button data-dec="${st.id}" ${st.dupes ? '' : 'disabled'} aria-label="Quitar repetido">−</button>
+            <span class="n">${st.dupes || 0}</span>
+            <button class="plus" data-inc="${st.id}" aria-label="Añadir repetido">+</button>
+          </div>
+        </div>`).join('') :
+        `<div class="empty-msg">Marca primero en el Álbum los cromos que tienes; aquí podrás apuntar sus repetidos.</div>`}
+    </div>
+  `;
+
+  const change = (id, delta) => {
+    const st = section.stickers.find(s => s.id === id);
+    st.dupes = Math.max(0, (st.dupes || 0) + delta);
+    save();
+    renderAll();
+  };
+  main.querySelectorAll('[data-inc]').forEach(b => b.addEventListener('click', () => change(b.dataset.inc, 1)));
+  main.querySelectorAll('[data-dec]').forEach(b => b.addEventListener('click', () => change(b.dataset.dec, -1)));
+  document.getElementById('pdfBtn').addEventListener('click', downloadRepesPDF);
+  document.getElementById('pdfFaltanBtn').addEventListener('click', downloadFaltanPDF);
+  bindSectionNav(main);
+}
+
+function downloadRepesPDF(){
+  const groups = data.sections
+    .map(s => ({ s, its: groupBySlot(s.stickers).filter(st => st.obtained && st.dupes > 0) }))
+    .filter(g => g.its.length);
+  if(!groups.length){ alert('Todavía no has apuntado ningún repetido.'); return; }
+  const distinct = groups.reduce((n, g) => n + g.its.length, 0);
+  const units = groups.reduce((n, g) => n + g.its.reduce((m, st) => m + st.dupes, 0), 0);
+  listPDF(groups, 'Cromos repetidos', `${distinct} cromos distintos · ${units} en total · venta o cambio`,
+          st => st.dupes, 'cromos-repetidos.pdf');
+}
+
+function downloadFaltanPDF(){
+  const groups = data.sections
+    .map(s => ({ s, its: groupBySlot(s.stickers).filter(st => !st.obtained) }))
+    .filter(g => g.its.length);
+  if(!groups.length){ alert('¡No te falta ninguno! Álbum completo.'); return; }
+  const n = groups.reduce((m, g) => m + g.its.length, 0);
+  listPDF(groups, 'Cromos que me faltan', `${n} cromos`, () => 0, 'cromos-me-faltan.pdf');
+}
+
+/* Hoja para vender o cambiar: A4 a tres columnas, una barra roja por sección y cada
+   cromo con su número y, si qty() da más de uno, cuántos (x2, x3…). */
+function listPDF(groups, title, subtitle, qty, filename){
+  if(!window.jspdf){ alert('No se pudo cargar el generador de PDF. Revisa la conexión.'); return; }
+  const { jsPDF } = window.jspdf;
+  const doc = new jsPDF({ unit:'mm', format:'a4' });
+  const W = 210, H = 297, M = 12, G = 6, CW = (W - 2*M - 2*G) / 3, RH = 4.1, BAR = 5.2, TOP = 30, BOT = H - 12;
+  const RED = [200,16,46], CREAM = [247,243,233], INK = [30,30,30];
+
+  function page(first){
+    doc.setFillColor(...CREAM); doc.rect(0, 0, W, H, 'F');
+    doc.setFillColor(...RED); doc.rect(0, 0, W, first ? 24 : 10, 'F');
+    doc.setTextColor(255, 255, 255);
+    if(first){
+      doc.setFont('helvetica', 'bold'); doc.setFontSize(17);
+      doc.text(`${title} · LaLiga 2026-27`, M, 12);
+      doc.setFont('helvetica', 'normal'); doc.setFontSize(9);
+      doc.text(`Panini · ${subtitle}`, M, 18.5);
+    } else {
+      doc.setFont('helvetica', 'bold'); doc.setFontSize(9);
+      doc.text(`${title} · LaLiga 2026-27 (cont.)`, M, 6.5);
+    }
+  }
+  let col = 0, y = TOP, top = TOP;
+  page(true);
+  function nextCol(){
+    col++;
+    if(col > 2){ doc.addPage(); page(false); col = 0; top = 16; }
+    y = top;
+  }
+  function bar(name, count, cont){
+    const x = M + col*(CW + G);
+    doc.setFillColor(...RED); doc.rect(x, y, CW, BAR, 'F');
+    doc.setTextColor(255, 255, 255); doc.setFont('helvetica', 'bold'); doc.setFontSize(7.5);
+    let label = name.toUpperCase() + (cont ? ' (cont.)' : '');
+    while(doc.getTextWidth(label) > CW - 8 && label.length > 4) label = label.slice(0, -1);
+    doc.text(label, x + 1.5, y + 3.6);
+    doc.setFont('helvetica', 'normal'); doc.text(String(count), x + CW - 1.5, y + 3.6, { align:'right' });
+    y += BAR + 2.6;
+  }
+  groups.forEach(({ s, its }) => {
+    const need = BAR + 2.6 + its.length*RH;
+    if(y + need > BOT && (need <= BOT - top || y + BAR + 2.6 + RH*2 > BOT)) nextCol();
+    bar(s.name, its.length, false);
+    its.forEach(st => {
+      if(y + RH > BOT){ nextCol(); bar(s.name, its.length, true); }
+      const x = M + col*(CW + G), q = qty(st);
+      doc.setFont('helvetica', 'bold'); doc.setFontSize(7.5); doc.setTextColor(...RED);
+      doc.text(String(st.number), x + 1, y);
+      doc.setFont('helvetica', 'normal'); doc.setTextColor(...INK);
+      let nm = st.name + (st.tag && !st.tag.startsWith('Nº') ? ' (' + st.tag + ')' : '');
+      const maxW = CW - (q > 1 ? 20 : 13);
+      if(doc.getTextWidth(nm) > maxW){
+        while(doc.getTextWidth(nm + '…') > maxW && nm.length > 3) nm = nm.slice(0, -1);
+        nm += '…';
+      }
+      doc.text(nm, x + 12, y);
+      if(q > 1){ doc.setFont('helvetica', 'bold'); doc.setTextColor(...RED); doc.text('x' + q, x + CW - 1, y, { align:'right' }); }
+      y += RH;
+    });
+    y += 3;
+  });
+  doc.save(filename);
 }
 
 function markObtained(section, id, cardEl){
@@ -1428,6 +1584,8 @@ function renderAll(){
   main.className = '';
   if(activeTab === 'album'){
     renderAlbum();
+  } else if(activeTab === 'repes'){
+    renderRepes();
   } else {
     renderCollection();
   }
