@@ -172,6 +172,8 @@
     font-weight:600; font-size:13px; cursor:pointer;
   }
   .pdf-btn:active{transform:scale(0.97);}
+  .pdf-btns{display:flex; gap:8px; flex-wrap:wrap;}
+  .pdf-btn.alt{background:var(--card-bg); color:var(--laliga-red); border:1.5px solid var(--laliga-red);}
   .repes .sticker{cursor:default;}
   .repes .sticker.dupe{border:1.5px solid var(--gold); background:#FFF6DA;}
   .repe-ctrl{display:flex; align-items:center; gap:8px; margin-top:auto;}
@@ -1435,8 +1437,11 @@ function renderRepes(){
   main.innerHTML = `
     <div class="repes-bar">
       <div class="total">${total} repetido${total===1?'':'s'} en total
-        <small>Descarga la lista para cambiar cromos</small></div>
-      <button class="pdf-btn" id="pdfBtn">Descargar PDF</button>
+        <small>Descarga las listas para vender o cambiar</small></div>
+      <div class="pdf-btns">
+        <button class="pdf-btn" id="pdfBtn">PDF repetidos</button>
+        <button class="pdf-btn alt" id="pdfFaltanBtn">PDF me faltan</button>
+      </div>
     </div>
     ${sectionHeadHTML(section, `${sectionDupes} repetido${sectionDupes===1?'':'s'}`)}
     <div class="sticker-grid">
@@ -1463,23 +1468,38 @@ function renderRepes(){
   main.querySelectorAll('[data-inc]').forEach(b => b.addEventListener('click', () => change(b.dataset.inc, 1)));
   main.querySelectorAll('[data-dec]').forEach(b => b.addEventListener('click', () => change(b.dataset.dec, -1)));
   document.getElementById('pdfBtn').addEventListener('click', downloadRepesPDF);
+  document.getElementById('pdfFaltanBtn').addEventListener('click', downloadFaltanPDF);
   bindSectionNav(main);
 }
 
-/* PDF de repetidos para vender o cambiar: A4 a tres columnas, una barra roja por
-   sección y cada cromo con su número y, si tienes más de uno, cuántos (x2, x3…). */
 function downloadRepesPDF(){
   const groups = data.sections
     .map(s => ({ s, its: groupBySlot(s.stickers).filter(st => st.obtained && st.dupes > 0) }))
     .filter(g => g.its.length);
   if(!groups.length){ alert('Todavía no has apuntado ningún repetido.'); return; }
+  const distinct = groups.reduce((n, g) => n + g.its.length, 0);
+  const units = groups.reduce((n, g) => n + g.its.reduce((m, st) => m + st.dupes, 0), 0);
+  listPDF(groups, 'Cromos repetidos', `${distinct} cromos distintos · ${units} en total · venta o cambio`,
+          st => st.dupes, 'cromos-repetidos.pdf');
+}
+
+function downloadFaltanPDF(){
+  const groups = data.sections
+    .map(s => ({ s, its: groupBySlot(s.stickers).filter(st => !st.obtained) }))
+    .filter(g => g.its.length);
+  if(!groups.length){ alert('¡No te falta ninguno! Álbum completo.'); return; }
+  const n = groups.reduce((m, g) => m + g.its.length, 0);
+  listPDF(groups, 'Cromos que me faltan', `${n} cromos · busco o cambio`, () => 0, 'cromos-me-faltan.pdf');
+}
+
+/* Hoja para vender o cambiar: A4 a tres columnas, una barra roja por sección y cada
+   cromo con su número y, si qty() da más de uno, cuántos (x2, x3…). */
+function listPDF(groups, title, subtitle, qty, filename){
   if(!window.jspdf){ alert('No se pudo cargar el generador de PDF. Revisa la conexión.'); return; }
   const { jsPDF } = window.jspdf;
   const doc = new jsPDF({ unit:'mm', format:'a4' });
   const W = 210, H = 297, M = 12, G = 6, CW = (W - 2*M - 2*G) / 3, RH = 4.1, BAR = 5.2, TOP = 30, BOT = H - 12;
   const RED = [200,16,46], CREAM = [247,243,233], INK = [30,30,30];
-  const distinct = groups.reduce((n, g) => n + g.its.length, 0);
-  const units = groups.reduce((n, g) => n + g.its.reduce((m, st) => m + st.dupes, 0), 0);
 
   function page(first){
     doc.setFillColor(...CREAM); doc.rect(0, 0, W, H, 'F');
@@ -1487,12 +1507,12 @@ function downloadRepesPDF(){
     doc.setTextColor(255, 255, 255);
     if(first){
       doc.setFont('helvetica', 'bold'); doc.setFontSize(17);
-      doc.text('Cromos repetidos · LaLiga 2026-27', M, 12);
+      doc.text(`${title} · LaLiga 2026-27`, M, 12);
       doc.setFont('helvetica', 'normal'); doc.setFontSize(9);
-      doc.text(`Panini · ${distinct} cromos distintos · ${units} en total · venta o cambio`, M, 18.5);
+      doc.text(`Panini · ${subtitle}`, M, 18.5);
     } else {
       doc.setFont('helvetica', 'bold'); doc.setFontSize(9);
-      doc.text('Cromos repetidos · LaLiga 2026-27 (cont.)', M, 6.5);
+      doc.text(`${title} · LaLiga 2026-27 (cont.)`, M, 6.5);
     }
   }
   let col = 0, y = TOP, top = TOP;
@@ -1518,7 +1538,7 @@ function downloadRepesPDF(){
     bar(s.name, its.length, false);
     its.forEach(st => {
       if(y + RH > BOT){ nextCol(); bar(s.name, its.length, true); }
-      const x = M + col*(CW + G), q = st.dupes;
+      const x = M + col*(CW + G), q = qty(st);
       doc.setFont('helvetica', 'bold'); doc.setFontSize(7.5); doc.setTextColor(...RED);
       doc.text(String(st.number), x + 1, y);
       doc.setFont('helvetica', 'normal'); doc.setTextColor(...INK);
@@ -1534,7 +1554,7 @@ function downloadRepesPDF(){
     });
     y += 3;
   });
-  doc.save('cromos-repetidos.pdf');
+  doc.save(filename);
 }
 
 function markObtained(section, id, cardEl){
