@@ -32,7 +32,7 @@
     color:var(--ink);
     font-family:'Inter',system-ui,sans-serif;
     -webkit-font-smoothing:antialiased;
-    padding-bottom:60px;
+    padding-bottom:calc(90px + env(safe-area-inset-bottom, 0px));
   }
   h1,h2,h3, .num, .tabbtn, .chip .count, .stat-num{
     font-family:'Oswald',system-ui,sans-serif;
@@ -53,13 +53,21 @@
   .progress-bar{height:9px; background:rgba(255,255,255,0.28); border-radius:5px; overflow:hidden;}
   .progress-fill{height:100%; background:var(--gold); border-radius:5px; transition:width .5s ease;}
 
-  .tabs{display:flex; gap:0; margin:16px 18px 0; border-bottom:2px solid var(--line);}
-  .tabbtn{
-    flex:1; text-align:center; padding:11px 6px 10px; background:none; border:none;
-    font-size:14.5px; font-weight:600; letter-spacing:0.3px; text-transform:uppercase;
-    color:var(--ink-soft); cursor:pointer; border-bottom:3px solid transparent; margin-bottom:-2px;
+  /* Barra de pestañas fija abajo, como en las apps de móvil */
+  .tabs{
+    position:fixed; left:0; right:0; bottom:0; z-index:50; display:flex;
+    background:var(--card-bg); border-top:1.5px solid var(--line);
+    padding:6px 6px calc(6px + env(safe-area-inset-bottom, 0px));
+    box-shadow:0 -3px 12px rgba(30,27,22,0.10);
   }
-  .tabbtn.active{color:var(--laliga-red); border-bottom-color:var(--laliga-red);}
+  .tabbtn{
+    flex:1; display:flex; flex-direction:column; align-items:center; gap:3px;
+    padding:6px 4px; background:none; border:none; border-radius:10px;
+    font-size:11.5px; font-weight:600; letter-spacing:0.3px; text-transform:uppercase;
+    color:var(--ink-soft); cursor:pointer;
+  }
+  .tabbtn svg{width:24px; height:24px; fill:none; stroke:currentColor; stroke-width:2; stroke-linecap:round; stroke-linejoin:round;}
+  .tabbtn.active{color:var(--laliga-red); background:rgba(200,16,46,0.08);}
 
   .chip-row{
     display:flex; gap:8px; overflow-x:auto; padding:14px 18px; -webkit-overflow-scrolling:touch;
@@ -86,18 +94,13 @@
   .crest{width:46px; height:46px; object-fit:contain; flex:0 0 auto; background:rgba(255,255,255,0.92); border-radius:10px; padding:4px;}
   .chip-row{position:relative;}
   .chip-crest{width:20px; height:20px; object-fit:contain; flex:0 0 auto;}
-  .section-nav{display:flex; gap:10px; margin-top:14px;}
-  .nav-btn{
-    flex:1; min-width:0; display:flex; align-items:center; gap:10px; text-align:left;
-    background:var(--card-bg); border:1.5px solid var(--line); border-radius:10px; padding:12px;
-    font-family:'Inter',system-ui,sans-serif; color:var(--ink); cursor:pointer;
+  .head-arrow{
+    flex:0 0 auto; width:38px; height:38px; border-radius:50%; border:none; cursor:pointer;
+    background:rgba(255,255,255,0.22); color:#fff; font-family:'Oswald',system-ui,sans-serif;
+    font-size:22px; line-height:1; display:flex; align-items:center; justify-content:center;
   }
-  .nav-btn.next{flex-direction:row-reverse; text-align:right;}
-  .nav-btn:active{transform:scale(0.97);}
-  .nav-btn .arrow{font-family:'Oswald',system-ui,sans-serif; font-size:24px; line-height:1; color:var(--laliga-red); flex:0 0 auto;}
-  .nav-label{min-width:0; display:block;}
-  .nav-label small{display:block; font-size:10.5px; color:var(--ink-soft); text-transform:uppercase; letter-spacing:0.5px;}
-  .nav-name{display:block; font-size:13.5px; font-weight:600; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;}
+  .head-arrow:active{transform:scale(0.92); background:rgba(255,255,255,0.35);}
+  .section-head .head-main{flex:1;}
 
   .sticker-grid{
     display:grid; grid-template-columns:repeat(auto-fill, minmax(150px,1fr)); gap:10px;
@@ -254,9 +257,12 @@
 </header>
 
 <div class="tabs">
-  <button class="tabbtn active" data-tab="album">Álbum</button>
-  <button class="tabbtn" data-tab="collection">Mi colección</button>
-  <button class="tabbtn" data-tab="repes">Repetidos</button>
+  <button class="tabbtn active" data-tab="album">
+    <svg viewBox="0 0 24 24"><path d="M4 5a2 2 0 0 1 2-2h13v16H6a2 2 0 0 0-2 2z"/><path d="M4 21V5"/><path d="M9 8h6"/></svg>Álbum</button>
+  <button class="tabbtn" data-tab="collection">
+    <svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="3"/><path d="m8 12 3 3 5-6"/></svg>Mi colección</button>
+  <button class="tabbtn" data-tab="repes">
+    <svg viewBox="0 0 24 24"><rect x="8" y="8" width="13" height="13" rx="2"/><path d="M16 8V5a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h3"/></svg>Repetidos</button>
 </div>
 
 <div class="chip-row" id="chipRow"></div>
@@ -1298,6 +1304,7 @@ function sectionHeadHTML(section, subText){
     : '';
   return `
     <div class="section-head" style="background:${section.color}">
+      <button class="head-arrow" data-nav="-1" aria-label="Equipo anterior">←</button>
       <div class="head-main">
         ${crest}
         <div>
@@ -1305,24 +1312,7 @@ function sectionHeadHTML(section, subText){
           <div class="sub">${subText}</div>
         </div>
       </div>
-    </div>`;
-}
-
-function sectionNavHTML(){
-  const n = data.sections.length;
-  const idx = data.sections.findIndex(s => s.id === currentSection().id);
-  const prev = data.sections[(idx - 1 + n) % n];
-  const next = data.sections[(idx + 1) % n];
-  return `
-    <div class="section-nav">
-      <button class="nav-btn" data-nav="-1">
-        <span class="arrow">←</span>
-        <span class="nav-label"><small>Anterior</small><span class="nav-name">${escapeHTML(prev.name)}</span></span>
-      </button>
-      <button class="nav-btn next" data-nav="1">
-        <span class="arrow">→</span>
-        <span class="nav-label"><small>Siguiente</small><span class="nav-name">${escapeHTML(next.name)}</span></span>
-      </button>
+      <button class="head-arrow" data-nav="1" aria-label="Equipo siguiente">→</button>
     </div>`;
 }
 
@@ -1390,7 +1380,6 @@ function renderAlbum(){
       ${missing.length ? missing.map(st => stickerCardHTML(section, st, false)).join('') :
         `<div class="empty-msg">${section.stickers.length ? '¡Los tienes todos de esta sección! 🎉' : 'No hay cromos en esta sección.'}</div>`}
     </div>
-    ${sectionNavHTML()}
   `;
 
   document.getElementById('stickerGrid').querySelectorAll('.sticker').forEach(card => {
@@ -1413,7 +1402,6 @@ function renderCollection(){
       ${obtained.length ? obtained.map(st => stickerCardHTML(section, st, true)).join('') :
         `<div class="empty-msg">Todavía no tienes cromos conseguidos en esta sección.</div>`}
     </div>
-    ${sectionNavHTML()}
   `;
 
   main.querySelectorAll('[data-undo]').forEach(btn => {
@@ -1464,7 +1452,6 @@ function renderRepes(){
         </div>`).join('') :
         `<div class="empty-msg">Marca primero en el Álbum los cromos que tienes; aquí podrás apuntar sus repetidos.</div>`}
     </div>
-    ${sectionNavHTML()}
   `;
 
   const change = (id, delta) => {
@@ -1479,78 +1466,75 @@ function renderRepes(){
   bindSectionNav(main);
 }
 
-/* PDF con la lista de repetidos (y debajo los que faltan) de todas las secciones,
-   con una casilla al lado de cada cromo para ir tachando al cambiar. */
+/* PDF de repetidos para vender o cambiar: A4 a tres columnas, una barra roja por
+   sección y cada cromo con su número y, si tienes más de uno, cuántos (x2, x3…). */
 function downloadRepesPDF(){
+  const groups = data.sections
+    .map(s => ({ s, its: groupBySlot(s.stickers).filter(st => st.obtained && st.dupes > 0) }))
+    .filter(g => g.its.length);
+  if(!groups.length){ alert('Todavía no has apuntado ningún repetido.'); return; }
   if(!window.jspdf){ alert('No se pudo cargar el generador de PDF. Revisa la conexión.'); return; }
   const { jsPDF } = window.jspdf;
   const doc = new jsPDF({ unit:'mm', format:'a4' });
-  const W = 210, H = 297, M = 14, colGap = 6, colW = (W - 2*M - colGap) / 2;
-  let y = M, col = 0, topY = M;
-  const x = () => M + col * (colW + colGap);
-  const ensure = h => {
-    if(y + h <= H - M) return;
-    if(col === 0){ col = 1; y = topY; } else { doc.addPage(); col = 0; y = topY = M; }
-  };
+  const W = 210, H = 297, M = 12, G = 6, CW = (W - 2*M - 2*G) / 3, RH = 4.1, BAR = 5.2, TOP = 30, BOT = H - 12;
+  const RED = [200,16,46], CREAM = [247,243,233], INK = [30,30,30];
+  const distinct = groups.reduce((n, g) => n + g.its.length, 0);
+  const units = groups.reduce((n, g) => n + g.its.reduce((m, st) => m + st.dupes, 0), 0);
 
-  doc.setFont('helvetica', 'bold'); doc.setFontSize(16); doc.setTextColor(200, 16, 46);
-  doc.text('Álbum LaLiga 2026-27 · Repetidos', M, y + 5);
-  doc.setFont('helvetica', 'normal'); doc.setFontSize(9); doc.setTextColor(92, 86, 74);
-  const {total, have} = totalCounts();
-  doc.text(`${new Date().toLocaleDateString('es-ES')} · ${totalDupes()} repetidos · ${have} de ${total} cromos`, M, y + 10);
-  y += 16; topY = y;
-
-  const heading = (text, rgb) => {
-    ensure(14);
-    doc.setFont('helvetica', 'bold'); doc.setFontSize(12); doc.setTextColor(...rgb);
-    doc.text(text, x(), y + 4); y += 7;
-  };
-  const sectionTitle = name => {
-    ensure(11);
-    doc.setFont('helvetica', 'bold'); doc.setFontSize(9.5); doc.setTextColor(30, 27, 22);
-    doc.text(name.toUpperCase(), x(), y + 3.5);
-    doc.setDrawColor(201, 191, 163); doc.line(x(), y + 5, x() + colW, y + 5);
-    y += 7;
-  };
-  const row = (st, suffix) => {
-    let label = `${st.number}  ${st.name}${st.tag ? ' (' + st.tag + ')' : ''}`;
-    doc.setFont('helvetica', 'bold'); doc.setFontSize(8.5);
-    const maxW = colW - 6 - (suffix ? doc.getTextWidth(suffix) + 2 : 0);
-    doc.setFont('helvetica', 'normal');
-    if(doc.getTextWidth(label) > maxW){
-      while(doc.getTextWidth(label + '…') > maxW && label.length > 4) label = label.slice(0, -1);
-      label += '…';
+  function page(first){
+    doc.setFillColor(...CREAM); doc.rect(0, 0, W, H, 'F');
+    doc.setFillColor(...RED); doc.rect(0, 0, W, first ? 24 : 10, 'F');
+    doc.setTextColor(255, 255, 255);
+    if(first){
+      doc.setFont('helvetica', 'bold'); doc.setFontSize(17);
+      doc.text('Cromos repetidos · LaLiga 2026-27', M, 12);
+      doc.setFont('helvetica', 'normal'); doc.setFontSize(9);
+      doc.text(`Panini · ${distinct} cromos distintos · ${units} en total · venta o cambio`, M, 18.5);
+    } else {
+      doc.setFont('helvetica', 'bold'); doc.setFontSize(9);
+      doc.text('Cromos repetidos · LaLiga 2026-27 (cont.)', M, 6.5);
     }
-    ensure(4.6);
-    doc.setDrawColor(150, 140, 120); doc.rect(x(), y + 0.6, 2.8, 2.8);
-    doc.setTextColor(30, 27, 22); doc.text(label, x() + 4.5, y + 3);
-    if(suffix){ doc.setFont('helvetica', 'bold'); doc.text(suffix, x() + colW, y + 3, { align:'right' }); }
-    y += 4.6;
-  };
-
-  heading('Tengo repetidos', [151, 11, 34]);
-  let any = false;
-  data.sections.forEach(s => {
-    const list = groupBySlot(s.stickers).filter(st => st.obtained && st.dupes > 0);
-    if(!list.length) return;
-    any = true;
-    sectionTitle(s.name);
-    list.forEach(st => row(st, '×' + st.dupes));
-    y += 2;
+  }
+  let col = 0, y = TOP, top = TOP;
+  page(true);
+  function nextCol(){
+    col++;
+    if(col > 2){ doc.addPage(); page(false); col = 0; top = 16; }
+    y = top;
+  }
+  function bar(name, count, cont){
+    const x = M + col*(CW + G);
+    doc.setFillColor(...RED); doc.rect(x, y, CW, BAR, 'F');
+    doc.setTextColor(255, 255, 255); doc.setFont('helvetica', 'bold'); doc.setFontSize(7.5);
+    let label = name.toUpperCase() + (cont ? ' (cont.)' : '');
+    while(doc.getTextWidth(label) > CW - 8 && label.length > 4) label = label.slice(0, -1);
+    doc.text(label, x + 1.5, y + 3.6);
+    doc.setFont('helvetica', 'normal'); doc.text(String(count), x + CW - 1.5, y + 3.6, { align:'right' });
+    y += BAR + 2.6;
+  }
+  groups.forEach(({ s, its }) => {
+    const need = BAR + 2.6 + its.length*RH;
+    if(y + need > BOT && (need <= BOT - top || y + BAR + 2.6 + RH*2 > BOT)) nextCol();
+    bar(s.name, its.length, false);
+    its.forEach(st => {
+      if(y + RH > BOT){ nextCol(); bar(s.name, its.length, true); }
+      const x = M + col*(CW + G), q = st.dupes;
+      doc.setFont('helvetica', 'bold'); doc.setFontSize(7.5); doc.setTextColor(...RED);
+      doc.text(String(st.number), x + 1, y);
+      doc.setFont('helvetica', 'normal'); doc.setTextColor(...INK);
+      let nm = st.name + (st.tag && !st.tag.startsWith('Nº') ? ' (' + st.tag + ')' : '');
+      const maxW = CW - (q > 1 ? 20 : 13);
+      if(doc.getTextWidth(nm) > maxW){
+        while(doc.getTextWidth(nm + '…') > maxW && nm.length > 3) nm = nm.slice(0, -1);
+        nm += '…';
+      }
+      doc.text(nm, x + 12, y);
+      if(q > 1){ doc.setFont('helvetica', 'bold'); doc.setTextColor(...RED); doc.text('x' + q, x + CW - 1, y, { align:'right' }); }
+      y += RH;
+    });
+    y += 3;
   });
-  if(!any){ doc.setFontSize(9); doc.setTextColor(92, 86, 74); doc.text('Todavía no hay repetidos apuntados.', x(), y + 3); y += 7; }
-
-  y += 3;
-  heading('Me faltan', [151, 11, 34]);
-  data.sections.forEach(s => {
-    const list = groupBySlot(s.stickers).filter(st => !st.obtained);
-    if(!list.length) return;
-    sectionTitle(s.name);
-    list.forEach(st => row(st, ''));
-    y += 2;
-  });
-
-  doc.save('repetidos-laliga-26-27.pdf');
+  doc.save('cromos-repetidos.pdf');
 }
 
 function markObtained(section, id, cardEl){
