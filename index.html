@@ -1489,7 +1489,7 @@ function downloadFaltanPDF(){
     .filter(g => g.its.length);
   if(!groups.length){ alert('¡No te falta ninguno! Álbum completo.'); return; }
   const n = groups.reduce((m, g) => m + g.its.length, 0);
-  listPDF(groups, 'Cromos que me faltan', `${n} cromos · busco o cambio`, () => 0, 'cromos-me-faltan.pdf');
+  listPDF(groups, 'Cromos que me faltan', `${n} cromos`, () => 0, 'cromos-me-faltan.pdf');
 }
 
 /* Hoja para vender o cambiar: A4 a tres columnas, una barra roja por sección y cada
