@@ -791,7 +791,7 @@ const TEAMS_RAW = {
 /* Secciones especiales, en el orden pedido. Draft 23 incluye ambas variantes
    (numérica y Kromix) y Extra Sticker junta Bronce/Plata/Oro, diferenciados con una etiqueta. */
 const SPECIALS_RAW = [
-{ name:"ADN / LaLiga Prime", color:"#4C3B87", raw:`
+{ name:"ADN / LaLiga Prime", crest:"escudos/adn.png", color:"#4C3B87", raw:`
 1|Antony (Betis)|delantero
 2|Bellingham (Real Madrid)|medio
 3|Courtois (Real Madrid)|portero
@@ -807,7 +807,7 @@ const SPECIALS_RAW = [
 13|Raphinha (Barcelona)|delantero
 14|Unai Simón (Athletic)|portero
 15|Vinícius (Real Madrid)|delantero`},
-{ name:"LaLiga Fantasy", color:"#3F51B5", raw:`
+{ name:"LaLiga Fantasy", crest:"escudos/fantasy.png", color:"#3F51B5", raw:`
 1|Hansi Flick (Barcelona)|entrenador
 2|Joan García (Barcelona)|portero
 3|Lejeune (Rayo Vallecano)|defensa
@@ -817,7 +817,7 @@ const SPECIALS_RAW = [
 7|Pedri (Barcelona)|medio
 8|Luis Milla (Getafe)|medio
 9|Mbappé (Real Madrid)|delantero`},
-{ name:"Draft 23", color:"#8E44AD", raw:`
+{ name:"Draft 23", crest:"escudos/draft-23.png", color:"#8E44AD", raw:`
 1|Asencio (Real Madrid)|defensa
 2|Balde (Barcelona)|defensa
 3|Barrios (Atlético de Madrid)|medio
@@ -864,7 +864,7 @@ K20|Renato Veiga (Villarreal)|defensa|Kromix
 K21|Rodri Mendoza (Atlético de Madrid)|medio|Kromix
 K22|Thiago Pitarch (Real Madrid)|medio|Kromix
 K23|Yeremay (Deportivo)|delantero|Kromix`},
-{ name:"Últimos Fichajes", color:"#6B4FA0", raw:`
+{ name:"Últimos Fichajes", crest:"escudos/ultimos-fichajes.png", color:"#6B4FA0", raw:`
 UF1|CANALES (Racing de Santander)|medio|2
 UF2|CALATRAVA (Espanyol)|medio|2
 UF3|DUMFRIES (Real Madrid)|defensa|2
@@ -905,7 +905,7 @@ UF37|GALÁN (Celta)|defensa|3ª ed.
 UF38|PARROTT (Betis)|delantero|3ª ed.
 UF39|DIOMANDE (Real Madrid)|delantero|3ª ed.
 UF40|RODRI (Barcelona)|medio|3ª ed.`},
-{ name:"Chicles", color:"#E85D9E", raw:`
+{ name:"Chicles", crest:"escudos/chicles.png", color:"#E85D9E", raw:`
 1|Escudo (D. Alavés)
 2|Boyé (D. Alavés)|Masterclass
 3|Blanco (D. Alavés)|Box to Box
@@ -966,7 +966,7 @@ UF40|RODRI (Barcelona)|medio|3ª ed.`},
 58|Escudo (Villarreal CF)
 59|Moleiro (Villarreal CF)|Masterclass
 60|Pape Gueye (Villarreal CF)|Box to Box`},
-{ name:"Extra Sticker", color:"#B8860B", raw:`
+{ name:"Extra Sticker", crest:"escudos/extra-sticker.png", color:"#B8860B", raw:`
 B1|Lamine Yamal (Barcelona)|delantero|Bronce
 B2|Mbappé (Real Madrid)|delantero|Bronce
 B3|Nico Williams (Athletic)|delantero|Bronce
@@ -1070,7 +1070,7 @@ function buildSections(){
   });
   SPECIALS_RAW.forEach((sp, i) => {
     const id = 'special-' + i;
-    sections.push({ id, name:sp.name, type:'special', color:sp.color, crest:null,
+    sections.push({ id, name:sp.name, type:'special', color:sp.color, crest:sp.crest || null,
                     stickers: stickersFor(id, sp.raw) });
   });
   return sections;
