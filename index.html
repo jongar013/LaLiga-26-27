@@ -493,6 +493,8 @@
   .propose-btn{width:100%; min-height:44px; margin-top:10px;}
   .trade-prop{margin-top:10px; padding:10px 12px; border-radius:10px; background:var(--field-bg); border:1.5px solid var(--line);}
   .trade-prop.in{border-color:var(--laliga-red);}
+  .trade-prop.way{border-color:var(--gold); background:var(--dupe-bg);}
+  .tp-note{margin:8px 0 0 !important; font-size:13.5px !important; color:var(--ink-soft);}
   .trade-prop p{margin:0 0 6px; font-size:15px;}
   .tp-side{margin-top:6px;}
   .tp-side small{display:block; margin-bottom:4px; font-size:12.5px; font-weight:700; color:var(--ink-soft); text-transform:uppercase; letter-spacing:.3px;}
@@ -511,73 +513,6 @@
   .pick[aria-pressed="true"] b{color:#fff;}
   .pick[aria-pressed="true"]::before{content:"✓"; font-weight:700;}
   .t-sum{margin:10px 0 0; font-weight:700; font-size:15px;}
-  /* ---------- Tanda 3: abrir el sobre ---------- */
-  .pack-open{
-    position:fixed; inset:0; z-index:65; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:14px;
-    padding:calc(20px + env(safe-area-inset-top, 0px)) 16px calc(20px + env(safe-area-inset-bottom, 0px));
-    background:radial-gradient(ellipse at 50% 30%, #2A3352, #0B0F1C 70%); color:#fff; overflow:hidden;
-  }
-  .pack-open[hidden]{display:none;}
-  .po-stage{position:relative; width:100%; max-width:480px; flex:0 1 auto; display:flex; justify-content:center; align-items:center; min-height:340px;}
-  .po-pack{
-    position:relative; width:190px; height:270px; border:none; padding:0; cursor:pointer; background:none;
-    animation:po-wobble 2.2s ease-in-out infinite; transition:transform .45s ease, opacity .45s ease;
-  }
-  .po-pack .po-body, .po-pack .po-top{
-    position:absolute; left:0; right:0; display:flex; flex-direction:column; align-items:center; justify-content:center;
-    background:
-      repeating-linear-gradient(135deg, rgba(255,255,255,0.07) 0 2px, transparent 2px 12px),
-      linear-gradient(160deg, #E8243F, #A50C24 70%);
-    box-shadow:0 18px 40px rgba(0,0,0,0.5);
-  }
-  .po-pack .po-top{top:0; height:38px; border-radius:10px 10px 0 0; clip-path:polygon(0 0, 100% 0, 100% 80%, 92% 100%, 84% 80%, 76% 100%, 68% 80%, 60% 100%, 52% 80%, 44% 100%, 36% 80%, 28% 100%, 20% 80%, 12% 100%, 4% 80%, 0 100%);
-    transition:transform .5s cubic-bezier(.3,.6,.4,1), opacity .5s;}
-  .po-pack .po-body{top:30px; bottom:0; border-radius:0 0 10px 10px; gap:4px; font-family:var(--display); text-transform:uppercase; color:#fff;}
-  .po-body b{font-size:46px; font-weight:900; line-height:.9; text-shadow:0 3px 0 rgba(0,0,0,0.25);}
-  .po-body i{font-style:normal; font-size:26px; font-weight:800; color:#F5D36B;}
-  .po-body small{margin-top:14px; padding:4px 12px 2px; border-radius:4px; background:#F5D36B; color:#131A2E; font-size:16px; font-weight:900;}
-  @keyframes po-wobble{ 0%,100%{transform:rotate(-2deg);} 50%{transform:rotate(2deg) translateY(-6px);} }
-  .po-stage.torn .po-pack{animation:none;}
-  .po-stage.torn .po-top{transform:translate(70px, -120px) rotate(28deg); opacity:0;}
-  .po-stage.dealt .po-pack{transform:translateY(120%) scale(.8); opacity:0; pointer-events:none;}
-  .po-cards{
-    position:absolute; inset:0; display:flex; flex-wrap:wrap; justify-content:center; align-content:center; gap:12px;
-    pointer-events:none;
-  }
-  .po-card{width:30%; max-width:130px; perspective:900px; opacity:0; transform:translateY(80px) scale(.6);
-    transition:transform .45s cubic-bezier(.2,.8,.3,1.2), opacity .3s; transition-delay:calc(var(--i) * 70ms);}
-  .po-card.wide{width:46%; max-width:200px;}
-  .po-cards.many .po-card{width:22%;}
-  .po-stage.dealt .po-cards{pointer-events:auto;}
-  .po-stage.dealt .po-card{opacity:1; transform:none;}
-  .po-inner{position:relative; transform-style:preserve-3d; transition:transform .55s cubic-bezier(.3,.7,.3,1);}
-  .po-card.flipped .po-inner{transform:rotateY(180deg);}
-  .po-back, .po-front{backface-visibility:hidden; -webkit-backface-visibility:hidden;}
-  .po-back{
-    position:absolute; inset:0; border-radius:7px; display:flex; align-items:center; justify-content:center;
-    background:
-      repeating-linear-gradient(45deg, rgba(255,255,255,0.08) 0 3px, transparent 3px 10px),
-      linear-gradient(160deg, #1B2442, #0E1325);
-    box-shadow:inset 0 0 0 3px #F5D36B, 0 8px 18px rgba(0,0,0,0.45);
-  }
-  .po-back span{font-family:var(--display); font-weight:900; font-size:22px; text-transform:uppercase; color:#F5D36B; transform:rotate(-12deg);}
-  .po-front{position:relative; transform:rotateY(180deg);}
-  .po-front .sticker{cursor:default;}
-  .po-front .cap{display:none;}
-  .po-label{
-    position:absolute; left:50%; bottom:-10px; z-index:3; transform:translateX(-50%) rotate(-6deg); white-space:nowrap;
-    padding:4px 10px 2px; border-radius:5px; font-family:var(--display); font-weight:900; font-size:17px; text-transform:uppercase;
-    box-shadow:0 3px 0 rgba(0,0,0,0.3);
-  }
-  .po-label.new{background:#1F8A4C; color:#fff;}
-  .po-label.repe{background:#F5D36B; color:#131A2E;}
-  .po-card.flipped .po-front:has(.po-label.new) .sticker{box-shadow:0 0 0 3px #F5D36B, 0 0 26px 6px rgba(245,211,107,0.55);}
-  .po-hint{margin:0; min-height:1.3em; font-family:var(--display); font-weight:800; font-size:24px; text-transform:uppercase; text-align:center;}
-  .po-actions{display:flex; flex-direction:column; align-items:center; gap:4px; min-height:92px;}
-  .po-actions .pdf-btn{min-height:48px; padding:12px 28px; font-size:16px;}
-  .po-skip{min-height:44px; background:none; border:none; color:rgba(255,255,255,0.75); font:inherit; font-weight:600; font-size:15px; cursor:pointer;}
-  .po-pack:focus-visible, .po-skip:focus-visible{outline:3px solid #F5D36B; outline-offset:4px;}
-
   /* ---------- Vitrina ---------- */
   .vt-day{
     display:flex; gap:14px; align-items:center; padding:14px; border-radius:14px; color:#fff;
@@ -973,7 +908,7 @@
 <div class="sheet-backdrop" id="tradeSheet" hidden>
   <div class="sheet trade-sheet" role="dialog" aria-labelledby="tradeTitle">
     <h3 id="tradeTitle">Cambio</h3>
-    <p class="hint">Marca lo que le das y lo que te da. Cuando lo acepte, se apunta solo en los dos álbumes.</p>
+    <p class="hint">Marca lo que le das y lo que te da. Cuando lo acepte quedará en camino, y cada uno lo apunta cuando le lleguen los cromos por correo.</p>
     <h4>Le das <small>tus repes que le faltan</small></h4>
     <div id="tGive"></div>
     <h4>Te da <small>sus repes que te faltan</small></h4>
@@ -983,15 +918,6 @@
       <button class="pdf-btn" id="tSend" disabled>Enviar propuesta</button>
       <button class="pdf-btn alt" data-close>Cancelar</button>
     </div>
-  </div>
-</div>
-
-<div class="pack-open" id="packOpen" role="dialog" aria-label="Abrir el sobre" hidden>
-  <div class="po-stage" id="poStage"></div>
-  <p class="po-hint" id="poHint" aria-live="polite"></p>
-  <div class="po-actions">
-    <button class="pdf-btn" id="poDone" hidden>Ver mi álbum</button>
-    <button class="po-skip" id="poSkip">Saltar</button>
   </div>
 </div>
 
@@ -1009,7 +935,7 @@
 </div>
 
 <script>
-const APP_VERSION = '2026-10-21.3';
+const APP_VERSION = '2026-10-21.4';
 const STORAGE_KEY = 'laliga_2627_album_v5';
 
 /* Orden exacto de equipos indicado por el usuario */
@@ -1999,7 +1925,6 @@ function startSync(uid){
     renderAll();
     suppressSave = false;
     checkNewStickers();
-    settleTrades();
   }, err => {
     console.error('Error de sincronización:', err);
   });
@@ -2109,7 +2034,7 @@ function startFriends(user){
     const trades = db.collection('trades');
     const onTradesError = err => { console.error('Cambios:', err); tradesError = true; rerenderTrades(); };
     friendUnsubs.push(trades.where('from', '==', user.uid).onSnapshot(snap => {
-      tradesFrom = snap.docs.map(d => ({ id:d.id, ...d.data() })); tradesError = false; settleTrades(); rerenderTrades();
+      tradesFrom = snap.docs.map(d => ({ id:d.id, ...d.data() })); tradesError = false; rerenderTrades();
     }, onTradesError));
     friendUnsubs.push(trades.where('to', '==', user.uid).onSnapshot(snap => {
       tradesTo = snap.docs.map(d => ({ id:d.id, ...d.data() })); tradesError = false; rerenderTrades(); updateTradeBadge();
@@ -2303,10 +2228,10 @@ function renderTrades(){
 
 /* ---------- Proponer un cambio ----------
    Eliges qué le das (tus repes que le faltan) y qué te da (sus repes que te faltan).
-   Tu amigo lo acepta en su móvil y cada uno apunta su parte en su propio álbum:
-   él al aceptar y tú en cuanto tu app ve que lo ha aceptado. Una marca en la
-   propuesta evita que se apunte dos veces (por ejemplo con la cuenta abierta en
-   dos móviles). */
+   Tu amigo lo acepta en su móvil y el cambio queda "en camino": los cromos van por
+   correo, así que cada uno lo apunta en su álbum cuando le llegan ("Ya me han
+   llegado"). Una marca en la propuesta evita que se apunte dos veces (por ejemplo
+   con la cuenta abierta en dos móviles). */
 function stickerLabel(id){
   const st = findSticker(id);
   if(!st) return '';
@@ -2333,6 +2258,19 @@ function pendingTradesHTML(f){
       <div class="tp-side"><small>Te da ${t.get.length}</small><div class="trade-list">${tradeNamesHTML(t.get)}</div></div>
       <div class="tp-btns"><button class="pdf-btn alt" data-trade="${t.id}" data-act="cancel">${t.status === 'declined' ? 'Vale' : 'Cancelar propuesta'}</button></div>
     </div>`));
+  const me = auth.currentUser && auth.currentUser.uid;
+  [...tradesTo, ...tradesFrom].filter(t => (t.from === f.uid || t.to === f.uid) && t.status === 'accepted' &&
+      !(t.from === me ? t.appliedFrom : t.appliedTo)).forEach(t => {
+    const mine = t.from === me, receive = mine ? t.get : t.give, hand = mine ? t.give : t.get;
+    rows.push(`
+    <div class="trade-prop way">
+      <p><b>En camino</b> · cambio con ${escapeHTML(f.name || '')}</p>
+      <div class="tp-side"><small>Te llegan ${receive.length}</small><div class="trade-list">${tradeNamesHTML(receive)}</div></div>
+      <div class="tp-side"><small>Envías ${hand.length}</small><div class="trade-list">${tradeNamesHTML(hand)}</div></div>
+      <p class="tp-note">Cuando te lleguen por correo, márcalo y se pegarán en tu álbum (y se restarán los repes que envías).</p>
+      <div class="tp-btns"><button class="pdf-btn" data-trade="${t.id}" data-act="arrived">Ya me han llegado</button></div>
+    </div>`);
+  });
   return rows.join('');
 }
 function updateTradeBadge(){
@@ -2381,7 +2319,7 @@ document.getElementById('tSend').addEventListener('click', async () => {
       give:[...tradePick.give], get:[...tradePick.get], appliedFrom:false, appliedTo:false, created:Date.now()
     });
     closeSheet('tradeSheet');
-    showNote(`Propuesta enviada a ${f.name || 'tu amigo'}. Cuando la acepte se apuntará sola.`);
+    showNote(`Propuesta enviada a ${f.name || 'tu amigo'}. Te avisará aquí cuando la acepte.`);
   } catch(e){
     console.error(e);
     btn.disabled = false;
@@ -2408,55 +2346,41 @@ async function tradeAction(id, act){
     if(act === 'decline'){ await ref.update({ status:'declined' }); return; }
     if(act === 'cancel'){ await ref.delete(); return; }
     // Aceptar: tienes que seguir teniendo repetidos los que das.
-    const gone = t.get.filter(x => { const st = findSticker(x); return !st || !st.obtained || !(st.dupes > 0); });
+    const gone = act !== 'accept' ? [] : t.get.filter(x => { const st = findSticker(x); return !st || !st.obtained || !(st.dupes > 0); });
     if(gone.length){
       tradeMsg = `Ya no tienes repetido: ${gone.map(stickerLabel).join(', ')}. Rechaza este cambio y que te proponga otro.`;
       rerenderTrades();
       return;
     }
-    const ok = await db.runTransaction(async tx => {
+    if(act === 'accept'){
+      await db.runTransaction(async tx => {
+        const snap = await tx.get(ref);
+        if(snap.exists && snap.data().status === 'pending') tx.update(ref, { status:'accepted' });
+      });
+      showNote('Cambio aceptado. Cuando te lleguen los cromos, márcalo en Cambios y se pegarán.');
+      return;
+    }
+    // Me han llegado: apunto mi parte una sola vez; cuando los dos lo han marcado se borra.
+    const mine = t.from === auth.currentUser.uid, flag = mine ? 'appliedFrom' : 'appliedTo', other = mine ? 'appliedTo' : 'appliedFrom';
+    const res = await db.runTransaction(async tx => {
       const snap = await tx.get(ref);
-      if(!snap.exists || snap.data().status !== 'pending' || snap.data().appliedTo) return false;
-      tx.update(ref, { status:'accepted', appliedTo:true });
-      return true;
+      if(!snap.exists || snap.data().status !== 'accepted' || snap.data()[flag]) return null;
+      tx.update(ref, { [flag]:true });
+      return { last: !!snap.data()[other] };
     });
-    if(!ok) return;
+    if(!res) return;
     const before = totalCounts().have;
-    applyTrade(t.give, t.get);
+    if(mine) applyTrade(t.get, t.give); else applyTrade(t.give, t.get);
     renderAll();
-    const nuevos = totalCounts().have - before;
-    showNote(`Cambio hecho con ${t.fromName || 'tu amigo'}: ${t.give.length} cromo${t.give.length === 1 ? '' : 's'} para ti` + (nuevos ? ` (${nuevos} nuevo${nuevos === 1 ? '' : 's'})` : '') + '.');
+    const n = (mine ? t.get : t.give).length, nuevos = totalCounts().have - before;
+    showNote(`Apuntado el cambio con ${(mine ? t.toName : t.fromName) || 'tu amigo'}: ${n} cromo${n === 1 ? '' : 's'}` + (nuevos ? `, ${nuevos} nuevo${nuevos === 1 ? '' : 's'}` : '') + '.');
+    if(res.last) ref.delete().catch(() => {});
   } catch(e){
     console.error(e);
     tradeMsg = 'No se ha podido completar. Revisa la conexión y vuelve a probar.';
     rerenderTrades();
   }
 }
-/* Tu amigo ha aceptado: tu app apunta tu parte una sola vez y borra la propuesta. */
-const settling = new Set();
-function settleTrades(){
-  if(!data) return;
-  tradesFrom.filter(t => t.status === 'accepted' && !t.appliedFrom && !settling.has(t.id)).forEach(async t => {
-    settling.add(t.id);
-    const ref = db.collection('trades').doc(t.id);
-    try {
-      const ok = await db.runTransaction(async tx => {
-        const snap = await tx.get(ref);
-        if(!snap.exists || snap.data().appliedFrom) return false;
-        tx.update(ref, { appliedFrom:true });
-        return true;
-      });
-      if(ok){
-        applyTrade(t.get, t.give);
-        renderAll();
-        showNote(`${t.toName || 'Tu amigo'} ha aceptado el cambio: ya está apuntado en tu álbum.`);
-        ref.delete().catch(() => {});
-      }
-    } catch(e){ console.error(e); }
-    settling.delete(t.id);
-  });
-}
-
 function getSection(id){
   return data.sections.find(s => s.id === id);
 }
@@ -2994,86 +2918,15 @@ document.getElementById('packSave').addEventListener('click', () => {
   closeSheet('packSheet');
   renderAll();
   const nNew = items.filter(x => !x.repe).length, nRep = items.length - nNew;
-  // Para la animación: cada cromo con su sello (nuevo o repe ×n), en el orden del sobre.
-  const run = {};
-  const reveal = items.map(({ id, st, repe }) => {
-    const r = run[id] || (run[id] = { ...before[id] });
-    if(r.obtained) r.dupes++; else r.obtained = true;
-    return { id, repe, dupes: r.dupes };
+  showUndo(`Sobre apuntado: ${nNew} nuevo${nNew === 1 ? '' : 's'} y ${nRep} repetido${nRep === 1 ? '' : 's'}`, () => {
+    setStickers(Object.keys(before).map(id => findSticker(id)).filter(Boolean).map(st => [st, before[st.id].obtained, before[st.id].dupes]));
+    renderAll();
   });
-  // El sobre ya está guardado; la animación es solo para verlo.
-  playPack(reveal, () => {
-    showUndo(`Sobre apuntado: ${nNew} nuevo${nNew === 1 ? '' : 's'} y ${nRep} repetido${nRep === 1 ? '' : 's'}`, () => {
-      setStickers(Object.keys(before).map(id => findSticker(id)).filter(Boolean).map(st => [st, before[st.id].obtained, before[st.id].dupes]));
-      renderAll();
-    });
-    const { total, have } = totalCounts();
-    const done = data.sections.find(s => isComplete(s) && !wasComplete.has(s.id));
-    if(have === total) celebrateAlbum(total);
-    else if(done) celebrate(done);
-  });
+  const { total, have } = totalCounts();
+  const done = data.sections.find(s => isComplete(s) && !wasComplete.has(s.id));
+  if(have === total) celebrateAlbum(total);
+  else if(done) celebrate(done);
 });
-
-/* ---------- Abrir el sobre ----------
-   Se rasga el sobre, salen los cromos boca abajo y se giran uno a uno: el nuevo
-   brilla y el repetido recibe su sello. Con "reducir movimiento" no hay animación. */
-let packDone = null, packTimers = [];
-function playPack(reveal, done){
-  if(window.matchMedia('(prefers-reduced-motion: reduce)').matches){ done(); return; }
-  packDone = done;
-  const nNew = reveal.filter(x => !x.repe).length;
-  const stage = document.getElementById('poStage');
-  stage.innerHTML = `
-    <button class="po-pack" id="poPack" aria-label="Abrir el sobre">
-      <span class="po-top"></span>
-      <span class="po-body"><b>LaLiga</b><i>2026-27</i><small>${reveal.length} cromo${reveal.length === 1 ? '' : 's'}</small></span>
-    </button>
-    <div class="po-cards${reveal.length > 6 ? ' many' : ''}">${reveal.map((x, i) => {
-      const st = findSticker(x.id), sec = st && sectionOf(st);
-      if(!st) return '';
-      return `<div class="po-card${isChicles(sec) ? ' wide' : ''}" style="--i:${i}">
-        <div class="po-inner">
-          <div class="po-back"><span>LaLiga</span></div>
-          <div class="po-front" style="--team:${readableColor(sec.color)}">
-            <div class="sticker has${rarityClass(st)}">${stickerFaceHTML(sec, st)}</div>
-            <span class="po-label ${x.repe ? 'repe' : 'new'}">${x.repe ? `Repe ×${x.dupes}` : '¡Nuevo!'}</span>
-          </div>
-        </div></div>`;
-    }).join('')}</div>`;
-  document.getElementById('poHint').textContent = 'Toca el sobre para abrirlo';
-  document.getElementById('poDone').hidden = true;
-  document.getElementById('poSkip').hidden = false;
-  document.getElementById('packOpen').hidden = false;
-  document.getElementById('poPack').focus();
-  document.getElementById('poPack').addEventListener('click', () => {
-    stage.classList.add('torn');
-    const cards = [...stage.querySelectorAll('.po-card')];
-    packTimers.push(setTimeout(() => stage.classList.add('dealt'), 450));
-    cards.forEach((c, i) => packTimers.push(setTimeout(() => {
-      c.classList.add('flipped');
-      if(navigator.vibrate) navigator.vibrate(c.querySelector('.po-label.new') ? 18 : 8);
-    }, 1100 + i * 520)));
-    packTimers.push(setTimeout(finishReveal, 1100 + cards.length * 520 + 200));
-    document.getElementById('poHint').textContent = '';
-    function finishReveal(){
-      const nRep = reveal.length - nNew;
-      document.getElementById('poHint').textContent = `${nNew} nuevo${nNew === 1 ? '' : 's'} y ${nRep} repe${nRep === 1 ? '' : 's'}`;
-      document.getElementById('poSkip').hidden = true;
-      const btn = document.getElementById('poDone');
-      btn.hidden = false; btn.focus();
-    }
-  }, { once:true });
-}
-function closePack(){
-  packTimers.forEach(clearTimeout); packTimers = [];
-  const stage = document.getElementById('poStage');
-  stage.className = 'po-stage';
-  document.getElementById('packOpen').hidden = true;
-  const fn = packDone; packDone = null;
-  if(fn) fn();
-}
-document.getElementById('poDone').addEventListener('click', closePack);
-document.getElementById('poSkip').addEventListener('click', closePack);
 
 /* ---------- Vitrina ----------
    Logros por lo que ya has hecho, colecciones con cromos que ya existen y el cromo
@@ -3617,7 +3470,6 @@ document.querySelectorAll('.sheet-backdrop').forEach(bd => {
 });
 document.addEventListener('keydown', e => {
   if(e.key !== 'Escape') return;
-  if(!document.getElementById('packOpen').hidden){ closePack(); return; }
   const open = [...document.querySelectorAll('.sheet-backdrop')].find(b => !b.hidden);
   if(open) closeSheet(open.id);
 });
