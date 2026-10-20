@@ -312,6 +312,13 @@
       linear-gradient(165deg, color-mix(in srgb, var(--team, var(--laliga-red)) 72%, #fff), var(--team, var(--laliga-red)) 70%);
   }
   .sticker.has .sil{fill:rgba(255,255,255,0.55);}
+  /* Cromo pegado: en vez de la silueta, el escudo del equipo del jugador. */
+  .sticker .crest-art{display:none;}
+  .sticker.has .with-crest .crest-art{
+    display:block; position:absolute; left:20%; top:26%; width:60%; height:62%; object-fit:contain;
+    filter:drop-shadow(0 3px 4px rgba(0,0,0,0.3));
+  }
+  .sticker.has .with-crest .sil, .sticker.has .with-crest .wm{display:none;}
   .sticker.has .wm{display:block; position:absolute; right:-14%; top:-10%; width:62%; opacity:.22; filter:grayscale(1) brightness(3);}
   .sticker.has .num{background:#131A2E; color:#fff;}
   .sticker.has .cap{padding:5px 3px 3px; color:#131A2E;}
@@ -1993,6 +2000,22 @@ const SIL_CREST = '<svg class="sil" viewBox="0 0 100 100" aria-hidden="true"><pa
 
 /* Parte de cada cromo: la ilustración (silueta, escudo de fondo, número y
    etiqueta) y la cartela con el nombre y la posición. */
+/* Escudo que se ve en el cromo pegado: el del equipo de la página o, en las
+   secciones especiales, el del equipo del jugador ("Lamine Yamal (Barcelona)"). */
+const CLUB_KEYS = [
+  ['real sociedad', 'real-sociedad'], ['atletico', 'atletico'], ['madrid', 'real-madrid'],
+  ['alaves', 'alaves'], ['athletic', 'athletic'], ['barcelona', 'barcelona'], ['betis', 'betis'],
+  ['celta', 'celta'], ['deportivo', 'deportivo'], ['elche', 'elche'], ['espanyol', 'espanyol'],
+  ['getafe', 'getafe'], ['levante', 'levante'], ['malaga', 'malaga'], ['osasuna', 'osasuna'],
+  ['racing', 'racing'], ['rayo', 'rayo'], ['sevilla', 'sevilla'], ['valencia', 'valencia'], ['villarreal', 'villarreal']
+];
+function stickerCrest(section, club){
+  if(section.type === 'team') return section.crest;
+  const c = club.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+  const hit = c && CLUB_KEYS.find(([k]) => c.includes(k));
+  return hit ? 'escudos/' + hit[1] + '.png' : null;
+}
+
 /* Nombre, posición y (en las secciones especiales) equipo, por separado:
    "Lamine Yamal (Barcelona) — Delantero" → Lamine Yamal / Delantero · Barcelona. */
 function splitName(section, st){
@@ -2011,8 +2034,10 @@ function stickerFaceHTML(section, st, extra){
   const badge = st.tag ? `<span class="tag-badge ${tagClass(st.tag)}">${escapeHTML(st.tag)}</span>` : '';
   const sub = [club, role].filter(Boolean).map(escapeHTML).join('<br>');
   const wm = section.crest ? `<img class="wm" src="${section.crest}" alt="" onerror="this.remove()">` : '';
+  const crest = stickerCrest(section, club);
+  const crestImg = crest ? `<img class="crest-art" src="${crest}" alt="" onerror="this.parentNode.classList.remove('with-crest'); this.remove()">` : '';
   return `
-    <div class="art">${wm}${/^escudo/i.test(name) ? SIL_CREST : SIL_PLAYER}<span class="num">${escapeHTML(String(st.number))}</span>${badge}${extra || ''}</div>
+    <div class="art${crest ? ' with-crest' : ''}">${wm}${crestImg}${/^escudo/i.test(name) ? SIL_CREST : SIL_PLAYER}<span class="num">${escapeHTML(String(st.number))}</span>${badge}${extra || ''}</div>
     <div class="cap"><b>${escapeHTML(name)}</b>${sub ? `<small>${sub}</small>` : ''}</div>`;
 }
 
