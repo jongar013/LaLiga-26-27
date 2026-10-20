@@ -125,9 +125,6 @@
   }
   .trade-card h3, .friend-card h3{margin:0 0 6px; font-size:16px; text-transform:uppercase; letter-spacing:0.3px;}
   .trade-card .hint{color:var(--ink-soft); font-size:12.5px; margin:6px 0 10px;}
-  .code-row{display:flex; align-items:center; gap:10px;}
-  .my-code{font-family:'Oswald',system-ui,sans-serif; font-size:28px; font-weight:700; letter-spacing:3px; color:var(--laliga-red);}
-  .add-row input{text-transform:uppercase; letter-spacing:2px; font-weight:600;}
   .trade-msg{font-size:13px; color:var(--laliga-red-dark); margin-top:8px; min-height:1em;}
   .req-row{display:flex; align-items:center; justify-content:space-between; gap:8px; padding:8px 0; border-top:1px solid var(--line); font-size:14px;}
   .req-row:first-of-type{border-top:none;}
@@ -1202,12 +1199,10 @@ let activeTab = 'album';
                              friends(albumId, request.auth.uid) || friends(request.auth.uid, albumId));
               allow write: if signedIn() && request.auth.uid == albumId;
             }
-            match /profiles/{uid} {
-              allow read, write: if signedIn() && request.auth.uid == uid;
-            }
-            match /codes/{code} {
+            match /users/{email} {
               allow get: if signedIn();
-              allow create: if signedIn() && request.resource.data.uid == request.auth.uid;
+              allow write: if signedIn() && request.resource.data.uid == request.auth.uid &&
+                              email == request.auth.token.email.lower();
             }
             match /friendRequests/{id} {
               allow read: if signedIn() && (request.auth.uid == resource.data.from || request.auth.uid == resource.data.to);
@@ -1393,39 +1388,19 @@ auth.onAuthStateChanged(user => {
 /* ================================================================================================ */
 
 /* ======================= AMIGOS Y CAMBIOS =======================
-   Cada cuenta tiene un código de amigo (codes/{código} → uid). Para ser amigos, uno
-   envía una solicitud con el código del otro (friendRequests/{de}_{para}) y el otro
-   la acepta; entonces cada uno puede leer el álbum del otro y se cruzan tus
-   repetidos con sus faltas y al revés. */
-const CODE_CHARS = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+   Cada cuenta se apunta en users/{email} → uid. Para ser amigos, uno envía una
+   solicitud con el email del otro (friendRequests/{de}_{para}) y el otro la acepta;
+   entonces cada uno puede leer el álbum del otro y se cruzan tus repetidos con sus
+   faltas y al revés. */
 let myProfile = null, friendsError = '', tradeMsg = '';
 let reqsFrom = [], reqsTo = [];
 let friendAlbums = {}, albumUnsubs = {}, friendUnsubs = [];
 
-function randomCode(){
-  let c = '';
-  for(let i = 0; i < 6; i++) c += CODE_CHARS[Math.floor(Math.random() * CODE_CHARS.length)];
-  return c;
-}
-
 async function ensureProfile(user){
-  const ref = db.collection('profiles').doc(user.uid);
-  const snap = await ref.get();
-  if(snap.exists && snap.data().code) return snap.data();
-  const name = (user.email || 'Amigo').split('@')[0];
-  for(let i = 0; ; i++){
-    const code = randomCode();
-    try {
-      await db.collection('codes').doc(code).set({ uid:user.uid, name });
-    } catch(e){
-      // Si el código ya existe las reglas no dejan sobrescribirlo: se prueba otro.
-      if(e.code === 'permission-denied' && i < 4) continue;
-      throw e;
-    }
-    const prof = { code, name };
-    await ref.set(prof);
-    return prof;
-  }
+  const email = (user.email || '').toLowerCase();
+  const prof = { email, name: email.split('@')[0] || 'Amigo' };
+  await db.collection('users').doc(email).set({ uid:user.uid, name:prof.name });
+  return prof;
 }
 
 function startFriends(user){
@@ -1485,15 +1460,15 @@ function rerenderTrades(){
   if(data && activeTab === 'trades') renderAll();
 }
 
-async function sendFriendRequest(rawCode){
-  const code = rawCode.trim().toUpperCase();
+async function sendFriendRequest(rawEmail){
+  const email = rawEmail.trim().toLowerCase();
   const me = auth.currentUser.uid;
   const setMsg = t => { tradeMsg = t; rerenderTrades(); };
-  if(code.length !== 6){ setMsg('El código tiene 6 letras o números.'); return; }
-  if(code === myProfile.code){ setMsg('Ese es tu propio código.'); return; }
+  if(!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)){ setMsg('Escribe el email con el que tu amigo entra en la app.'); return; }
+  if(email === myProfile.email){ setMsg('Ese es tu propio email.'); return; }
   try {
-    const c = await db.collection('codes').doc(code).get();
-    if(!c.exists){ setMsg('No hay ninguna cuenta con ese código.'); return; }
+    const c = await db.collection('users').doc(email).get();
+    if(!c.exists){ setMsg('No hay ninguna cuenta con ese email. Tu amigo tiene que haber entrado al menos una vez con esta versión de la app.'); return; }
     const other = c.data().uid;
     if(friendsList().some(f => f.uid === other)){ setMsg(`Ya eres amigo de ${c.data().name}.`); return; }
     const theirs = reqsTo.find(r => r.from === other && r.status === 'pending');
@@ -1568,12 +1543,10 @@ function renderTrades(){
 
   main.innerHTML = `
     <div class="trade-card">
-      <h3>Tu código de amigo</h3>
-      <div class="code-row"><span class="my-code">${escapeHTML(myProfile.code)}</span>
-        <button class="mini-btn" id="copyCode">Copiar</button></div>
-      <p class="hint">Pásaselo a tu amigo para que te añada, o escribe aquí el suyo. Cuando uno acepte la solicitud del otro, veréis qué cromos podéis cambiar.</p>
-      <div class="add-row"><input id="friendCode" placeholder="Código de tu amigo" maxlength="6" autocomplete="off">
-        <button class="pdf-btn" id="addFriend">Añadir</button></div>
+      <h3>Añadir amigo</h3>
+      <p class="hint">Escribe el email con el que tu amigo entra en la app y envíale una solicitud. Cuando la acepte, aquí verás qué cromos podéis cambiar. A ti te encuentran por <b>${escapeHTML(myProfile.email)}</b>.</p>
+      <div class="add-row"><input id="friendCode" type="email" placeholder="Email de tu amigo" autocomplete="off" autocapitalize="none">
+        <button class="pdf-btn" id="addFriend">Enviar</button></div>
       <div class="trade-msg">${escapeHTML(tradeMsg)}</div>
     </div>
     ${incoming.length || outgoing.length ? `
@@ -1608,12 +1581,6 @@ function renderTrades(){
   input.value = typed;
   document.getElementById('addFriend').addEventListener('click', () => sendFriendRequest(input.value));
   input.addEventListener('keydown', e => { if(e.key === 'Enter') sendFriendRequest(input.value); });
-  document.getElementById('copyCode').addEventListener('click', e => {
-    const btn = e.currentTarget;
-    navigator.clipboard && navigator.clipboard.writeText(myProfile.code).then(() => {
-      btn.textContent = '¡Copiado!'; setTimeout(() => btn.textContent = 'Copiar', 1400);
-    });
-  });
   const all = [...reqsFrom, ...reqsTo];
   main.querySelectorAll('[data-accept]').forEach(b => b.addEventListener('click', () => {
     const r = all.find(x => x.id === b.dataset.accept); if(r) acceptRequest(r);
