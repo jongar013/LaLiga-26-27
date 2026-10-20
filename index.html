@@ -206,7 +206,7 @@
     width:100%; height:100%; border-radius:50%; background:#fff; display:flex; align-items:center; justify-content:center; overflow:hidden;
     font-family:var(--display); font-weight:900; font-size:18px; color:var(--team);
   }
-  .crest-btn img{width:76%; height:76%; object-fit:contain;}
+  .crest-btn img{width:calc(var(--fit, .78) * 100%); height:calc(var(--fit, .78) * 100%); object-fit:contain;}
   .crest-btn.active{color:var(--ink); width:64px; gap:8px;}
   .crest-btn.active .ring{transform:scale(1.12); box-shadow:0 0 0 2px var(--paper), 0 0 0 4px var(--ink);}
 
@@ -233,9 +233,12 @@
   .section-head .sub{font-size:15px; font-weight:600; margin-top:8px; opacity:.95; display:flex; align-items:center; gap:8px; flex-wrap:wrap;}
   .head-main{flex:1; display:flex; align-items:center; gap:12px; min-width:0;}
   .crest{
-    width:68px; height:68px; object-fit:contain; flex:0 0 auto; background:#fff; border-radius:50%; padding:9px;
+    width:68px; height:68px; flex:0 0 auto; background:#fff; border-radius:50%;
+    display:flex; align-items:center; justify-content:center;
     box-shadow:0 4px 0 rgba(0,0,0,0.16);
   }
+  /* El escudo va dentro del círculo, sin recortarse: su tamaño depende de su forma. */
+  .crest img{width:calc(var(--fit, .78) * 100%); height:calc(var(--fit, .78) * 100%); object-fit:contain;}
   .head-progress{height:6px; margin-top:8px; border-radius:3px; background:rgba(0,0,0,0.22); overflow:hidden; width:min(200px, 100%);}
   .head-progress span{display:block; height:100%; background:#fff; border-radius:3px; transition:width .5s ease;}
   .section-head.complete{box-shadow:inset 0 0 0 4px var(--gold);}
@@ -1914,6 +1917,17 @@ function goToSection(offset){
   window.scrollTo(0, 0);
 }
 
+/* Tamaño de cada escudo dentro de su círculo para que no se corten las puntas:
+   los escudos cuadrados o con picos (Athletic, Fantasy…) van algo más pequeños.
+   Calculado a partir de la forma de cada imagen; el resto usa 0,78. */
+const CREST_FIT = {
+  'escudos/athletic.png':0.68, 'escudos/fantasy.png':0.69, 'escudos/deportivo.png':0.70,
+  'escudos/atletico.png':0.71, 'escudos/malaga.png':0.71, 'escudos/sevilla.png':0.71,
+  'escudos/ultimos-fichajes.png':0.72, 'escudos/barcelona.png':0.73, 'escudos/rayo.png':0.73,
+  'escudos/real-sociedad.png':0.74
+};
+function crestFit(src){ return CREST_FIT[src] || 0.78; }
+
 function renderChips(){
   const row = document.getElementById('chipRow');
   row.innerHTML = '';
@@ -1930,7 +1944,7 @@ function renderChips(){
     if(isActive) chip.setAttribute('aria-current', 'true');
     const initial = escapeHTML(s.name.charAt(0));
     const marker = s.crest
-      ? `<img src="${s.crest}" alt="" onerror="this.outerHTML='${initial}'">`
+      ? `<img src="${s.crest}" alt="" style="--fit:${crestFit(s.crest)}" onerror="this.outerHTML='${initial}'">`
       : initial;
     chip.innerHTML = `<span class="ring"><span>${marker}</span></span>${have}/${s.stickers.length}`;
     chip.onclick = () => { setCurrentSection(s.id); renderAll(); };
@@ -1960,7 +1974,7 @@ function readableColor(hex){
 
 function sectionHeadHTML(section, subText){
   const crest = section.crest
-    ? `<img class="crest" src="${section.crest}" alt="" onerror="this.remove()">`
+    ? `<span class="crest" style="--fit:${crestFit(section.crest)}"><img src="${section.crest}" alt="" onerror="this.parentNode.remove()"></span>`
     : '';
   const have = section.stickers.filter(st => st.obtained).length, total = section.stickers.length;
   const complete = total > 0 && have === total;
