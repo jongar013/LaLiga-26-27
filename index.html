@@ -483,6 +483,116 @@
   .chicles-grid .sticker .ch-cap{position:absolute; width:1px; height:1px; overflow:hidden; clip-path:inset(50%); white-space:nowrap; padding:0;}
   .sticker:not(.has) .chicle{border-radius:6px;}
   .pdf-btn:disabled{opacity:.45; cursor:default; transform:none;}
+
+  /* ---------- Tanda 3: abrir el sobre ---------- */
+  .pack-open{
+    position:fixed; inset:0; z-index:65; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:14px;
+    padding:calc(20px + env(safe-area-inset-top, 0px)) 16px calc(20px + env(safe-area-inset-bottom, 0px));
+    background:radial-gradient(ellipse at 50% 30%, #2A3352, #0B0F1C 70%); color:#fff; overflow:hidden;
+  }
+  .pack-open[hidden]{display:none;}
+  .po-stage{position:relative; width:100%; max-width:480px; flex:0 1 auto; display:flex; justify-content:center; align-items:center; min-height:340px;}
+  .po-pack{
+    position:relative; width:190px; height:270px; border:none; padding:0; cursor:pointer; background:none;
+    animation:po-wobble 2.2s ease-in-out infinite; transition:transform .45s ease, opacity .45s ease;
+  }
+  .po-pack .po-body, .po-pack .po-top{
+    position:absolute; left:0; right:0; display:flex; flex-direction:column; align-items:center; justify-content:center;
+    background:
+      repeating-linear-gradient(135deg, rgba(255,255,255,0.07) 0 2px, transparent 2px 12px),
+      linear-gradient(160deg, #E8243F, #A50C24 70%);
+    box-shadow:0 18px 40px rgba(0,0,0,0.5);
+  }
+  .po-pack .po-top{top:0; height:38px; border-radius:10px 10px 0 0; clip-path:polygon(0 0, 100% 0, 100% 80%, 92% 100%, 84% 80%, 76% 100%, 68% 80%, 60% 100%, 52% 80%, 44% 100%, 36% 80%, 28% 100%, 20% 80%, 12% 100%, 4% 80%, 0 100%);
+    transition:transform .5s cubic-bezier(.3,.6,.4,1), opacity .5s;}
+  .po-pack .po-body{top:30px; bottom:0; border-radius:0 0 10px 10px; gap:4px; font-family:var(--display); text-transform:uppercase; color:#fff;}
+  .po-body b{font-size:46px; font-weight:900; line-height:.9; text-shadow:0 3px 0 rgba(0,0,0,0.25);}
+  .po-body i{font-style:normal; font-size:26px; font-weight:800; color:#F5D36B;}
+  .po-body small{margin-top:14px; padding:4px 12px 2px; border-radius:4px; background:#F5D36B; color:#131A2E; font-size:16px; font-weight:900;}
+  @keyframes po-wobble{ 0%,100%{transform:rotate(-2deg);} 50%{transform:rotate(2deg) translateY(-6px);} }
+  .po-stage.torn .po-pack{animation:none;}
+  .po-stage.torn .po-top{transform:translate(70px, -120px) rotate(28deg); opacity:0;}
+  .po-stage.dealt .po-pack{transform:translateY(120%) scale(.8); opacity:0; pointer-events:none;}
+  .po-cards{
+    position:absolute; inset:0; display:flex; flex-wrap:wrap; justify-content:center; align-content:center; gap:12px;
+    pointer-events:none;
+  }
+  .po-card{width:30%; max-width:130px; perspective:900px; opacity:0; transform:translateY(80px) scale(.6);
+    transition:transform .45s cubic-bezier(.2,.8,.3,1.2), opacity .3s; transition-delay:calc(var(--i) * 70ms);}
+  .po-card.wide{width:46%; max-width:200px;}
+  .po-cards.many .po-card{width:22%;}
+  .po-stage.dealt .po-cards{pointer-events:auto;}
+  .po-stage.dealt .po-card{opacity:1; transform:none;}
+  .po-inner{position:relative; transform-style:preserve-3d; transition:transform .55s cubic-bezier(.3,.7,.3,1);}
+  .po-card.flipped .po-inner{transform:rotateY(180deg);}
+  .po-back, .po-front{backface-visibility:hidden; -webkit-backface-visibility:hidden;}
+  .po-back{
+    position:absolute; inset:0; border-radius:7px; display:flex; align-items:center; justify-content:center;
+    background:
+      repeating-linear-gradient(45deg, rgba(255,255,255,0.08) 0 3px, transparent 3px 10px),
+      linear-gradient(160deg, #1B2442, #0E1325);
+    box-shadow:inset 0 0 0 3px #F5D36B, 0 8px 18px rgba(0,0,0,0.45);
+  }
+  .po-back span{font-family:var(--display); font-weight:900; font-size:22px; text-transform:uppercase; color:#F5D36B; transform:rotate(-12deg);}
+  .po-front{position:relative; transform:rotateY(180deg);}
+  .po-front .sticker{cursor:default;}
+  .po-front .cap{display:none;}
+  .po-label{
+    position:absolute; left:50%; bottom:-10px; z-index:3; transform:translateX(-50%) rotate(-6deg); white-space:nowrap;
+    padding:4px 10px 2px; border-radius:5px; font-family:var(--display); font-weight:900; font-size:17px; text-transform:uppercase;
+    box-shadow:0 3px 0 rgba(0,0,0,0.3);
+  }
+  .po-label.new{background:#1F8A4C; color:#fff;}
+  .po-label.repe{background:#F5D36B; color:#131A2E;}
+  .po-card.flipped .po-front:has(.po-label.new) .sticker{box-shadow:0 0 0 3px #F5D36B, 0 0 26px 6px rgba(245,211,107,0.55);}
+  .po-hint{margin:0; min-height:1.3em; font-family:var(--display); font-weight:800; font-size:24px; text-transform:uppercase; text-align:center;}
+  .po-actions{display:flex; flex-direction:column; align-items:center; gap:4px; min-height:92px;}
+  .po-actions .pdf-btn{min-height:48px; padding:12px 28px; font-size:16px;}
+  .po-skip{min-height:44px; background:none; border:none; color:rgba(255,255,255,0.75); font:inherit; font-weight:600; font-size:15px; cursor:pointer;}
+  .po-pack:focus-visible, .po-skip:focus-visible{outline:3px solid #F5D36B; outline-offset:4px;}
+
+  /* ---------- Vitrina ---------- */
+  .vt-day{
+    display:flex; gap:14px; align-items:center; padding:14px; border-radius:14px; color:#fff;
+    background:radial-gradient(ellipse at 90% -20%, rgba(255,255,255,0.25), transparent 60%), linear-gradient(rgba(0,0,0,0.12), rgba(0,0,0,0.12)), var(--team);
+  }
+  .vt-day-card{flex:0 0 auto; width:36%; max-width:150px;}
+  .vt-day-card.wide{width:48%; max-width:220px;}
+  .vt-day-card .sticker{width:100%;}
+  .vt-day-info{flex:1; min-width:0; display:flex; flex-direction:column; align-items:flex-start; gap:4px;}
+  .vt-eyebrow{padding:2px 8px 1px; border-radius:4px; background:var(--gold); color:#131A2E; font-family:var(--display); font-weight:900; font-size:14px; letter-spacing:.4px; text-transform:uppercase;}
+  .vt-day-info h3{margin:4px 0 0; font-size:28px; font-weight:900; line-height:.92; text-transform:uppercase; overflow-wrap:anywhere;}
+  .vt-day-info p{margin:0; font-size:14.5px; line-height:1.3; opacity:.95;}
+  .vt-day-note{font-weight:700;}
+  .vt-day-info .pdf-btn{margin-top:8px; min-height:42px; background:#fff; color:var(--team);}
+  .vt-h{display:flex; align-items:baseline; gap:10px; margin:22px 0 10px; font-size:26px; font-weight:900; text-transform:uppercase; line-height:1;}
+  .vt-h small{font-family:var(--text); font-size:14px; font-weight:600; text-transform:none; color:var(--ink-soft);}
+  .vt-seals{display:grid; grid-template-columns:repeat(auto-fill, minmax(102px, 1fr)); gap:14px 8px;}
+  .vt-seal{display:flex; flex-direction:column; align-items:center; text-align:center; gap:3px; color:var(--ink-soft);}
+  .vt-mark{
+    width:70px; height:70px; border-radius:50%; display:flex; align-items:center; justify-content:center; margin-bottom:4px;
+    border:2.5px dashed color-mix(in srgb, var(--ink-soft) 45%, transparent); font-family:var(--display); font-weight:900; font-size:24px;
+    color:color-mix(in srgb, var(--ink-soft) 60%, transparent);
+  }
+  .vt-seal b{font-size:14px; line-height:1.1; color:var(--ink);}
+  .vt-seal small{font-size:12.5px; line-height:1.15;}
+  .vt-seal.done .vt-mark{
+    border:none; color:#131A2E; transform:rotate(-8deg);
+    background:radial-gradient(circle at 35% 30%, #FFF1B8, #E2B53E 55%, #B8860B);
+    box-shadow:0 0 0 4px var(--paper), 0 0 0 6px #C99A2A, 0 4px 10px var(--shadow);
+  }
+  .vt-seal.done.m-kromix .vt-mark{background:conic-gradient(#FF8FB1, #FFD27A, #F8F59A, #8EF0C6, #8ACBFF, #C9A9FF, #FF8FB1); box-shadow:0 0 0 4px var(--paper), 0 0 0 6px #B18CFF, 0 4px 10px var(--shadow);}
+  .vt-seal.done small{color:var(--ink-soft);}
+  .vt-cols{display:flex; flex-direction:column; gap:8px;}
+  .vt-col{
+    display:grid; grid-template-columns:1fr auto; gap:6px 10px; align-items:center; width:100%; min-height:56px; padding:10px 14px; cursor:pointer;
+    background:var(--card-bg); border:1px solid var(--line); border-radius:10px; text-align:left; font:inherit; color:var(--ink);
+  }
+  .vt-col-t{font-weight:700; font-size:15.5px;}
+  .vt-col-n{font-family:var(--display); font-weight:900; font-size:18px;}
+  .vt-bar{grid-column:1 / -1; height:6px; border-radius:3px; background:var(--paper-dark); overflow:hidden;}
+  .vt-bar span{display:block; height:100%; border-radius:3px; background:var(--laliga-red);}
+  .vt-col:focus-visible{outline:3px solid var(--gold); outline-offset:2px;}
   /* ---------- Tanda 2 ---------- */
   .album-tools{display:flex; align-items:center; justify-content:space-between; gap:8px 12px; flex-wrap:wrap; margin:0 0 10px;}
   .pack-btn{
@@ -731,6 +841,8 @@
     <svg viewBox="0 0 24 24"><path d="M4 5a2 2 0 0 1 2-2h13v16H6a2 2 0 0 0-2 2z"/><path d="M4 21V5"/><path d="M9 8h6"/></svg>Álbum</button>
   <button class="tabbtn" data-tab="repes">
     <svg viewBox="0 0 24 24"><rect x="8" y="8" width="13" height="13" rx="2"/><path d="M16 8V5a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h3"/></svg>Repetidos</button>
+  <button class="tabbtn" data-tab="vitrina">
+    <svg viewBox="0 0 24 24"><path d="M8 4h8v5a4 4 0 0 1-8 0z"/><path d="M8 6H5a3 3 0 0 0 3 4M16 6h3a3 3 0 0 1-3 4"/><path d="M12 13v4M8.5 20h7l-1-3h-5z"/></svg>Vitrina</button>
   <button class="tabbtn" data-tab="trades">
     <svg viewBox="0 0 24 24"><path d="M4 8h13l-3-3"/><path d="M20 16H7l3 3"/></svg>Cambios</button>
 </div>
@@ -831,6 +943,15 @@
   </div>
 </div>
 
+<div class="pack-open" id="packOpen" role="dialog" aria-label="Abrir el sobre" hidden>
+  <div class="po-stage" id="poStage"></div>
+  <p class="po-hint" id="poHint" aria-live="polite"></p>
+  <div class="po-actions">
+    <button class="pdf-btn" id="poDone" hidden>Ver mi álbum</button>
+    <button class="po-skip" id="poSkip">Saltar</button>
+  </div>
+</div>
+
 <div class="sheet-backdrop" id="newsSheet" hidden>
   <div class="sheet" role="dialog" aria-labelledby="newsTitle">
     <h3 id="newsTitle"></h3>
@@ -845,7 +966,7 @@
 </div>
 
 <script>
-const APP_VERSION = '2026-10-21.1';
+const APP_VERSION = '2026-10-21.2';
 const STORAGE_KEY = 'laliga_2627_album_v5';
 
 /* Orden exacto de equipos indicado por el usuario */
@@ -2499,18 +2620,23 @@ function clubBarHTML(section){
       <button class="fav-btn" id="favBtn" aria-pressed="${fav}">${fav ? '★ Mi equipo' : '☆ Es mi equipo'}</button>
     </div>`;
 }
-let clubSheetId = null;
+/* Hoja con una lista de cromos agrupados por página (tu equipo en las especiales,
+   una colección de la vitrina…). Se puede pegar o abrir la ficha desde ahí. */
+let listSheet = null;
 function openClub(id){
-  clubSheetId = id;
+  const section = getSection(id);
+  openList(`${section.name} en las especiales`, () => clubSpecials(getSection(id)));
+}
+function openList(title, groups){
+  listSheet = { title, groups };
   renderClub();
   openSheet('clubSheet');
 }
 function renderClub(){
-  const section = getSection(clubSheetId);
-  if(!section) return;
-  document.getElementById('clubTitle').textContent = `${section.name} en las especiales`;
+  if(!listSheet) return;
+  document.getElementById('clubTitle').textContent = listSheet.title;
   const box = document.getElementById('clubBody');
-  box.innerHTML = clubSpecials(section).map(({ s, its }) => `
+  box.innerHTML = listSheet.groups().map(({ s, its }) => `
     <h4>${escapeHTML(s.name)} · ${its.filter(st => st.obtained).length} de ${its.length}</h4>
     <div class="sticker-grid${gridClass(s)}" style="--team:${readableColor(s.color)}">
       ${its.map(st => stickerCardHTML(s, st)).join('')}
@@ -2644,15 +2770,206 @@ document.getElementById('packSave').addEventListener('click', () => {
   closeSheet('packSheet');
   renderAll();
   const nNew = items.filter(x => !x.repe).length, nRep = items.length - nNew;
-  showUndo(`Sobre apuntado: ${nNew} nuevo${nNew === 1 ? '' : 's'} y ${nRep} repetido${nRep === 1 ? '' : 's'}`, () => {
-    setStickers(Object.keys(before).map(id => findSticker(id)).filter(Boolean).map(st => [st, before[st.id].obtained, before[st.id].dupes]));
-    renderAll();
+  // Para la animación: cada cromo con su sello (nuevo o repe ×n), en el orden del sobre.
+  const run = {};
+  const reveal = items.map(({ id, st, repe }) => {
+    const r = run[id] || (run[id] = { ...before[id] });
+    if(r.obtained) r.dupes++; else r.obtained = true;
+    return { id, repe, dupes: r.dupes };
   });
-  const { total, have } = totalCounts();
-  const done = data.sections.find(s => isComplete(s) && !wasComplete.has(s.id));
-  if(have === total) celebrateAlbum(total);
-  else if(done) celebrate(done);
+  // El sobre ya está guardado; la animación es solo para verlo.
+  playPack(reveal, () => {
+    showUndo(`Sobre apuntado: ${nNew} nuevo${nNew === 1 ? '' : 's'} y ${nRep} repetido${nRep === 1 ? '' : 's'}`, () => {
+      setStickers(Object.keys(before).map(id => findSticker(id)).filter(Boolean).map(st => [st, before[st.id].obtained, before[st.id].dupes]));
+      renderAll();
+    });
+    const { total, have } = totalCounts();
+    const done = data.sections.find(s => isComplete(s) && !wasComplete.has(s.id));
+    if(have === total) celebrateAlbum(total);
+    else if(done) celebrate(done);
+  });
 });
+
+/* ---------- Abrir el sobre ----------
+   Se rasga el sobre, salen los cromos boca abajo y se giran uno a uno: el nuevo
+   brilla y el repetido recibe su sello. Con "reducir movimiento" no hay animación. */
+let packDone = null, packTimers = [];
+function playPack(reveal, done){
+  if(window.matchMedia('(prefers-reduced-motion: reduce)').matches){ done(); return; }
+  packDone = done;
+  const nNew = reveal.filter(x => !x.repe).length;
+  const stage = document.getElementById('poStage');
+  stage.innerHTML = `
+    <button class="po-pack" id="poPack" aria-label="Abrir el sobre">
+      <span class="po-top"></span>
+      <span class="po-body"><b>LaLiga</b><i>2026-27</i><small>${reveal.length} cromo${reveal.length === 1 ? '' : 's'}</small></span>
+    </button>
+    <div class="po-cards${reveal.length > 6 ? ' many' : ''}">${reveal.map((x, i) => {
+      const st = findSticker(x.id), sec = st && sectionOf(st);
+      if(!st) return '';
+      return `<div class="po-card${isChicles(sec) ? ' wide' : ''}" style="--i:${i}">
+        <div class="po-inner">
+          <div class="po-back"><span>LaLiga</span></div>
+          <div class="po-front" style="--team:${readableColor(sec.color)}">
+            <div class="sticker has${rarityClass(st)}">${stickerFaceHTML(sec, st)}</div>
+            <span class="po-label ${x.repe ? 'repe' : 'new'}">${x.repe ? `Repe ×${x.dupes}` : '¡Nuevo!'}</span>
+          </div>
+        </div></div>`;
+    }).join('')}</div>`;
+  document.getElementById('poHint').textContent = 'Toca el sobre para abrirlo';
+  document.getElementById('poDone').hidden = true;
+  document.getElementById('poSkip').hidden = false;
+  document.getElementById('packOpen').hidden = false;
+  document.getElementById('poPack').focus();
+  document.getElementById('poPack').addEventListener('click', () => {
+    stage.classList.add('torn');
+    const cards = [...stage.querySelectorAll('.po-card')];
+    packTimers.push(setTimeout(() => stage.classList.add('dealt'), 450));
+    cards.forEach((c, i) => packTimers.push(setTimeout(() => {
+      c.classList.add('flipped');
+      if(navigator.vibrate) navigator.vibrate(c.querySelector('.po-label.new') ? 18 : 8);
+    }, 1100 + i * 520)));
+    packTimers.push(setTimeout(finishReveal, 1100 + cards.length * 520 + 200));
+    document.getElementById('poHint').textContent = '';
+    function finishReveal(){
+      const nRep = reveal.length - nNew;
+      document.getElementById('poHint').textContent = `${nNew} nuevo${nNew === 1 ? '' : 's'} y ${nRep} repe${nRep === 1 ? '' : 's'}`;
+      document.getElementById('poSkip').hidden = true;
+      const btn = document.getElementById('poDone');
+      btn.hidden = false; btn.focus();
+    }
+  }, { once:true });
+}
+function closePack(){
+  packTimers.forEach(clearTimeout); packTimers = [];
+  const stage = document.getElementById('poStage');
+  stage.className = 'po-stage';
+  document.getElementById('packOpen').hidden = true;
+  const fn = packDone; packDone = null;
+  if(fn) fn();
+}
+document.getElementById('poDone').addEventListener('click', closePack);
+document.getElementById('poSkip').addEventListener('click', closePack);
+
+/* ---------- Vitrina ----------
+   Logros por lo que ya has hecho, colecciones con cromos que ya existen y el cromo
+   del día. Todo sale de tu álbum: no se guarda nada aparte. */
+function achievements(){
+  const all = data.sections.flatMap(s => s.stickers);
+  const have = all.filter(st => st.obtained).length;
+  const teams = data.sections.filter(s => s.type === 'team'), tDone = teams.filter(isComplete).length;
+  const specials = data.sections.filter(s => s.type === 'special');
+  const got = tag => { const l = all.filter(st => st.tag === tag); return [l.filter(st => st.obtained).length, l.length]; };
+  const [oro, oros] = got('Oro'), [kro, kros] = got('Kromix');
+  const fav = data.sections.find(s => s.id === favTeam);
+  const list = [
+    { mark:'1', name:'Primer cromo', text:'Pega tu primer cromo.', n:have, of:1 },
+    { mark:'100', name:'100 cromos', text:'Pega 100 cromos.', n:have, of:100 },
+    { mark:'250', name:'250 cromos', text:'Pega 250 cromos.', n:have, of:250 },
+    { mark:'500', name:'500 cromos', text:'Pega 500 cromos.', n:have, of:500 },
+    { mark:String(all.length), name:'Álbum completo', text:'Pega todos los cromos.', n:have, of:all.length },
+    { mark:'1º', name:'Primer equipo', text:'Completa un equipo.', n:tDone, of:1 },
+    { mark:'5', name:'5 equipos', text:'Completa 5 equipos.', n:tDone, of:5 },
+    { mark:'10', name:'10 equipos', text:'Completa 10 equipos.', n:tDone, of:10 },
+    { mark:String(teams.length), name:'Todos los equipos', text:'Completa los ' + teams.length + ' equipos.', n:tDone, of:teams.length },
+    fav ? { mark:'★', name:'Mi equipo completo', text:`Completa ${fav.name}.`, n:fav.stickers.filter(st => st.obtained).length, of:fav.stickers.length } : null,
+    oros ? { mark:'Oro', name:'Primer Oro', text:'Pega un Extra Sticker de oro.', n:oro, of:1, metal:'oro' } : null,
+    oros ? { mark:'Oro', name:'Todos los Oros', text:`Pega los ${oros} de oro.`, n:oro, of:oros, metal:'oro' } : null,
+    kros ? { mark:'K', name:'Primer Kromix', text:'Pega un Kromix.', n:kro, of:1, metal:'kromix' } : null,
+    kros ? { mark:'K', name:'Todos los Kromix', text:`Pega los ${kros} Kromix.`, n:kro, of:kros, metal:'kromix' } : null,
+    { mark:'ESP', name:'Especiales', text:'Completa todas las secciones especiales.', n:specials.filter(isComplete).length, of:specials.length }
+  ].filter(Boolean);
+  return list.map(a => ({ ...a, n: Math.min(a.n, a.of), done: a.n >= a.of }));
+}
+
+const norm = t => String(t).toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+function byGroups(pairs){
+  const out = [];
+  pairs.forEach(({ s, st }) => {
+    let g = out.find(x => x.s === s);
+    if(!g) out.push(g = { s, its:[] });
+    g.its.push(st);
+  });
+  return out;
+}
+function themeCollections(){
+  const every = data.sections.flatMap(s => groupBySlot(s.stickers).map(st => ({ s, st, ...splitName(s, st) })));
+  const teamOnly = every.filter(x => x.s.type === 'team');
+  const cols = [
+    { title:'Todos los escudos', pick: () => teamOnly.filter(x => /^escudo/i.test(x.name)) },
+    { title:'Los entrenadores', pick: () => teamOnly.filter(x => norm(x.role) === 'entrenador') },
+    { title:'Los porteros', pick: () => teamOnly.filter(x => norm(x.role) === 'portero') }
+  ];
+  // Los jugadores con más versiones (normal, Chicles, ADN, Extra…).
+  const count = {};
+  every.forEach(x => { if(!/^escudo/i.test(x.name) && x.role && norm(x.role) !== 'entrenador') (count[norm(x.name)] = count[norm(x.name)] || { name:x.name, n:0 }).n++; });
+  Object.values(count).filter(c => c.n >= 4).sort((a, b) => b.n - a.n).slice(0, 4).forEach(c => {
+    cols.push({ title:`${c.name} en todas sus versiones`, pick: () => every.filter(x => norm(x.name) === norm(c.name)) });
+  });
+  return cols.map(c => {
+    const items = c.pick();
+    return { title:c.title, groups: () => byGroups(c.pick()), n: items.filter(x => x.st.obtained).length, of: items.length };
+  });
+}
+
+/* Cromo del día: uno que te falta, distinto cada día (el mismo en los dos móviles). */
+function stickerOfDay(){
+  const every = data.sections.flatMap(s => groupBySlot(s.stickers).map(st => ({ s, st })));
+  const miss = every.filter(x => !x.st.obtained);
+  const pool = miss.length ? miss : every;
+  const d = new Date(), key = d.getFullYear() * 10000 + (d.getMonth() + 1) * 100 + d.getDate();
+  return pool[(Math.imul(key, 2654435761) >>> 0) % pool.length];
+}
+
+function renderVitrina(){
+  const main = document.getElementById('mainArea');
+  main.className = 'vitrina';
+  const ach = achievements(), nDone = ach.filter(a => a.done).length;
+  const cols = themeCollections();
+  const day = stickerOfDay();
+  const { name, role, club } = splitName(day.s, day.st);
+  const owners = friendsList().filter(f => {
+    const fd = friendAlbums[f.uid];
+    const t = fd && (fd.sections || []).flatMap(x => x.stickers || []).find(x => x.id === day.st.id);
+    return t && t.obtained && t.dupes > 0;
+  }).map(f => f.name || 'tu amigo');
+  main.innerHTML = `
+    <section class="vt-day" style="--team:${readableColor(day.s.color)}">
+      <div class="vt-day-card${isChicles(day.s) ? ' wide' : ''}">${stickerCardHTML(day.s, day.st)}</div>
+      <div class="vt-day-info">
+        <span class="vt-eyebrow">Cromo del día</span>
+        <h3>${escapeHTML(/^escudo/i.test(name) && club ? 'Escudo · ' + club : name)}</h3>
+        <p>Nº ${escapeHTML(String(day.st.number))} de ${escapeHTML(day.s.name)}${role ? ' · ' + escapeHTML(role) : ''}</p>
+        <p class="vt-day-note">${day.st.obtained ? 'Ya lo tienes pegado.' : owners.length ? `Te falta, y ${escapeHTML(owners.join(', '))} lo tiene repetido.` : 'Te falta. Mañana sale otro.'}</p>
+        <button class="pdf-btn" id="dayGo">Ver en el álbum</button>
+      </div>
+    </section>
+
+    <h3 class="vt-h">Logros <small>${nDone} de ${ach.length}</small></h3>
+    <div class="vt-seals">${ach.map(a => `
+      <div class="vt-seal${a.done ? ' done' : ''}${a.metal ? ' m-' + a.metal : ''}" title="${escapeHTML(a.text)}">
+        <span class="vt-mark" aria-hidden="true">${escapeHTML(a.mark)}</span>
+        <b>${escapeHTML(a.name)}</b>
+        <small>${a.done ? 'Conseguido' : `${a.n} de ${a.of}`}</small>
+      </div>`).join('')}
+    </div>
+
+    <h3 class="vt-h">Colecciones <small>con los cromos del álbum</small></h3>
+    <div class="vt-cols">${cols.map((c, i) => `
+      <button class="vt-col" data-col="${i}">
+        <span class="vt-col-t">${escapeHTML(c.title)}</span>
+        <span class="vt-col-n">${c.n} de ${c.of}</span>
+        <span class="vt-bar"><span style="width:${c.of ? Math.round(c.n / c.of * 100) : 0}%"></span></span>
+      </button>`).join('')}
+    </div>
+  `;
+  bindCards(main.querySelector('.vt-day-card'));
+  document.getElementById('dayGo').addEventListener('click', () => { setCurrentSection(day.s.id); switchTab('album'); });
+  main.querySelectorAll('[data-col]').forEach(b => b.addEventListener('click', () => {
+    const c = cols[+b.dataset.col];
+    openList(c.title, c.groups);
+  }));
+}
 
 /* ---------- Cromos nuevos de una edición ----------
    Este móvil recuerda qué cromos conocía; si al abrir hay más (nueva tanda de
@@ -3074,6 +3391,7 @@ document.querySelectorAll('.sheet-backdrop').forEach(bd => {
 });
 document.addEventListener('keydown', e => {
   if(e.key !== 'Escape') return;
+  if(!document.getElementById('packOpen').hidden){ closePack(); return; }
   const open = [...document.querySelectorAll('.sheet-backdrop')].find(b => !b.hidden);
   if(open) closeSheet(open.id);
 });
@@ -3138,14 +3456,17 @@ function renderAll(){
   if(!data) return;
   renderHeader();
   const chipRow = document.getElementById('chipRow');
-  chipRow.style.display = activeTab === 'trades' ? 'none' : '';
-  if(activeTab !== 'trades') renderChips();
+  const noChips = activeTab === 'trades' || activeTab === 'vitrina';
+  chipRow.style.display = noChips ? 'none' : '';
+  if(!noChips) renderChips();
   const main = document.getElementById('mainArea');
   main.className = '';
   if(activeTab === 'album'){
     renderAlbum();
   } else if(activeTab === 'repes'){
     renderRepes();
+  } else if(activeTab === 'vitrina'){
+    renderVitrina();
   } else {
     renderTrades();
   }
