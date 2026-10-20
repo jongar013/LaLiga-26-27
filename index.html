@@ -483,6 +483,128 @@
   .chicles-grid .sticker .ch-cap{position:absolute; width:1px; height:1px; overflow:hidden; clip-path:inset(50%); white-space:nowrap; padding:0;}
   .sticker:not(.has) .chicle{border-radius:6px;}
   .pdf-btn:disabled{opacity:.45; cursor:default; transform:none;}
+  /* ---------- Tanda 2 ---------- */
+  .album-tools{display:flex; align-items:center; justify-content:space-between; gap:8px 12px; flex-wrap:wrap; margin:0 0 10px;}
+  .pack-btn{
+    display:flex; align-items:center; gap:8px; min-height:46px; padding:8px 16px 6px; border:none; border-radius:10px; cursor:pointer;
+    background:var(--laliga-red); color:#fff; font-family:var(--display); font-weight:900; font-size:21px; text-transform:uppercase;
+    box-shadow:0 3px 0 var(--laliga-red-dark);
+  }
+  .pack-btn svg{width:22px; height:22px; margin-top:-2px; fill:none; stroke:currentColor; stroke-width:2.2; stroke-linejoin:round; stroke-linecap:round;}
+  .pack-btn:active{transform:translateY(2px); box-shadow:0 1px 0 var(--laliga-red-dark);}
+  .switch{display:flex; align-items:center; gap:8px; min-height:44px; padding:0; background:none; border:none; cursor:pointer;
+    font:inherit; font-size:14.5px; font-weight:600; color:var(--ink-soft);}
+  .switch .knob{position:relative; flex:0 0 auto; width:40px; height:24px; border-radius:12px; background:var(--line); transition:background .2s;}
+  .switch .knob::after{content:""; position:absolute; left:3px; top:3px; width:18px; height:18px; border-radius:50%; background:#fff;
+    box-shadow:0 1px 2px rgba(0,0,0,0.3); transition:transform .2s;}
+  .switch[aria-checked="true"]{color:var(--ink);}
+  .switch[aria-checked="true"] .knob{background:var(--laliga-red);}
+  .switch[aria-checked="true"] .knob::after{transform:translateX(16px);}
+  .pack-btn:focus-visible, .switch:focus-visible, .fav-btn:focus-visible, .club-more:focus-visible, .pnum:focus-visible{outline:3px solid var(--gold); outline-offset:2px;}
+
+  #mainArea .sticker.has{cursor:pointer;}
+  .done-card{padding:14px 12px 12px;}
+
+  /* Tira entre la cabecera y la página: el club en las especiales y "Mi equipo". */
+  .club-bar{
+    display:flex; align-items:center; justify-content:space-between; gap:8px; padding:4px 10px; color:#fff;
+    background:linear-gradient(rgba(0,0,0,0.26), rgba(0,0,0,0.26)), var(--team);
+  }
+  .club-more{min-height:44px; padding:0 2px; background:none; border:none; color:#fff; font:inherit; font-size:14.5px; font-weight:600; text-align:left; cursor:pointer;}
+  .club-more b{font-weight:700;}
+  .fav-btn{
+    flex:0 0 auto; min-height:36px; padding:0 12px; border-radius:18px; border:1.5px solid rgba(255,255,255,0.55); cursor:pointer;
+    background:none; color:#fff; font:inherit; font-size:14px; font-weight:700; white-space:nowrap;
+  }
+  .fav-btn[aria-pressed="true"]{background:var(--gold); border-color:var(--gold); color:#131A2E;}
+  .crest-btn.fav{color:var(--ink);}
+  .crest-btn.fav .ring{box-shadow:0 0 0 2px var(--gold);}
+  .club-sheet h4{margin:10px 0 6px; font-size:14px; font-weight:700; color:var(--ink-soft);}
+  .club-sheet .sticker-grid{border-radius:10px; grid-template-columns:repeat(auto-fill, minmax(96px, 1fr));}
+  .club-sheet .sticker-grid.chicles-grid{grid-template-columns:repeat(3, minmax(0, 1fr));}
+  .club-sheet > .pdf-btn{min-height:44px; margin-top:8px;}
+
+  /* Ficha del cromo */
+  .card-top{display:flex; gap:14px; align-items:flex-start;}
+  .card-big{flex:0 0 auto; width:42%; max-width:180px;}
+  .card-big.wide{width:55%; max-width:250px;}
+  .card-big .sticker{cursor:default;}
+  .card-big .cap{display:none;}
+  .card-info{flex:1; min-width:0; padding-top:2px;}
+  .card-info h3{font-size:28px; line-height:.95; overflow-wrap:anywhere; text-wrap:balance;}
+  .card-meta{margin:8px 0 0; font-size:15px; line-height:1.35; color:var(--ink-soft);}
+  .card-meta .tag-badge{margin-top:6px;}
+  .card-row{
+    display:flex; align-items:center; justify-content:space-between; gap:10px; margin-top:8px; padding:6px 8px 6px 14px;
+    background:var(--card-bg); border:1px solid var(--line); border-radius:10px; font-weight:700; font-size:16px;
+  }
+  .card-row .repe-ctrl{margin:0; padding:0; gap:14px;}
+  .card-row .repe-ctrl .n{color:var(--ink);}
+  .section-head h2.long{font-size:31px;}
+  .card-row .repe-ctrl button{width:44px; height:44px;}
+  .card-friends{list-style:none; margin:0; padding:0; font-size:15px;}
+  .card-friends li{padding:8px 2px; border-bottom:1px solid var(--line);}
+  .sheet-close.danger{color:var(--laliga-red-dark);}
+
+  /* Repetidos que le faltan a un amigo */
+  .needs{display:block; margin:4px 2px 0; font-size:12.5px; font-weight:700; color:#1F7A47; line-height:1.15;}
+
+  /* Apuntar sobre */
+  .sheet select{
+    width:100%; min-height:44px; border:1.5px solid var(--line); border-radius:6px; padding:8px 10px; font:inherit; font-size:16px;
+    background:var(--field-bg); color:var(--ink);
+  }
+  .pack-nums{display:grid; grid-template-columns:repeat(auto-fill, minmax(54px, 1fr)); gap:6px; margin:4px 0 6px;}
+  .pnum{
+    position:relative; min-height:44px; padding:4px 2px 2px; border-radius:8px; border:1.5px solid var(--line); cursor:pointer;
+    background:var(--field-bg); color:var(--ink); font-family:var(--display); font-weight:900; font-size:19px; line-height:1;
+  }
+  .pnum.own{background:var(--paper-dark); color:var(--ink-soft); border-style:dashed;}
+  .pnum:active{transform:scale(0.94);}
+  .pnum .cnt{
+    position:absolute; right:-5px; top:-6px; min-width:20px; height:20px; padding:0 4px; border-radius:10px;
+    background:var(--laliga-red); color:#fff; font-size:13px; line-height:21px;
+  }
+  .pack-head{display:flex; align-items:baseline; justify-content:space-between; gap:8px; margin-top:4px; font-size:15px;}
+  .pack-head span{font-size:13.5px; color:var(--ink-soft);}
+  .pack-list{display:flex; flex-direction:column; gap:6px;}
+  .pack-empty{margin:4px 0; color:var(--ink-soft); font-size:14px;}
+  .pitem{display:flex; align-items:center; gap:10px; padding:4px 4px 4px 10px; border-radius:8px; border:1px solid var(--line); background:var(--field-bg); font-size:15px;}
+  .pitem b{min-width:30px; font-family:var(--display); font-weight:900; font-size:20px; color:var(--laliga-red);}
+  .pitem .nm{flex:1; min-width:0; line-height:1.15; font-weight:600;}
+  .pitem .nm small{display:block; font-weight:500; font-size:12.5px; color:var(--ink-soft);}
+  .pitem em{font-style:normal; padding:3px 8px 1px; border-radius:4px; font-family:var(--display); font-weight:900; font-size:15px; text-transform:uppercase;}
+  .pitem.new em{background:#1F8A4C; color:#fff;}
+  .pitem.repe em{background:var(--gold); color:#131A2E;}
+  .pitem button{width:40px; height:40px; border:none; background:none; color:var(--ink-soft); font-size:22px; cursor:pointer;}
+
+  /* Raros que se notan. Kromix: marco y reflejo arcoíris. Coloca y 2ª/3ª ed.: cinta en la esquina. */
+  .sticker.rar-kromix:not(.has){
+    border:2px solid transparent; box-shadow:none;
+    background:
+      linear-gradient(color-mix(in srgb, var(--team, #333) 78%, #000), color-mix(in srgb, var(--team, #333) 78%, #000)) padding-box,
+      linear-gradient(135deg, #FF5F8F, #FFC15E, #F4F36B, #5EE6A8, #5EB8FF, #B18CFF, #FF5F8F) border-box;
+  }
+  .sticker.has.rar-kromix{
+    background:linear-gradient(135deg, #FF8FB1, #FFD27A 20%, #F8F59A 35%, #8EF0C6 50%, #8ACBFF 65%, #C9A9FF 80%, #FF8FB1);
+  }
+  .sticker.has.rar-kromix .art::before{
+    content:""; position:absolute; inset:0; z-index:1; pointer-events:none; mix-blend-mode:screen; opacity:.55;
+    background:linear-gradient(115deg, rgba(255,95,143,0.5), rgba(255,210,122,0.4), rgba(94,230,168,0.45), rgba(94,184,255,0.5), rgba(177,140,255,0.5), rgba(255,95,143,0.5));
+    background-size:300% 300%; animation:holo 7s linear infinite;
+  }
+  @keyframes holo{ from{background-position:0% 50%;} to{background-position:300% 50%;} }
+  .sticker .art .tag-badge.tag-colocas, .sticker .art .tag-badge.tag-2ed, .sticker .art .tag-badge.tag-3ed{
+    right:-26px; top:9px; width:92px; padding:3px 0 2px; border-radius:0; text-align:center; transform:rotate(40deg);
+    font-size:10.5px; letter-spacing:.4px; box-shadow:0 1px 2px rgba(0,0,0,0.25);
+  }
+  /* El oro, la plata y el bronce brillan de vez en cuando, como el papel metalizado. */
+  @keyframes shine5{ 0%,70%{background-position:100% 0;} 100%{background-position:-60% 0;} }
+  .sticker.has:has(.metal-art)::after{animation:shine5 5s ease-in-out infinite;}
+  @media (prefers-reduced-motion: reduce){
+    .sticker.has.rar-kromix .art::before, .sticker.has:has(.metal-art)::after{animation:none;}
+  }
+
   .repes-note{flex-basis:100%; margin:0; font-size:13px; color:var(--ink-soft);}
 
   /* Equipo completo en la pestaña Álbum */
@@ -607,8 +729,6 @@
 <div class="tabs">
   <button class="tabbtn active" data-tab="album">
     <svg viewBox="0 0 24 24"><path d="M4 5a2 2 0 0 1 2-2h13v16H6a2 2 0 0 0-2 2z"/><path d="M4 21V5"/><path d="M9 8h6"/></svg>Álbum</button>
-  <button class="tabbtn" data-tab="collection">
-    <svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="3"/><path d="m8 12 3 3 5-6"/></svg>Mi colección</button>
   <button class="tabbtn" data-tab="repes">
     <svg viewBox="0 0 24 24"><rect x="8" y="8" width="13" height="13" rx="2"/><path d="M16 8V5a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h3"/></svg>Repetidos</button>
   <button class="tabbtn" data-tab="trades">
@@ -660,10 +780,72 @@
     <button class="pdf-btn" data-close>Ver mi álbum</button>
   </div>
 </div>
+
+<div class="sheet-backdrop" id="cardSheet" hidden>
+  <div class="sheet card-sheet" role="dialog" aria-labelledby="cardTitle">
+    <div class="card-top">
+      <div class="card-big" id="cardBig"></div>
+      <div class="card-info">
+        <h3 id="cardTitle"></h3>
+        <p class="card-meta" id="cardMeta"></p>
+      </div>
+    </div>
+    <div class="card-row">
+      <span>Repetidos</span>
+      <div class="repe-ctrl">
+        <button id="cardDec" aria-label="Quitar un repetido">−</button>
+        <span class="n" id="cardDupes" aria-live="polite">0</span>
+        <button class="plus" id="cardInc" aria-label="Añadir un repetido">+</button>
+      </div>
+    </div>
+    <ul class="card-friends" id="cardFriends"></ul>
+    <div class="sheet-actions">
+      <button class="pdf-btn" data-close>Cerrar</button>
+      <button class="sheet-close danger" id="cardUnstick">Despegar este cromo</button>
+    </div>
+  </div>
+</div>
+
+<div class="sheet-backdrop" id="packSheet" hidden>
+  <div class="sheet pack-sheet" role="dialog" aria-labelledby="packTitle">
+    <h3 id="packTitle">Apuntar sobre</h3>
+    <p class="hint">Elige la página y toca los números que te han salido. Te digo cuáles son nuevos y cuáles repetidos.</p>
+    <label for="packSection">Página</label>
+    <select id="packSection"></select>
+    <div class="pack-nums" id="packNums"></div>
+    <div class="pack-head"><b>Tu sobre</b><span id="packCount"></span></div>
+    <div class="pack-list" id="packList"></div>
+    <div class="sheet-actions">
+      <button class="pdf-btn" id="packSave" disabled>Guardar sobre</button>
+      <button class="pdf-btn alt" data-close>Cancelar</button>
+    </div>
+  </div>
+</div>
+
+<div class="sheet-backdrop" id="clubSheet" hidden>
+  <div class="sheet club-sheet" role="dialog" aria-labelledby="clubTitle">
+    <h3 id="clubTitle"></h3>
+    <p class="hint">Toca un hueco para pegarlo o un cromo pegado para ver su ficha.</p>
+    <div id="clubBody"></div>
+    <button class="pdf-btn" data-close>Cerrar</button>
+  </div>
+</div>
+
+<div class="sheet-backdrop" id="newsSheet" hidden>
+  <div class="sheet" role="dialog" aria-labelledby="newsTitle">
+    <h3 id="newsTitle"></h3>
+    <p class="hint">Panini ha sacado cromos nuevos y ya están en el álbum. Lo que tenías pegado sigue igual.</p>
+    <div id="newsBody"></div>
+    <div class="sheet-actions">
+      <button class="pdf-btn" id="newsGo">Verlos en el álbum</button>
+      <button class="pdf-btn alt" data-close>Cerrar</button>
+    </div>
+  </div>
+</div>
 </div>
 
 <script>
-const APP_VERSION = '2026-10-20.5';
+const APP_VERSION = '2026-10-21.1';
 const STORAGE_KEY = 'laliga_2627_album_v5';
 
 /* Orden exacto de equipos indicado por el usuario */
@@ -1541,9 +1723,15 @@ function toStored(d){
    que si otro móvil acaba de marcar un cromo no se pierda al guardar este. */
 let pendingOps = {};
 function setSticker(st, obtained, dupes){
-  st.obtained = obtained;
-  st.dupes = dupes;
-  pendingOps[st.id] = { obtained, dupes };
+  setStickers([[st, obtained, dupes]]);
+}
+/* Varios cromos de golpe (un sobre entero) con un solo guardado. */
+function setStickers(list){
+  list.forEach(([st, obtained, dupes]) => {
+    st.obtained = obtained;
+    st.dupes = dupes;
+    pendingOps[st.id] = { obtained, dupes };
+  });
   save();
 }
 function applyOps(d, ops){
@@ -1637,6 +1825,7 @@ function startSync(uid){
     if(!activeTab) activeTab = 'album';
     renderAll();
     suppressSave = false;
+    checkNewStickers();
   }, err => {
     console.error('Error de sincronización:', err);
   });
@@ -1645,6 +1834,7 @@ function startSync(uid){
 function stopSync(){
   if(unsubscribeDoc){ unsubscribeDoc(); unsubscribeDoc = null; }
   data = null;
+  newsChecked = false;
 }
 
 function showLoginError(msg){
@@ -1784,7 +1974,7 @@ function syncFriendAlbums(){
 }
 
 function rerenderTrades(){
-  if(data && activeTab === 'trades') renderAll();
+  if(data && (activeTab === 'trades' || activeTab === 'repes')) renderAll();
 }
 
 async function sendFriendRequest(rawEmail){
@@ -1967,16 +2157,30 @@ let currentSectionId = null;
 try { currentSectionId = localStorage.getItem('laliga_2627_section'); } catch(e) {}
 
 function currentSection(){
-  return getSection(currentSectionId) || data.sections[0];
+  return getSection(currentSectionId) || orderedSections()[0];
+}
+
+/* Tu equipo sale el primero en la fila de escudos. Es de este móvil: si compartís
+   cuenta, cada uno puede tener el suyo. */
+let favTeam = null;
+try { favTeam = localStorage.getItem('laliga_2627_fav'); } catch(e) {}
+function orderedSections(){
+  const fav = data.sections.find(s => s.id === favTeam);
+  return fav ? [fav, ...data.sections.filter(s => s !== fav)] : data.sections;
+}
+function toggleFav(id){
+  favTeam = favTeam === id ? null : id;
+  try { favTeam ? localStorage.setItem('laliga_2627_fav', favTeam) : localStorage.removeItem('laliga_2627_fav'); } catch(e) {}
+  renderAll();
 }
 function setCurrentSection(id){
   currentSectionId = id;
   try { localStorage.setItem('laliga_2627_section', id); } catch(e) {}
 }
 function goToSection(offset){
-  const n = data.sections.length;
-  const idx = data.sections.findIndex(s => s.id === currentSection().id);
-  setCurrentSection(data.sections[(idx + offset + n) % n].id);
+  const list = orderedSections(), n = list.length;
+  const idx = list.findIndex(s => s.id === currentSection().id);
+  setCurrentSection(list[(idx + offset + n) % n].id);
   renderAll();
   window.scrollTo(0, 0);
 }
@@ -1997,14 +2201,15 @@ function renderChips(){
   row.innerHTML = '';
   const cur = currentSection();
   let activeChip = null;
-  data.sections.forEach(s => {
+  orderedSections().forEach(s => {
     const have = s.stickers.filter(st=>st.obtained).length;
     const chip = document.createElement('button');
     const isActive = s.id === cur.id;
     chip.className = 'crest-btn' + (isActive ? ' active' : '');
     chip.style.setProperty('--team', s.color);
     chip.style.setProperty('--p', s.stickers.length ? Math.round(have / s.stickers.length * 100) : 0);
-    chip.setAttribute('aria-label', `${s.name}: ${have} de ${s.stickers.length}`);
+    chip.setAttribute('aria-label', `${s.name}${s.id === favTeam ? ' (mi equipo)' : ''}: ${have} de ${s.stickers.length}`);
+    if(s.id === favTeam) chip.classList.add('fav');
     if(isActive) chip.setAttribute('aria-current', 'true');
     const initial = escapeHTML(s.name.charAt(0));
     const marker = s.crest
@@ -2048,7 +2253,7 @@ function sectionHeadHTML(section, subText){
       <div class="head-main">
         ${crest}
         <div>
-          <h2>${escapeHTML(section.name)}</h2>
+          <h2${section.name.split(' ').some(w => w.length > 8) ? ' class="long"' : ''}>${escapeHTML(section.name)}</h2>
           <div class="sub"><span>${subText}</span>${complete ? '<span class="seal">Completado</span>' : ''}</div>
           <div class="head-progress"><span style="width:${total ? Math.round(have / total * 100) : 0}%"></span></div>
         </div>
@@ -2188,15 +2393,30 @@ function stickerFaceHTML(section, st, extra){
     <div class="cap"><b>${escapeHTML(name)}</b>${sub ? `<small>${sub}</small>` : ''}</div>`;
 }
 
-function stickerCardHTML(section, st, collectionMode){
-  const cls = 'sticker' + (st.obtained ? ' has' : '');
-  const { name } = splitName(section, st);
-  const label = `Pegar el número ${st.number}, ${st.name.replace(' — ', ', ')}`;
+/* Clase por rareza para el marco: Kromix con reflejo arcoíris, y Coloca o 2ª/3ª ed.
+   con su cinta en la esquina. */
+const RARITY = { 'Kromix':'kromix', 'COLOCA':'coloca', '2ª ed.':'ed', '3ª ed.':'ed' };
+function rarityClass(st){ return RARITY[st.tag] ? ' rar-' + RARITY[st.tag] : ''; }
+
+/* En el Álbum, tocar un hueco pega el cromo y tocar un cromo pegado abre su ficha. */
+function stickerCardHTML(section, st){
+  const cls = 'sticker' + (st.obtained ? ' has' : '') + rarityClass(st);
+  const label = `${st.obtained ? 'Ver la ficha del' : 'Pegar el'} número ${st.number}, ${st.name.replace(' — ', ', ')}`;
   return `
-    <div class="${cls}" data-id="${st.id}"${collectionMode ? '' : ` role="button" tabindex="0" aria-label="${escapeHTML(label)}"`}>
+    <div class="${cls}" data-id="${st.id}" role="button" tabindex="0" aria-label="${escapeHTML(label)}">
       ${stickerFaceHTML(section, st)}
-      ${collectionMode ? `<button class="undo" data-undo="${st.id}" aria-label="Despegar ${escapeHTML(name)}">Despegar</button>` : ''}
     </div>`;
+}
+function bindCards(box){
+  box.querySelectorAll('.sticker[data-id]').forEach(card => {
+    const act = () => card.classList.contains('has') ? openCard(card.dataset.id) : markObtained(card.dataset.id, card);
+    card.addEventListener('click', act);
+    card.addEventListener('keydown', e => {
+      if(e.target !== card || (e.key !== 'Enter' && e.key !== ' ')) return;
+      e.preventDefault();
+      act();
+    });
+  });
 }
 
 function escapeHTML(str){
@@ -2205,37 +2425,50 @@ function escapeHTML(str){
   return d.innerHTML;
 }
 
+/* La página entera, con los cromos pegados en su sitio. "Solo los que me faltan"
+   deja ver solo los huecos, como antes; se recuerda en este móvil. */
+let onlyMissing = false;
+try { onlyMissing = localStorage.getItem('laliga_2627_only_missing') === '1'; } catch(e) {}
+
+const PACK_ICON = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 6.5 7 3h10l2 3.5"/><rect x="5" y="6.5" width="14" height="14.5" rx="1.5"/><path d="M5 10h14M9.5 14.5h5"/></svg>';
+
 function renderAlbum(){
   const section = currentSection();
-  const missing = groupBySlot(section.stickers).filter(st => !st.obtained);
-  const have = section.stickers.filter(st => st.obtained).length;
-
-  const total = section.stickers.length, left = total - have;
+  const all = groupBySlot(section.stickers);
+  const shown = onlyMissing ? all.filter(st => !st.obtained) : all;
+  const total = section.stickers.length, have = section.stickers.filter(st => st.obtained).length, left = total - have;
   const sub = `${have} de ${total} pegados` + (left > 0 && left <= 3 ? ` · solo te falta${left === 1 ? '' : 'n'} ${left}` : '');
 
   const main = document.getElementById('mainArea');
   main.innerHTML = `
+    <div class="album-tools">
+      <button class="pack-btn" id="packBtn">${PACK_ICON}Apuntar sobre</button>
+      <button class="switch" id="onlyMissing" role="switch" aria-checked="${onlyMissing}"><span class="knob"></span>Solo los que me faltan</button>
+    </div>
     ${sectionHeadHTML(section, sub)}
+    ${clubBarHTML(section)}
     <div class="sticker-grid${gridClass(section)}" id="stickerGrid" style="--team:${readableColor(section.color)}">
-      ${missing.length ? missing.map(st => stickerCardHTML(section, st, false)).join('') :
-        total ? doneCardHTML(section) : `<div class="empty-msg">No hay cromos en esta sección.</div>`}
+      ${total && !left ? doneCardHTML(section) : ''}
+      ${shown.map(st => stickerCardHTML(section, st)).join('')}
+      ${total ? '' : `<div class="empty-msg">No hay cromos en esta sección.</div>`}
     </div>
   `;
 
-  document.getElementById('stickerGrid').querySelectorAll('.sticker').forEach(card => {
-    card.addEventListener('click', () => markObtained(section, card.dataset.id, card));
-    card.addEventListener('keydown', e => {
-      if(e.target !== card || (e.key !== 'Enter' && e.key !== ' ')) return;
-      e.preventDefault();
-      markObtained(section, card.dataset.id, card);
-    });
+  bindCards(document.getElementById('stickerGrid'));
+  document.getElementById('packBtn').addEventListener('click', () => openPack());
+  document.getElementById('onlyMissing').addEventListener('click', () => {
+    onlyMissing = !onlyMissing;
+    try { localStorage.setItem('laliga_2627_only_missing', onlyMissing ? '1' : '0'); } catch(e) {}
+    renderAll();
   });
-  const seePage = document.getElementById('seePage');
-  if(seePage) seePage.addEventListener('click', () => switchTab('collection'));
+  const fav = document.getElementById('favBtn');
+  if(fav) fav.addEventListener('click', () => toggleFav(section.id));
+  const more = document.getElementById('clubMore');
+  if(more) more.addEventListener('click', () => openClub(section.id));
   bindSectionNav(main);
 }
 
-/* Página completa en la pestaña Álbum: sello y cuánto queda. */
+/* Equipo completo: aviso arriba de la página llena, con lo que queda. */
 function doneCardHTML(section){
   const same = data.sections.filter(s => s.type === section.type);
   const left = same.filter(s => !isComplete(s)).length;
@@ -2243,28 +2476,216 @@ function doneCardHTML(section){
   return `<div class="done-card">
       <p>Tienes los ${section.stickers.length} cromos de ${escapeHTML(section.name)}.</p>
       <small>${left ? `Te queda${left === 1 ? '' : 'n'} ${left} ${word[left === 1 ? 0 : 1]} por completar.` : `Has completado ${section.type === 'team' ? 'todos los equipos' : 'todas las secciones especiales'}.`}</small>
-      <button id="seePage">Ver la página en Mi colección</button>
     </div>`;
 }
 
-function renderCollection(){
-  const section = currentSection();
-  const obtained = groupBySlot(section.stickers).filter(st => st.obtained);
+/* ---------- Tu equipo en las secciones especiales ----------
+   Los cromos de un club repartidos por ADN, Draft, Fichajes, Chicles y Extra. */
+function clubSpecials(section){
+  const slug = CREST_SLUGS[section.name];
+  if(section.type !== 'team' || !slug) return [];
+  return data.sections.filter(s => s.type === 'special')
+    .map(s => ({ s, its: groupBySlot(s.stickers).filter(st => clubSlug(splitName(s, st).club) === slug) }))
+    .filter(g => g.its.length);
+}
+function clubBarHTML(section){
+  if(section.type !== 'team') return '';
+  const groups = clubSpecials(section);
+  const n = groups.reduce((m, g) => m + g.its.length, 0);
+  const have = groups.reduce((m, g) => m + g.its.filter(st => st.obtained).length, 0);
+  const fav = section.id === favTeam;
+  return `<div class="club-bar" style="--team:${readableColor(section.color)}">
+      ${n ? `<button class="club-more" id="clubMore">En las especiales: <b>${have} de ${n}</b> pegados <span aria-hidden="true">›</span></button>` : '<span></span>'}
+      <button class="fav-btn" id="favBtn" aria-pressed="${fav}">${fav ? '★ Mi equipo' : '☆ Es mi equipo'}</button>
+    </div>`;
+}
+let clubSheetId = null;
+function openClub(id){
+  clubSheetId = id;
+  renderClub();
+  openSheet('clubSheet');
+}
+function renderClub(){
+  const section = getSection(clubSheetId);
+  if(!section) return;
+  document.getElementById('clubTitle').textContent = `${section.name} en las especiales`;
+  const box = document.getElementById('clubBody');
+  box.innerHTML = clubSpecials(section).map(({ s, its }) => `
+    <h4>${escapeHTML(s.name)} · ${its.filter(st => st.obtained).length} de ${its.length}</h4>
+    <div class="sticker-grid${gridClass(s)}" style="--team:${readableColor(s.color)}">
+      ${its.map(st => stickerCardHTML(s, st)).join('')}
+    </div>`).join('');
+  bindCards(box);
+}
 
-  const main = document.getElementById('mainArea');
-  main.className = 'collection';
-  main.innerHTML = `
-    ${sectionHeadHTML(section, `${obtained.length} de ${section.stickers.length} pegados`)}
-    <div class="sticker-grid${gridClass(section)}" style="--team:${readableColor(section.color)}">
-      ${obtained.length ? obtained.map(st => stickerCardHTML(section, st, true)).join('') :
-        `<div class="empty-msg">Aún no has pegado ningún cromo de esta sección. Tócalos en la pestaña Álbum para pegarlos.</div>`}
-    </div>
-  `;
+/* ---------- Ficha del cromo ----------
+   Al tocar un cromo pegado: sus datos, sus repetidos, qué amigos lo tienen repetido o
+   lo necesitan, y despegarlo. */
+let cardId = null;
+function openCard(id){
+  cardId = id;
+  renderCard();
+  openSheet('cardSheet');
+}
+function sectionOf(st){ return data.sections.find(s => s.stickers.includes(st)); }
+function renderCard(){
+  const st = findSticker(cardId);
+  if(!st || !st.obtained){ if(!document.getElementById('cardSheet').hidden) closeSheet('cardSheet'); return; }
+  const section = sectionOf(st);
+  const { name, role, club } = splitName(section, st);
+  const big = document.getElementById('cardBig');
+  big.className = 'card-big' + (isChicles(section) ? ' wide' : '');
+  big.style.setProperty('--team', readableColor(section.color));
+  big.innerHTML = `<div class="sticker has${rarityClass(st)}">${stickerFaceHTML(section, st)}</div>`;
+  document.getElementById('cardTitle').textContent = /^escudo/i.test(name) && club ? `Escudo · ${club}` : name;
+  const meta = [`Nº ${st.number} de ${section.name}`, [role, club].filter(Boolean).join(' · ')].filter(Boolean);
+  document.getElementById('cardMeta').innerHTML = meta.map(escapeHTML).join('<br>') +
+    (st.tag ? `<br><span class="tag-badge ${tagClass(st.tag)}">${escapeHTML(st.tag)}</span>` : '');
+  document.getElementById('cardDupes').textContent = st.dupes || 0;
+  document.getElementById('cardDec').disabled = !st.dupes;
+  const lines = friendsList().map(f => {
+    const fd = friendAlbums[f.uid];
+    const t = fd && (fd.sections || []).flatMap(x => x.stickers || []).find(x => x.id === st.id);
+    if(!t) return '';
+    const who = escapeHTML(f.name || 'Tu amigo');
+    if(t.obtained && t.dupes > 0) return `<li><b>${who}</b> también lo tiene repetido.</li>`;
+    if(!t.obtained) return `<li>A <b>${who}</b> le falta${st.dupes ? ': se lo puedes cambiar.' : '.'}</li>`;
+    return '';
+  }).filter(Boolean);
+  document.getElementById('cardFriends').innerHTML = lines.join('');
+}
+document.getElementById('cardInc').addEventListener('click', () => changeCardDupes(1));
+document.getElementById('cardDec').addEventListener('click', () => changeCardDupes(-1));
+function changeCardDupes(delta){
+  const st = findSticker(cardId);
+  if(!st) return;
+  setSticker(st, true, Math.max(0, (st.dupes || 0) + delta));
+  renderAll();
+}
+document.getElementById('cardUnstick').addEventListener('click', () => {
+  const id = cardId;
+  closeSheet('cardSheet');
+  unstick(id);
+});
 
-  main.querySelectorAll('[data-undo]').forEach(btn => {
-    btn.addEventListener('click', () => unstick(btn.dataset.undo));
+/* A qué amigos les falta un repetido tuyo. */
+function needsHTML(st){
+  const names = friendsList().filter(f => {
+    const fd = friendAlbums[f.uid];
+    const t = fd && (fd.sections || []).flatMap(x => x.stickers || []).find(x => x.id === st.id);
+    return t && !t.obtained;
+  }).map(f => f.name || 'tu amigo');
+  return names.length ? `<small class="needs">Le falta a ${escapeHTML(names.join(', '))}</small>` : '';
+}
+
+/* ---------- Apuntar sobre ----------
+   Eliges la página, tocas los números que te han salido (de una o varias páginas) y
+   la app dice cuáles son nuevos y cuáles repetidos. Se guarda todo junto y se
+   puede deshacer el sobre entero. */
+let packItems = [], packSectionId = null;
+function openPack(){
+  packItems = [];
+  packSectionId = currentSection().id;
+  const sel = document.getElementById('packSection');
+  sel.innerHTML = orderedSections().map(s => `<option value="${s.id}">${escapeHTML(s.name)}</option>`).join('');
+  sel.value = packSectionId;
+  renderPack();
+  openSheet('packSheet');
+}
+document.getElementById('packSection').addEventListener('change', e => { packSectionId = e.target.value; renderPack(); });
+function packStatus(){
+  const seen = new Set();
+  return packItems.map((id, i) => {
+    const st = findSticker(id);
+    const repe = !!st && (st.obtained || seen.has(id));
+    seen.add(id);
+    return { id, st, repe, i };
+  }).filter(x => x.st);
+}
+function renderPack(){
+  const section = getSection(packSectionId) || currentSection();
+  const inPack = {};
+  packItems.forEach(id => { inPack[id] = (inPack[id] || 0) + 1; });
+  const nums = document.getElementById('packNums');
+  nums.innerHTML = section.stickers.map(st => {
+    const { name } = splitName(section, st);
+    return `<button class="pnum${st.obtained ? ' own' : ''}" data-add="${st.id}"
+      aria-label="${escapeHTML(`${st.number}, ${name}${st.obtained ? ', ya lo tienes' : ''}`)}">${escapeHTML(String(st.number))}${inPack[st.id] ? `<span class="cnt">${inPack[st.id]}</span>` : ''}</button>`;
+  }).join('');
+  nums.querySelectorAll('[data-add]').forEach(b => b.addEventListener('click', () => { packItems.push(b.dataset.add); renderPack(); }));
+  const items = packStatus();
+  const nNew = items.filter(x => !x.repe).length, nRep = items.length - nNew;
+  document.getElementById('packCount').textContent = items.length
+    ? `${items.length} cromo${items.length === 1 ? '' : 's'} · ${nNew} nuevo${nNew === 1 ? '' : 's'} · ${nRep} repe${nRep === 1 ? '' : 's'}` : '';
+  const list = document.getElementById('packList');
+  list.innerHTML = items.length ? items.map(x => {
+    const sec = sectionOf(x.st), { name } = splitName(sec, x.st);
+    return `<div class="pitem ${x.repe ? 'repe' : 'new'}"><b>${escapeHTML(String(x.st.number))}</b>
+      <span class="nm">${escapeHTML(name)}<small>${escapeHTML(sec.name)}</small></span>
+      <em>${x.repe ? 'Repe' : 'Nuevo'}</em>
+      <button data-rm="${x.i}" aria-label="Quitar ${escapeHTML(name)} del sobre">×</button></div>`;
+  }).join('') : '<p class="pack-empty">Toca arriba los números que te han salido.</p>';
+  list.querySelectorAll('[data-rm]').forEach(b => b.addEventListener('click', () => { packItems.splice(+b.dataset.rm, 1); renderPack(); }));
+  document.getElementById('packSave').disabled = !items.length;
+}
+document.getElementById('packSave').addEventListener('click', () => {
+  const items = packStatus();
+  if(!items.length) return;
+  const before = {}, after = {};
+  items.forEach(({ id, st }) => {
+    if(!before[id]) before[id] = { obtained: st.obtained, dupes: st.dupes || 0 };
+    const a = after[id] || { ...before[id] };
+    if(a.obtained) a.dupes++; else a.obtained = true;
+    after[id] = a;
   });
-  bindSectionNav(main);
+  const wasComplete = new Set(data.sections.filter(isComplete).map(s => s.id));
+  setStickers(Object.keys(after).map(id => [findSticker(id), after[id].obtained, after[id].dupes]));
+  packItems = [];
+  closeSheet('packSheet');
+  renderAll();
+  const nNew = items.filter(x => !x.repe).length, nRep = items.length - nNew;
+  showUndo(`Sobre apuntado: ${nNew} nuevo${nNew === 1 ? '' : 's'} y ${nRep} repetido${nRep === 1 ? '' : 's'}`, () => {
+    setStickers(Object.keys(before).map(id => findSticker(id)).filter(Boolean).map(st => [st, before[st.id].obtained, before[st.id].dupes]));
+    renderAll();
+  });
+  const { total, have } = totalCounts();
+  const done = data.sections.find(s => isComplete(s) && !wasComplete.has(s.id));
+  if(have === total) celebrateAlbum(total);
+  else if(done) celebrate(done);
+});
+
+/* ---------- Cromos nuevos de una edición ----------
+   Este móvil recuerda qué cromos conocía; si al abrir hay más (nueva tanda de
+   Panini), lo cuenta. La primera vez solo los apunta. */
+const KNOWN_KEY = 'laliga_2627_known';
+let newsChecked = false;
+function checkNewStickers(){
+  if(newsChecked || !data) return;
+  newsChecked = true;
+  const ids = data.sections.flatMap(s => s.stickers.map(st => st.id));
+  let known = null;
+  try { known = JSON.parse(localStorage.getItem(KNOWN_KEY)); } catch(e) {}
+  try { localStorage.setItem(KNOWN_KEY, JSON.stringify(ids)); } catch(e) {}
+  if(!Array.isArray(known)) return;
+  const old = new Set(known);
+  const groups = data.sections.map(s => ({ s, its: s.stickers.filter(st => !old.has(st.id)) })).filter(g => g.its.length);
+  const n = groups.reduce((m, g) => m + g.its.length, 0);
+  if(!n) return;
+  document.getElementById('newsTitle').textContent = n === 1 ? 'Ha salido 1 cromo nuevo' : `Han salido ${n} cromos nuevos`;
+  document.getElementById('newsBody').innerHTML = tradeListHTML(groups, '');
+  document.getElementById('newsGo').onclick = () => {
+    closeSheet('newsSheet');
+    setCurrentSection(groups[0].s.id);
+    switchTab('album');
+  };
+  openSheet('newsSheet');
+}
+
+/* Las hojas abiertas se actualizan si cambia el álbum (por ejemplo desde el otro móvil). */
+function refreshOpenSheets(){
+  if(!document.getElementById('cardSheet').hidden) renderCard();
+  if(!document.getElementById('clubSheet').hidden) renderClub();
+  if(!document.getElementById('packSheet').hidden) renderPack();
 }
 
 /* Despegar pregunta antes y avisa si se borran repetidos; después se puede deshacer. */
@@ -2322,6 +2743,7 @@ function renderRepes(){
       ${obtained.length ? obtained.map(st => `
         <div class="sticker has${st.dupes ? ' dupe' : ''}">
           ${stickerFaceHTML(section, st, st.dupes ? `<span class="dupe-stamp">×${st.dupes}</span>` : '')}
+          ${st.dupes ? needsHTML(st) : ''}
           <div class="repe-ctrl">
             <button data-dec="${st.id}" ${st.dupes ? '' : 'disabled'} aria-label="Quitar un repetido de ${escapeHTML(splitName(section, st).name)}">−</button>
             <span class="n" aria-live="polite">${st.dupes || 0}</span>
@@ -2535,7 +2957,7 @@ function listImages(groups, title, subtitle, qty, baseName){
     c.toBlob(b => res(new File([b], `${baseName}-${i + 1}.jpg`, { type:'image/jpeg' })), 'image/jpeg', 0.9))));
 }
 
-function markObtained(section, id, cardEl){
+function markObtained(id, cardEl){
   if(cardEl.classList.contains('pasting')) return;
   cardEl.classList.add('has', 'pasting');
   if(navigator.vibrate) setTimeout(() => navigator.vibrate(12), 380);
@@ -2724,11 +3146,10 @@ function renderAll(){
     renderAlbum();
   } else if(activeTab === 'repes'){
     renderRepes();
-  } else if(activeTab === 'trades'){
-    renderTrades();
   } else {
-    renderCollection();
+    renderTrades();
   }
+  refreshOpenSheets();
 }
 
 </script>
