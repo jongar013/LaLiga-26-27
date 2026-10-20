@@ -312,13 +312,32 @@
       linear-gradient(165deg, color-mix(in srgb, var(--team, var(--laliga-red)) 72%, #fff), var(--team, var(--laliga-red)) 70%);
   }
   .sticker.has .sil{fill:rgba(255,255,255,0.55);}
-  /* Cromo pegado: en vez de la silueta, el escudo del equipo del jugador. */
-  .sticker .crest-art{display:none;}
-  .sticker.has .with-crest .crest-art{
-    display:block; position:absolute; left:20%; top:26%; width:60%; height:62%; object-fit:contain;
-    filter:drop-shadow(0 3px 4px rgba(0,0,0,0.3));
+  /* Cromos de escudo: el escudo en sombra oscura mientras falta y en color al pegarlo. */
+  .crest-card .sil{display:none;}
+  .crest-card .crest-shape{
+    position:absolute; left:20%; top:24%; width:60%; height:64%; object-fit:contain;
+    filter:brightness(0); opacity:.3;
   }
-  .sticker.has .with-crest .sil, .sticker.has .with-crest .wm{display:none;}
+  .sticker.has .crest-card .crest-shape{filter:drop-shadow(0 3px 4px rgba(0,0,0,0.3)); opacity:1;}
+  .sticker.has .crest-card .wm{display:none;}
+
+  /* Extra Sticker pegado: el escudo del equipo del jugador teñido del metal del cromo,
+     con el mismo dibujo del escudo (gris) y el color del metal por encima. */
+  .metal-crest{display:none;}
+  .sticker.has .metal-card .metal-crest{
+    display:block; position:absolute; left:20%; top:24%; width:60%; height:64%; isolation:isolate;
+    filter:drop-shadow(0 3px 4px rgba(0,0,0,0.35));
+  }
+  .metal-crest img{width:100%; height:100%; object-fit:contain; filter:grayscale(1) contrast(1.15) brightness(1.15);}
+  .metal-crest::after{
+    content:""; position:absolute; inset:0; mix-blend-mode:multiply;
+    -webkit-mask:var(--crest) center/contain no-repeat; mask:var(--crest) center/contain no-repeat;
+    background:var(--metal);
+  }
+  .metal-oro{--metal:linear-gradient(135deg, #B8860B, #F7D774 40%, #C9971C 60%, #FFE9A3 78%, #A67C12);}
+  .metal-plata{--metal:linear-gradient(135deg, #9AA3AE, #F4F6F9 40%, #B9C1CB 60%, #FFFFFF 78%, #8E97A2);}
+  .metal-bronce{--metal:linear-gradient(135deg, #8A5129, #E7A974 40%, #A9632F 60%, #F2C49A 78%, #7C4520);}
+  .sticker.has .metal-card .sil, .sticker.has .metal-card .wm{display:none;}
   .sticker.has .wm{display:block; position:absolute; right:-14%; top:-10%; width:62%; opacity:.22; filter:grayscale(1) brightness(3);}
   .sticker.has .num{background:#131A2E; color:#fff;}
   .sticker.has .cap{padding:5px 3px 3px; color:#131A2E;}
@@ -2009,6 +2028,7 @@ const CLUB_KEYS = [
   ['getafe', 'getafe'], ['levante', 'levante'], ['malaga', 'malaga'], ['osasuna', 'osasuna'],
   ['racing', 'racing'], ['rayo', 'rayo'], ['sevilla', 'sevilla'], ['valencia', 'valencia'], ['villarreal', 'villarreal']
 ];
+const METALS = { 'Bronce':'bronce', 'Plata':'plata', 'Oro':'oro' };
 function stickerCrest(section, club){
   if(section.type === 'team') return section.crest;
   const c = club.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
@@ -2035,9 +2055,21 @@ function stickerFaceHTML(section, st, extra){
   const sub = [club, role].filter(Boolean).map(escapeHTML).join('<br>');
   const wm = section.crest ? `<img class="wm" src="${section.crest}" alt="" onerror="this.remove()">` : '';
   const crest = stickerCrest(section, club);
-  const crestImg = crest ? `<img class="crest-art" src="${crest}" alt="" onerror="this.parentNode.classList.remove('with-crest'); this.remove()">` : '';
+  const metal = METALS[st.tag];
+  let art = '', artClass = '';
+  if(/^escudo/i.test(name) && crest){
+    // Cromo de escudo: su escudo en sombra mientras falta y en color cuando lo tienes.
+    artClass = ' crest-card';
+    art = `<img class="crest-shape" src="${crest}" alt="" onerror="this.parentNode.classList.remove('crest-card'); this.remove()">${SIL_CREST}`;
+  } else if(metal && crest){
+    // Extra Sticker: al pegarlo, el escudo del equipo del jugador en bronce, plata u oro.
+    artClass = ' metal-card';
+    art = `<span class="metal-crest metal-${metal}" style="--crest:url('${crest}')"><img src="${crest}" alt="" onerror="this.parentNode.remove()"></span>${wm}${SIL_PLAYER}`;
+  } else {
+    art = wm + (/^escudo/i.test(name) ? SIL_CREST : SIL_PLAYER);
+  }
   return `
-    <div class="art${crest ? ' with-crest' : ''}">${wm}${crestImg}${/^escudo/i.test(name) ? SIL_CREST : SIL_PLAYER}<span class="num">${escapeHTML(String(st.number))}</span>${badge}${extra || ''}</div>
+    <div class="art${artClass}">${art}<span class="num">${escapeHTML(String(st.number))}</span>${badge}${extra || ''}</div>
     <div class="cap"><b>${escapeHTML(name)}</b>${sub ? `<small>${sub}</small>` : ''}</div>`;
 }
 
