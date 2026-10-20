@@ -479,8 +479,9 @@
   .ch-crest-small{position:absolute; right:5%; top:5%; z-index:2; width:clamp(14px, 15cqw, 20px); height:clamp(14px, 15cqw, 20px); object-fit:contain;
     background:#fff; border-radius:50%; padding:2px;}
   .chk-box .ch-crest-small{right:auto; left:32%;}
-  .chicles-grid .sticker .cap{padding:3px 5px 5px;}
-  .chicles-grid .sticker .cap small{margin:0; font-size:11px; line-height:1.2;}
+  /* el texto de debajo no se ve (el cromo ya se distingue), pero lo siguen leyendo los lectores de pantalla */
+  .chicles-grid .sticker .ch-cap{position:absolute; width:1px; height:1px; overflow:hidden; clip-path:inset(50%); white-space:nowrap; padding:0;}
+  .sticker:not(.has) .chicle{border-radius:6px;}
   .pdf-btn:disabled{opacity:.45; cursor:default; transform:none;}
   .repes-note{flex-basis:100%; margin:0; font-size:13px; color:var(--ink-soft);}
 
@@ -662,7 +663,7 @@
 </div>
 
 <script>
-const APP_VERSION = '2026-10-20.4';
+const APP_VERSION = '2026-10-20.5';
 const STORAGE_KEY = 'laliga_2627_album_v5';
 
 /* Orden exacto de equipos indicado por el usuario */
@@ -2158,7 +2159,7 @@ function chicleFaceHTML(section, st, extra){
   }
   return `
     <div class="art chicle chk-${kind}" style="--club:${color}">${inner}<span class="num">${escapeHTML(String(st.number))}</span>${extra || ''}</div>
-    <div class="cap"><small>${escapeHTML(kind === 'escudo' ? 'Escudo' : role)}${kind === 'escudo' ? '' : ' · ' + escapeHTML(club)}</small></div>`;
+    <div class="cap ch-cap"><small>${escapeHTML(kind === 'escudo' ? 'Escudo' : role)}${kind === 'escudo' ? '' : ' · ' + escapeHTML(club)}</small></div>`;
 }
 
 function stickerFaceHTML(section, st, extra){
