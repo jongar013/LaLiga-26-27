@@ -79,6 +79,70 @@
     opacity:0; transform:translateY(12px) scale(0.9); pointer-events:none; transition:opacity .2s, transform .2s;
   }
   .to-top.show{opacity:1; transform:none; pointer-events:auto;}
+
+  /* Aviso para deshacer el último cromo marcado */
+  .undo-toast{
+    position:fixed; left:16px; right:76px; bottom:calc(88px + env(safe-area-inset-bottom, 0px)); z-index:51;
+    max-width:420px; display:flex; align-items:center; justify-content:space-between; gap:10px;
+    background:var(--ink); color:#fff; border-radius:10px; padding:10px 10px 10px 14px;
+    font-size:13.5px; font-weight:500; box-shadow:0 4px 14px rgba(30,27,22,0.3);
+  }
+  .undo-toast[hidden]{display:none;}
+  .undo-toast span{min-width:0; line-height:1.3;}
+  .undo-toast button{
+    flex:0 0 auto; background:var(--gold); color:var(--ink); border:none; border-radius:6px;
+    padding:7px 12px; font-weight:700; font-size:13px; cursor:pointer;
+  }
+
+  /* Hoja del anuncio de Vinted */
+  .sheet-backdrop{position:fixed; inset:0; z-index:60; background:rgba(30,27,22,0.45); display:flex; align-items:flex-end; justify-content:center;}
+  .sheet-backdrop[hidden]{display:none;}
+  .sheet{
+    width:100%; max-width:520px; max-height:90vh; overflow-y:auto; background:var(--paper);
+    border-radius:16px 16px 0 0; padding:18px 18px calc(18px + env(safe-area-inset-bottom, 0px));
+    display:flex; flex-direction:column; gap:8px;
+  }
+  .sheet h3{margin:0; font-size:20px; text-transform:uppercase; color:var(--laliga-red);}
+  .sheet .hint{margin:0 0 4px; color:var(--ink-soft); font-size:13px;}
+  .sheet label{font-size:12px; font-weight:600; text-transform:uppercase; letter-spacing:0.4px; color:var(--ink-soft);}
+  .sheet input, .sheet textarea, .add-row input{
+    width:100%; border:1.5px solid var(--line); border-radius:6px; padding:10px; font:inherit; font-size:14px;
+    background:#fff; color:var(--ink);
+  }
+  .copy-row, .add-row{display:flex; gap:8px;}
+  .mini-btn{
+    flex:0 0 auto; align-self:flex-start; background:var(--card-bg); border:1.5px solid var(--line); border-radius:6px;
+    padding:8px 12px; font-weight:600; font-size:13px; cursor:pointer; color:var(--ink);
+  }
+  .sheet-actions{display:flex; flex-direction:column; gap:8px; margin-top:8px;}
+  .sheet-actions .pdf-btn{text-align:center; text-decoration:none; padding:12px;}
+  .sheet-actions small{color:var(--ink-soft); font-size:12px; text-align:center;}
+  .sheet-close{background:none; border:none; color:var(--ink-soft); font-weight:600; padding:10px; cursor:pointer;}
+
+  /* Pestaña de cambios con amigos */
+  .trade-card, .friend-card{
+    background:var(--card-bg); border:1.5px solid var(--line); border-radius:10px; padding:14px; margin-top:10px;
+  }
+  .trade-card h3, .friend-card h3{margin:0 0 6px; font-size:16px; text-transform:uppercase; letter-spacing:0.3px;}
+  .trade-card .hint{color:var(--ink-soft); font-size:12.5px; margin:6px 0 10px;}
+  .trade-msg{font-size:13px; color:var(--laliga-red-dark); margin-top:8px; min-height:1em;}
+  .req-row{display:flex; align-items:center; justify-content:space-between; gap:8px; padding:8px 0; border-top:1px solid var(--line); font-size:14px;}
+  .req-row:first-of-type{border-top:none;}
+  .req-row .btns{display:flex; gap:6px;}
+  .req-row .ok{background:var(--laliga-red); color:#fff; border-color:var(--laliga-red);}
+  .friend-head{display:flex; align-items:center; justify-content:space-between; gap:8px;}
+  .friend-head h3{margin:0;}
+  .link-btn{background:none; border:none; color:var(--ink-soft); font-size:12px; text-decoration:underline; cursor:pointer;}
+  .trade-sum{display:flex; gap:10px; margin:10px 0 4px;}
+  .trade-sum div{flex:1; background:var(--paper-dark); border-radius:8px; padding:8px 10px; font-size:12.5px; color:var(--ink-soft);}
+  .trade-sum b{display:block; font-family:'Oswald',system-ui,sans-serif; font-size:24px; color:var(--ink);}
+  .friend-card details{margin-top:8px;}
+  .friend-card summary{cursor:pointer; font-weight:600; font-size:14px; padding:6px 0;}
+  .trade-group h4{margin:8px 0 4px; font-size:11.5px; text-transform:uppercase; letter-spacing:0.5px; color:var(--ink-soft);}
+  .trade-list{display:flex; flex-wrap:wrap; gap:5px;}
+  .trade-item{background:#fff; border:1px solid var(--line); border-radius:6px; padding:3px 7px; font-size:12.5px;}
+  .trade-item b{color:var(--laliga-red); margin-right:4px; font-family:'Oswald',system-ui,sans-serif;}
+  .trade-empty{color:var(--ink-soft); font-size:13px; margin:4px 0;}
   .to-top:active{transform:scale(0.92);}
 
   .chip-row{
@@ -186,6 +250,7 @@
   .pdf-btn:active{transform:scale(0.97);}
   .pdf-btns{display:flex; gap:8px; flex-wrap:wrap;}
   .pdf-btn.alt{background:var(--card-bg); color:var(--laliga-red); border:1.5px solid var(--laliga-red);}
+  .pdf-btn.vinted{background:#007782;}
   .repes .sticker{cursor:default;}
   .repes .sticker.dupe{border:1.5px solid var(--gold); background:#FFF6DA;}
   .repe-ctrl{display:flex; align-items:center; gap:8px; margin-top:auto;}
@@ -277,12 +342,33 @@
     <svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="3"/><path d="m8 12 3 3 5-6"/></svg>Mi colección</button>
   <button class="tabbtn" data-tab="repes">
     <svg viewBox="0 0 24 24"><rect x="8" y="8" width="13" height="13" rx="2"/><path d="M16 8V5a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h3"/></svg>Repetidos</button>
+  <button class="tabbtn" data-tab="trades">
+    <svg viewBox="0 0 24 24"><path d="M4 8h13l-3-3"/><path d="M20 16H7l3 3"/></svg>Cambios</button>
 </div>
 
 <div class="chip-row" id="chipRow"></div>
 
 <main id="mainArea"></main>
 <button class="to-top" id="toTop" aria-label="Volver arriba">↑</button>
+<div class="undo-toast" id="undoToast" hidden><span id="undoText"></span><button id="undoBtn">Deshacer</button></div>
+
+<div class="sheet-backdrop" id="vintedSheet" hidden>
+  <div class="sheet" role="dialog" aria-labelledby="vintedTitle">
+    <h3 id="vintedTitle">Anuncio para Vinted</h3>
+    <p class="hint">Vinted no deja que otras apps publiquen anuncios por ti, así que te lo dejo preparado: copia el texto, guarda las fotos de las listas y crea el anuncio en Vinted.</p>
+    <label for="vTitle">Título</label>
+    <div class="copy-row"><input id="vTitle"><button class="mini-btn" data-copy="vTitle">Copiar</button></div>
+    <label for="vDesc">Descripción</label>
+    <textarea id="vDesc" rows="6"></textarea>
+    <button class="mini-btn" data-copy="vDesc">Copiar descripción</button>
+    <div class="sheet-actions">
+      <button class="pdf-btn" id="vPhotos">Guardar fotos de las listas</button>
+      <small id="vPhotosInfo"></small>
+      <a class="pdf-btn alt" href="https://www.vinted.es/items/new" target="_blank" rel="noopener">Abrir Vinted</a>
+    </div>
+    <button class="sheet-close" id="vClose">Cerrar</button>
+  </div>
+</div>
 </div>
 
 <script>
@@ -1098,12 +1184,36 @@ let activeTab = 'album';
    3. Build > Firestore Database > Crear base de datos (elige una región de Europa).
    4. Configuración del proyecto (icono engranaje) > Tus apps > Web (</>) > registra la app
       y copia aquí abajo los valores que te da (apiKey, authDomain, projectId, etc.).
-   5. En Firestore > pestaña "Reglas", pega esto y publica:
+   5. En Firestore > pestaña "Reglas", pega esto y publica (incluye lo necesario para
+      los amigos y la pestaña Intercambios):
         rules_version = '2';
         service cloud.firestore {
           match /databases/{database}/documents {
+            function signedIn() { return request.auth != null; }
+            function friends(a, b) {
+              return exists(/databases/$(database)/documents/friendRequests/$(a + '_' + b)) &&
+                     get(/databases/$(database)/documents/friendRequests/$(a + '_' + b)).data.status == 'accepted';
+            }
             match /albums/{albumId} {
-              allow read, write: if request.auth != null && request.auth.uid == albumId;
+              allow read: if signedIn() && (request.auth.uid == albumId ||
+                             friends(albumId, request.auth.uid) || friends(request.auth.uid, albumId));
+              allow write: if signedIn() && request.auth.uid == albumId;
+            }
+            match /users/{email} {
+              allow get: if signedIn();
+              allow write: if signedIn() && request.resource.data.uid == request.auth.uid &&
+                              email == request.auth.token.email.lower();
+            }
+            match /friendRequests/{id} {
+              allow read: if signedIn() && (request.auth.uid == resource.data.from || request.auth.uid == resource.data.to);
+              allow create: if signedIn() && request.resource.data.from == request.auth.uid &&
+                               id == request.auth.uid + '_' + request.resource.data.to &&
+                               request.resource.data.status == 'pending';
+              allow update: if signedIn() && request.auth.uid == resource.data.to &&
+                               request.resource.data.status == 'accepted' &&
+                               request.resource.data.from == resource.data.from &&
+                               request.resource.data.to == resource.data.to;
+              allow delete: if signedIn() && (request.auth.uid == resource.data.from || request.auth.uid == resource.data.to);
             }
           }
         }
@@ -1267,12 +1377,220 @@ auth.onAuthStateChanged(user => {
     loginScreen.classList.add('hidden');
     appRoot.classList.remove('hidden');
     startSync(user.uid);
+    startFriends(user);
   } else {
     stopSync();
+    stopFriends();
     appRoot.classList.add('hidden');
     loginScreen.classList.remove('hidden');
   }
 });
+/* ================================================================================================ */
+
+/* ======================= AMIGOS Y CAMBIOS =======================
+   Cada cuenta se apunta en users/{email} → uid. Para ser amigos, uno envía una
+   solicitud con el email del otro (friendRequests/{de}_{para}) y el otro la acepta;
+   entonces cada uno puede leer el álbum del otro y se cruzan tus repetidos con sus
+   faltas y al revés. */
+let myProfile = null, friendsError = '', tradeMsg = '';
+let reqsFrom = [], reqsTo = [];
+let friendAlbums = {}, albumUnsubs = {}, friendUnsubs = [];
+
+async function ensureProfile(user){
+  const email = (user.email || '').toLowerCase();
+  const prof = { email, name: email.split('@')[0] || 'Amigo' };
+  await db.collection('users').doc(email).set({ uid:user.uid, name:prof.name });
+  return prof;
+}
+
+function startFriends(user){
+  stopFriends();
+  ensureProfile(user).then(p => {
+    myProfile = p;
+    const col = db.collection('friendRequests');
+    friendUnsubs.push(col.where('from', '==', user.uid).onSnapshot(snap => {
+      reqsFrom = snap.docs.map(d => ({ id:d.id, ...d.data() })); syncFriendAlbums();
+    }, onFriendsError));
+    friendUnsubs.push(col.where('to', '==', user.uid).onSnapshot(snap => {
+      reqsTo = snap.docs.map(d => ({ id:d.id, ...d.data() })); syncFriendAlbums();
+    }, onFriendsError));
+    rerenderTrades();
+  }).catch(onFriendsError);
+}
+
+function stopFriends(){
+  friendUnsubs.forEach(u => u()); friendUnsubs = [];
+  Object.values(albumUnsubs).forEach(u => u()); albumUnsubs = {};
+  friendAlbums = {}; reqsFrom = []; reqsTo = []; myProfile = null; friendsError = ''; tradeMsg = '';
+}
+
+function onFriendsError(err){
+  console.error('Amigos:', err);
+  friendsError = err && err.code === 'permission-denied'
+    ? 'Para usar los cambios con amigos hay que actualizar las reglas de Firebase (las tienes al principio del código, en el paso 5).'
+    : 'No se pudieron cargar tus amigos. Revisa la conexión.';
+  rerenderTrades();
+}
+
+function friendsList(){
+  const uid = auth.currentUser && auth.currentUser.uid, seen = {};
+  return [...reqsFrom, ...reqsTo].filter(r => r.status === 'accepted').map(r =>
+    r.from === uid ? { uid:r.to, name:r.toName, req:r } : { uid:r.from, name:r.fromName, req:r }
+  ).filter(f => !seen[f.uid] && (seen[f.uid] = true));
+}
+
+function syncFriendAlbums(){
+  const current = friendsList().map(f => f.uid);
+  current.forEach(uid => {
+    if(albumUnsubs[uid]) return;
+    tradeMsg = '';
+    albumUnsubs[uid] = docRefFor(uid).onSnapshot(snap => {
+      friendAlbums[uid] = snap.exists ? snap.data() : null;
+      rerenderTrades();
+    }, err => console.error('Álbum de amigo:', err));
+  });
+  Object.keys(albumUnsubs).forEach(uid => {
+    if(current.includes(uid)) return;
+    albumUnsubs[uid](); delete albumUnsubs[uid]; delete friendAlbums[uid];
+  });
+  rerenderTrades();
+}
+
+function rerenderTrades(){
+  if(data && activeTab === 'trades') renderAll();
+}
+
+async function sendFriendRequest(rawEmail){
+  const email = rawEmail.trim().toLowerCase();
+  const me = auth.currentUser.uid;
+  const setMsg = t => { tradeMsg = t; rerenderTrades(); };
+  if(!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)){ setMsg('Escribe el email con el que tu amigo entra en la app.'); return; }
+  if(email === myProfile.email){ setMsg('Ese es tu propio email.'); return; }
+  try {
+    const c = await db.collection('users').doc(email).get();
+    if(!c.exists){ setMsg('No hay ninguna cuenta con ese email. Tu amigo tiene que haber entrado al menos una vez con esta versión de la app.'); return; }
+    const other = c.data().uid;
+    if(friendsList().some(f => f.uid === other)){ setMsg(`Ya eres amigo de ${c.data().name}.`); return; }
+    const theirs = reqsTo.find(r => r.from === other && r.status === 'pending');
+    if(theirs){ await acceptRequest(theirs); setMsg(`${c.data().name} ya te había enviado una solicitud: ahora sois amigos.`); return; }
+    if(reqsFrom.some(r => r.to === other)){ setMsg(`Ya le enviaste una solicitud a ${c.data().name}.`); return; }
+    await db.collection('friendRequests').doc(me + '_' + other).set({
+      from:me, to:other, fromName:myProfile.name, toName:c.data().name, status:'pending'
+    });
+    const input = document.getElementById('friendCode');
+    if(input) input.value = '';
+    setMsg(`Solicitud enviada a ${c.data().name}. Cuando la acepte, verás aquí los cambios.`);
+  } catch(e){
+    console.error(e);
+    setMsg(e.code === 'permission-denied' ? 'Faltan por actualizar las reglas de Firebase.' : 'No se pudo enviar la solicitud.');
+  }
+}
+
+function acceptRequest(r){
+  return db.collection('friendRequests').doc(r.id).update({ status:'accepted' });
+}
+function deleteRequest(r){
+  return db.collection('friendRequests').doc(r.id).delete();
+}
+
+/* Tus repetidos que a tu amigo le faltan, y sus repetidos que te faltan a ti. */
+function tradesWith(friendData){
+  const theirs = {};
+  ((friendData && friendData.sections) || []).forEach(s => (s.stickers || []).forEach(st => { theirs[st.id] = st; }));
+  const give = [], get = [];
+  data.sections.forEach(s => {
+    const g = [], r = [];
+    groupBySlot(s.stickers).forEach(st => {
+      const t = theirs[st.id];
+      if(!t) return;
+      if(st.obtained && st.dupes > 0 && !t.obtained) g.push(st);
+      if(!st.obtained && t.obtained && (t.dupes || 0) > 0) r.push(st);
+    });
+    if(g.length) give.push({ s, its:g });
+    if(r.length) get.push({ s, its:r });
+  });
+  const count = gs => gs.reduce((n, x) => n + x.its.length, 0);
+  return { give, get, nGive:count(give), nGet:count(get) };
+}
+
+function tradeListHTML(groups, emptyText){
+  if(!groups.length) return `<p class="trade-empty">${emptyText}</p>`;
+  return groups.map(({ s, its }) => `
+    <div class="trade-group"><h4>${escapeHTML(s.name)} · ${its.length}</h4>
+      <div class="trade-list">${its.map(st =>
+        `<span class="trade-item"><b>${escapeHTML(String(st.number))}</b>${escapeHTML(st.name.split(' — ')[0])}</span>`).join('')}
+      </div></div>`).join('');
+}
+
+function renderTrades(){
+  const main = document.getElementById('mainArea');
+  const prevInput = document.getElementById('friendCode');
+  const typed = prevInput ? prevInput.value : '';
+  const open = {};
+  main.querySelectorAll('details[data-key]').forEach(d => { open[d.dataset.key] = d.open; });
+
+  if(friendsError){
+    main.innerHTML = `<div class="trade-card"><h3>Cambios con amigos</h3><p class="hint">${escapeHTML(friendsError)}</p></div>`;
+    return;
+  }
+  if(!myProfile){
+    main.innerHTML = `<div class="trade-card"><h3>Cambios con amigos</h3><p class="hint">Cargando…</p></div>`;
+    return;
+  }
+  const incoming = reqsTo.filter(r => r.status === 'pending');
+  const outgoing = reqsFrom.filter(r => r.status === 'pending');
+  const friends = friendsList();
+
+  main.innerHTML = `
+    <div class="trade-card">
+      <h3>Añadir amigo</h3>
+      <p class="hint">Escribe el email con el que tu amigo entra en la app y envíale una solicitud. Cuando la acepte, aquí verás qué cromos podéis cambiar. A ti te encuentran por <b>${escapeHTML(myProfile.email)}</b>.</p>
+      <div class="add-row"><input id="friendCode" type="email" placeholder="Email de tu amigo" autocomplete="off" autocapitalize="none">
+        <button class="pdf-btn" id="addFriend">Enviar</button></div>
+      <div class="trade-msg">${escapeHTML(tradeMsg)}</div>
+    </div>
+    ${incoming.length || outgoing.length ? `
+    <div class="trade-card">
+      <h3>Solicitudes</h3>
+      ${incoming.map(r => `<div class="req-row"><span><b>${escapeHTML(r.fromName || 'Alguien')}</b> quiere ser tu amigo</span>
+        <span class="btns"><button class="mini-btn ok" data-accept="${r.id}">Aceptar</button><button class="mini-btn" data-del="${r.id}">Rechazar</button></span></div>`).join('')}
+      ${outgoing.map(r => `<div class="req-row"><span>Esperando a <b>${escapeHTML(r.toName || '')}</b></span>
+        <span class="btns"><button class="mini-btn" data-del="${r.id}">Cancelar</button></span></div>`).join('')}
+    </div>` : ''}
+    ${friends.length ? friends.map(f => {
+      const fd = friendAlbums[f.uid];
+      if(fd === undefined) return `<div class="friend-card"><h3>${escapeHTML(f.name || '')}</h3><p class="trade-empty">Cargando su álbum…</p></div>`;
+      const t = tradesWith(fd);
+      return `
+      <div class="friend-card">
+        <div class="friend-head"><h3>${escapeHTML(f.name || '')}</h3>
+          <button class="link-btn" data-del="${f.req.id}" data-name="${escapeHTML(f.name || '')}">Quitar amigo</button></div>
+        <div class="trade-sum">
+          <div><b>${t.nGive}</b>le puedes dar</div>
+          <div><b>${t.nGet}</b>te puede dar</div>
+        </div>
+        <details data-key="give-${f.uid}" ${open['give-' + f.uid] ? 'open' : ''}><summary>Le puedes dar (${t.nGive})</summary>
+          ${tradeListHTML(t.give, 'Ninguno de tus repetidos le falta.')}</details>
+        <details data-key="get-${f.uid}" ${open['get-' + f.uid] ? 'open' : ''}><summary>Te puede dar (${t.nGet})</summary>
+          ${tradeListHTML(t.get, 'No tiene repetidos que te falten.')}</details>
+      </div>`;
+    }).join('') : `<div class="trade-card"><p class="trade-empty">Todavía no tienes amigos añadidos.</p></div>`}
+  `;
+
+  const input = document.getElementById('friendCode');
+  input.value = typed;
+  document.getElementById('addFriend').addEventListener('click', () => sendFriendRequest(input.value));
+  input.addEventListener('keydown', e => { if(e.key === 'Enter') sendFriendRequest(input.value); });
+  const all = [...reqsFrom, ...reqsTo];
+  main.querySelectorAll('[data-accept]').forEach(b => b.addEventListener('click', () => {
+    const r = all.find(x => x.id === b.dataset.accept); if(r) acceptRequest(r);
+  }));
+  main.querySelectorAll('[data-del]').forEach(b => b.addEventListener('click', () => {
+    const r = all.find(x => x.id === b.dataset.del); if(!r) return;
+    if(b.dataset.name && !confirm(`¿Quitar a ${b.dataset.name} de tus amigos?`)) return;
+    deleteRequest(r);
+  }));
+}
 /* ================================================================================================ */
 
 function getSection(id){
@@ -1491,6 +1809,7 @@ function renderRepes(){
       <div class="pdf-btns">
         <button class="pdf-btn" id="pdfBtn">PDF repetidos</button>
         <button class="pdf-btn alt" id="pdfFaltanBtn">PDF me faltan</button>
+        <button class="pdf-btn vinted" id="vintedBtn">Anunciar en Vinted</button>
       </div>
     </div>
     ${sectionHeadHTML(section, `${sectionDupes} repetido${sectionDupes===1?'':'s'}`)}
@@ -1520,67 +1839,127 @@ function renderRepes(){
   main.querySelectorAll('[data-dec]').forEach(b => b.addEventListener('click', () => change(b.dataset.dec, -1)));
   document.getElementById('pdfBtn').addEventListener('click', downloadRepesPDF);
   document.getElementById('pdfFaltanBtn').addEventListener('click', downloadFaltanPDF);
+  document.getElementById('vintedBtn').addEventListener('click', openVinted);
   bindSectionNav(main);
 }
 
-function downloadRepesPDF(){
+/* Las dos listas (repetidos y me faltan) con su título, subtítulo y cantidad. */
+function repesList(){
   const groups = data.sections
     .map(s => ({ s, its: groupBySlot(s.stickers).filter(st => st.obtained && st.dupes > 0) }))
     .filter(g => g.its.length);
-  if(!groups.length){ alert('Todavía no has apuntado ningún repetido.'); return; }
   const distinct = groups.reduce((n, g) => n + g.its.length, 0);
   const units = groups.reduce((n, g) => n + g.its.reduce((m, st) => m + st.dupes, 0), 0);
-  listPDF(groups, 'Cromos repetidos', `${distinct} cromos distintos · ${units} en total · venta o cambio`,
-          st => st.dupes, 'cromos-repetidos.pdf');
+  return { groups, distinct, units, title:'Cromos repetidos',
+           subtitle:`${distinct} cromos distintos · ${units} en total · venta o cambio`, qty: st => st.dupes };
 }
-
-function downloadFaltanPDF(){
+function faltanList(){
   const groups = data.sections
     .map(s => ({ s, its: groupBySlot(s.stickers).filter(st => !st.obtained) }))
     .filter(g => g.its.length);
-  if(!groups.length){ alert('¡No te falta ninguno! Álbum completo.'); return; }
   const n = groups.reduce((m, g) => m + g.its.length, 0);
-  listPDF(groups, 'Cromos que me faltan', `${n} cromos`, () => 0, 'cromos-me-faltan.pdf');
+  return { groups, n, title:'Cromos que me faltan', subtitle:`${n} cromos`, qty: () => 0 };
 }
 
+function downloadRepesPDF(){
+  const l = repesList();
+  if(!l.groups.length){ alert('Todavía no has apuntado ningún repetido.'); return; }
+  listPDF(l.groups, l.title, l.subtitle, l.qty, 'cromos-repetidos.pdf');
+}
+
+function downloadFaltanPDF(){
+  const l = faltanList();
+  if(!l.groups.length){ alert('¡No te falta ninguno! Álbum completo.'); return; }
+  listPDF(l.groups, l.title, l.subtitle, l.qty, 'cromos-me-faltan.pdf');
+}
+
+/* ---------- Anuncio de Vinted ----------
+   Vinted no tiene forma de crear anuncios desde otra app: se prepara el texto y las
+   fotos de las dos listas y se abre Vinted para publicarlo a mano. */
+let vintedFiles = [];
+function openVinted(){
+  const r = repesList(), f = faltanList();
+  if(!r.groups.length){ alert('Apunta primero algún repetido.'); return; }
+  document.getElementById('vTitle').value = `Cromos repetidos LaLiga 2026-27 Panini (${r.distinct} cromos)`;
+  document.getElementById('vDesc').value =
+`Vendo ${r.distinct} cromos repetidos del álbum LaLiga 2026-27 de Panini (3ª edición), ${r.units} unidades en total.
+
+En las fotos tienes la lista completa de los que tengo repetidos${f.groups.length ? ' y la de los que me faltan' : ''}.
+
+Pregunta por cualquier cromo sin compromiso.`;
+  const info = document.getElementById('vPhotosInfo');
+  info.textContent = 'Preparando las fotos…';
+  vintedFiles = [];
+  document.getElementById('vintedSheet').hidden = false;
+  const jobs = [listImages(r.groups, r.title, r.subtitle, r.qty, 'cromos-repetidos')];
+  if(f.groups.length) jobs.push(listImages(f.groups, f.title, f.subtitle, f.qty, 'cromos-me-faltan'));
+  Promise.all(jobs).then(([rep, fal = []]) => {
+    vintedFiles = [...rep, ...fal];
+    info.textContent = `${vintedFiles.length} foto${vintedFiles.length === 1 ? '' : 's'}: ${rep.length} de repetidos` +
+      (fal.length ? ` y ${fal.length} de los que te faltan` : '') + '.';
+  });
+}
+
+async function saveVintedPhotos(){
+  if(!vintedFiles.length) return;
+  if(navigator.canShare && navigator.canShare({ files: vintedFiles })){
+    try { await navigator.share({ files: vintedFiles }); return; }
+    catch(e){ if(e.name === 'AbortError') return; }
+  }
+  for(const file of vintedFiles){
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(file); a.download = file.name;
+    document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(() => URL.revokeObjectURL(a.href), 4000);
+    await new Promise(r => setTimeout(r, 350));
+  }
+}
+
+document.getElementById('vPhotos').addEventListener('click', saveVintedPhotos);
+document.getElementById('vClose').addEventListener('click', () => { document.getElementById('vintedSheet').hidden = true; });
+document.getElementById('vintedSheet').addEventListener('click', e => {
+  if(e.target.id === 'vintedSheet') e.currentTarget.hidden = true;
+});
+document.querySelectorAll('[data-copy]').forEach(btn => btn.addEventListener('click', () => {
+  const el = document.getElementById(btn.dataset.copy);
+  const done = () => { const t = btn.textContent; btn.textContent = '¡Copiado!'; setTimeout(() => btn.textContent = t, 1400); };
+  if(navigator.clipboard) navigator.clipboard.writeText(el.value).then(done, () => { el.select(); document.execCommand('copy'); done(); });
+  else { el.select(); document.execCommand('copy'); done(); }
+}));
+
 /* Hoja para vender o cambiar: A4 a tres columnas, una barra roja por sección y cada
-   cromo con su número y, si qty() da más de uno, cuántos (x2, x3…). */
-function listPDF(groups, title, subtitle, qty, filename){
-  if(!window.jspdf){ alert('No se pudo cargar el generador de PDF. Revisa la conexión.'); return; }
-  const { jsPDF } = window.jspdf;
-  const doc = new jsPDF({ unit:'mm', format:'a4' });
+   cromo con su número y, si qty() da más de uno, cuántos (x2, x3…). Se dibuja igual
+   en PDF o en fotos (para Vinted, que solo admite imágenes) con el "drawer" que toque. */
+function drawList(d, groups, title, subtitle, qty){
   const W = 210, H = 297, M = 12, G = 6, CW = (W - 2*M - 2*G) / 3, RH = 4.1, BAR = 5.2, TOP = 30, BOT = H - 12;
-  const RED = [200,16,46], CREAM = [247,243,233], INK = [30,30,30];
+  const RED = [200,16,46], CREAM = [247,243,233], INK = [30,30,30], WHITE = [255,255,255];
 
   function page(first){
-    doc.setFillColor(...CREAM); doc.rect(0, 0, W, H, 'F');
-    doc.setFillColor(...RED); doc.rect(0, 0, W, first ? 24 : 10, 'F');
-    doc.setTextColor(255, 255, 255);
+    d.page();
+    d.rect(0, 0, W, H, CREAM);
+    d.rect(0, 0, W, first ? 24 : 10, RED);
     if(first){
-      doc.setFont('helvetica', 'bold'); doc.setFontSize(17);
-      doc.text(`${title} · LaLiga 2026-27`, M, 12);
-      doc.setFont('helvetica', 'normal'); doc.setFontSize(9);
-      doc.text(`Panini · ${subtitle}`, M, 18.5);
+      d.font(17, true); d.text(`${title} · LaLiga 2026-27`, M, 12, WHITE);
+      d.font(9, false); d.text(`Panini · ${subtitle}`, M, 18.5, WHITE);
     } else {
-      doc.setFont('helvetica', 'bold'); doc.setFontSize(9);
-      doc.text(`${title} · LaLiga 2026-27 (cont.)`, M, 6.5);
+      d.font(9, true); d.text(`${title} · LaLiga 2026-27 (cont.)`, M, 6.5, WHITE);
     }
   }
   let col = 0, y = TOP, top = TOP;
   page(true);
   function nextCol(){
     col++;
-    if(col > 2){ doc.addPage(); page(false); col = 0; top = 16; }
+    if(col > 2){ page(false); col = 0; top = 16; }
     y = top;
   }
   function bar(name, count, cont){
     const x = M + col*(CW + G);
-    doc.setFillColor(...RED); doc.rect(x, y, CW, BAR, 'F');
-    doc.setTextColor(255, 255, 255); doc.setFont('helvetica', 'bold'); doc.setFontSize(7.5);
+    d.rect(x, y, CW, BAR, RED);
+    d.font(7.5, true);
     let label = name.toUpperCase() + (cont ? ' (cont.)' : '');
-    while(doc.getTextWidth(label) > CW - 8 && label.length > 4) label = label.slice(0, -1);
-    doc.text(label, x + 1.5, y + 3.6);
-    doc.setFont('helvetica', 'normal'); doc.text(String(count), x + CW - 1.5, y + 3.6, { align:'right' });
+    while(d.width(label) > CW - 8 && label.length > 4) label = label.slice(0, -1);
+    d.text(label, x + 1.5, y + 3.6, WHITE);
+    d.font(7.5, false); d.text(String(count), x + CW - 1.5, y + 3.6, WHITE, 'right');
     y += BAR + 2.6;
   }
   groups.forEach(({ s, its }) => {
@@ -1590,22 +1969,67 @@ function listPDF(groups, title, subtitle, qty, filename){
     its.forEach(st => {
       if(y + RH > BOT){ nextCol(); bar(s.name, its.length, true); }
       const x = M + col*(CW + G), q = qty(st);
-      doc.setFont('helvetica', 'bold'); doc.setFontSize(7.5); doc.setTextColor(...RED);
-      doc.text(String(st.number), x + 1, y);
-      doc.setFont('helvetica', 'normal'); doc.setTextColor(...INK);
+      d.font(7.5, true); d.text(String(st.number), x + 1, y, RED);
+      d.font(7.5, false);
       let nm = st.name + (st.tag && !st.tag.startsWith('Nº') ? ' (' + st.tag + ')' : '');
       const maxW = CW - (q > 1 ? 20 : 13);
-      if(doc.getTextWidth(nm) > maxW){
-        while(doc.getTextWidth(nm + '…') > maxW && nm.length > 3) nm = nm.slice(0, -1);
+      if(d.width(nm) > maxW){
+        while(d.width(nm + '…') > maxW && nm.length > 3) nm = nm.slice(0, -1);
         nm += '…';
       }
-      doc.text(nm, x + 12, y);
-      if(q > 1){ doc.setFont('helvetica', 'bold'); doc.setTextColor(...RED); doc.text('x' + q, x + CW - 1, y, { align:'right' }); }
+      d.text(nm, x + 12, y, INK);
+      if(q > 1){ d.font(7.5, true); d.text('x' + q, x + CW - 1, y, RED, 'right'); }
       y += RH;
     });
     y += 3;
   });
-  doc.save(filename);
+}
+
+function pdfDrawer(){
+  const { jsPDF } = window.jspdf;
+  const doc = new jsPDF({ unit:'mm', format:'a4' });
+  let first = true;
+  return {
+    doc,
+    page(){ if(!first) doc.addPage(); first = false; },
+    rect(x, y, w, h, rgb){ doc.setFillColor(...rgb); doc.rect(x, y, w, h, 'F'); },
+    font(size, bold){ doc.setFont('helvetica', bold ? 'bold' : 'normal'); doc.setFontSize(size); },
+    width(t){ return doc.getTextWidth(t); },
+    text(t, x, y, rgb, align){ doc.setTextColor(...rgb); doc.text(t, x, y, align ? { align } : undefined); }
+  };
+}
+
+/* Mismo dibujo en un canvas por página, en milímetros (6 px por mm ≈ 1260×1782). */
+function canvasDrawer(){
+  const S = 6, pages = [];
+  let ctx = null;
+  return {
+    pages,
+    page(){
+      const c = document.createElement('canvas');
+      c.width = 210*S; c.height = 297*S;
+      ctx = c.getContext('2d'); ctx.scale(S, S);
+      pages.push(c);
+    },
+    rect(x, y, w, h, rgb){ ctx.fillStyle = `rgb(${rgb})`; ctx.fillRect(x, y, w, h); },
+    font(size, bold){ ctx.font = `${bold ? 'bold ' : ''}${size * 0.3528}px Helvetica, Arial, sans-serif`; },
+    width(t){ return ctx.measureText(t).width; },
+    text(t, x, y, rgb, align){ ctx.fillStyle = `rgb(${rgb})`; ctx.textAlign = align || 'left'; ctx.fillText(t, x, y); }
+  };
+}
+
+function listPDF(groups, title, subtitle, qty, filename){
+  if(!window.jspdf){ alert('No se pudo cargar el generador de PDF. Revisa la conexión.'); return; }
+  const d = pdfDrawer();
+  drawList(d, groups, title, subtitle, qty);
+  d.doc.save(filename);
+}
+
+function listImages(groups, title, subtitle, qty, baseName){
+  const d = canvasDrawer();
+  drawList(d, groups, title, subtitle, qty);
+  return Promise.all(d.pages.map((c, i) => new Promise(res =>
+    c.toBlob(b => res(new File([b], `${baseName}-${i + 1}.jpg`, { type:'image/jpeg' })), 'image/jpeg', 0.9))));
 }
 
 function markObtained(section, id, cardEl){
@@ -1617,8 +2041,31 @@ function markObtained(section, id, cardEl){
     st.obtained = true;
     save();
     renderAll();
+    showUndo(st);
   }, 480);
 }
+
+/* Tras marcar un cromo aparece unos segundos un aviso con "Deshacer". */
+let undoId = null, undoTimer = null;
+function showUndo(st){
+  undoId = st.id;
+  document.getElementById('undoText').textContent = `Nº ${st.number} ${st.name.split(' — ')[0]} marcado`;
+  document.getElementById('undoToast').hidden = false;
+  clearTimeout(undoTimer);
+  undoTimer = setTimeout(hideUndo, 5000);
+}
+function hideUndo(){
+  undoId = null;
+  document.getElementById('undoToast').hidden = true;
+}
+document.getElementById('undoBtn').addEventListener('click', () => {
+  const st = undoId && findSticker(undoId);
+  hideUndo();
+  if(!st) return;
+  st.obtained = false;
+  save();
+  renderAll();
+});
 
 document.querySelectorAll('.tabbtn').forEach(btn => {
   btn.addEventListener('click', () => {
@@ -1637,13 +2084,17 @@ window.addEventListener('scroll', () => {
 function renderAll(){
   if(!data) return;
   renderHeader();
-  renderChips();
+  const chipRow = document.getElementById('chipRow');
+  chipRow.style.display = activeTab === 'trades' ? 'none' : '';
+  if(activeTab !== 'trades') renderChips();
   const main = document.getElementById('mainArea');
   main.className = '';
   if(activeTab === 'album'){
     renderAlbum();
   } else if(activeTab === 'repes'){
     renderRepes();
+  } else if(activeTab === 'trades'){
+    renderTrades();
   } else {
     renderCollection();
   }
