@@ -484,28 +484,36 @@
   .sticker:not(.has) .chicle{border-radius:6px;}
   .pdf-btn:disabled{opacity:.45; cursor:default; transform:none;}
 
-  /* ---------- Tanda 3: abrir el sobre ---------- */
+  /* ---------- Abrir el sobre (como en los juegos de cartas: deslizas para cortarlo y pasas los cromos) ---------- */
   .pack-open{
     position:fixed; inset:0; z-index:65; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:14px;
     padding:calc(20px + env(safe-area-inset-top, 0px)) 16px calc(20px + env(safe-area-inset-bottom, 0px));
-    background:radial-gradient(ellipse at 50% 30%, #2A3352, #0B0F1C 70%); color:#fff; overflow:hidden;
+    background:radial-gradient(ellipse at 50% 35%, #4A3590, #170F33 60%, #0A0718); color:#fff; overflow:hidden;
+    touch-action:none; user-select:none; -webkit-user-select:none;
   }
   .pack-open[hidden]{display:none;}
-  .po-stage{position:relative; width:100%; max-width:480px; flex:0 1 auto; display:flex; justify-content:center; align-items:center; min-height:340px;}
-  /* El sobre es la foto del logo (icono.png.jpg): la tira de arriba se rasga y se va. */
-  .po-pack{
-    --pw:220px; --ph:254px; --tear:40px;
-    position:relative; width:var(--pw); height:var(--ph); border:none; padding:0; cursor:pointer; background:none;
-    filter:drop-shadow(0 18px 30px rgba(0,0,0,0.55));
-    animation:po-wobble 2.2s ease-in-out infinite; transition:transform .45s ease, opacity .45s ease;
+  .pack-open img{-webkit-user-drag:none; pointer-events:none;}
+  .pack-open::before{
+    content:""; position:absolute; left:50%; top:42%; width:640px; height:640px; margin:-320px 0 0 -320px; pointer-events:none;
+    background:repeating-conic-gradient(from 0deg, rgba(255,214,90,0.10) 0 8deg, transparent 8deg 22deg);
+    border-radius:50%; mask:radial-gradient(circle, #000 20%, transparent 68%); -webkit-mask:radial-gradient(circle, #000 20%, transparent 68%);
+    animation:po-spin 40s linear infinite;
   }
+  @keyframes po-spin{ to{transform:rotate(360deg);} }
+  .po-stage{position:relative; width:100%; max-width:480px; flex:0 1 auto; display:flex; justify-content:center; align-items:center; min-height:400px;}
+  /* El sobre es la foto del logo (icono.png.jpg). Por encima va la línea de corte. */
+  .po-pack{
+    --pw:250px; --ph:289px; --tear:46px;
+    position:relative; width:var(--pw); height:var(--ph); border:none; padding:0; cursor:grab; background:none; touch-action:none;
+    filter:drop-shadow(0 20px 34px rgba(0,0,0,0.6));
+    animation:po-float 3s ease-in-out infinite; transition:transform .55s cubic-bezier(.5,0,.7,.4), opacity .45s ease;
+  }
+  @keyframes po-float{ 0%,100%{transform:translateY(0);} 50%{transform:translateY(-8px);} }
   .po-pack .po-body, .po-pack .po-top{
     position:absolute; left:0; right:0; overflow:hidden;
     background:url("icono.png.jpg") no-repeat; background-size:var(--pw) var(--ph);
   }
-  .po-pack .po-top{top:0; height:calc(var(--tear) + 6px); border-radius:6px 6px 0 0; background-position:0 0;
-    clip-path:polygon(0 0, 100% 0, 100% 80%, 92% 100%, 84% 80%, 76% 100%, 68% 80%, 60% 100%, 52% 80%, 44% 100%, 36% 80%, 28% 100%, 20% 80%, 12% 100%, 4% 80%, 0 100%);
-    transition:transform .5s cubic-bezier(.3,.6,.4,1), opacity .5s;}
+  .po-pack .po-top{top:0; height:var(--tear); border-radius:6px 6px 0 0; background-position:0 0; transition:transform .6s cubic-bezier(.2,.7,.3,1), opacity .6s;}
   .po-pack .po-body{top:var(--tear); bottom:0; border-radius:0 0 6px 6px; background-position:0 calc(var(--tear) * -1);}
   .po-pack .po-body::after{
     content:""; position:absolute; inset:0; pointer-events:none;
@@ -513,50 +521,67 @@
     background-size:250% 100%; animation:po-shine 2.6s ease-in-out infinite;
   }
   @keyframes po-shine{ 0%{background-position:130% 0;} 60%,100%{background-position:-30% 0;} }
+  /* Línea de corte: discontinua; lo cortado se ilumina siguiendo el dedo. */
+  .po-cut{position:absolute; left:-6px; right:-6px; top:calc(var(--tear) - 2px); height:4px; z-index:3; pointer-events:none;
+    background:repeating-linear-gradient(90deg, rgba(255,255,255,0.95) 0 8px, transparent 8px 14px);}
+  .po-cut i{position:absolute; top:-3px; bottom:-3px; left:var(--from, 0%); width:var(--len, 0%); border-radius:5px;
+    background:#fff; box-shadow:0 0 12px 4px #FFE58A, 0 0 26px 8px rgba(255,200,60,0.7);}
+  .po-finger{position:absolute; top:calc(var(--tear) - 16px); left:0; z-index:4; width:30px; height:30px; margin-left:-15px; border-radius:50%; pointer-events:none;
+    background:radial-gradient(circle, #fff 30%, rgba(255,255,255,0.35) 60%, transparent 70%); animation:po-swipe 1.8s ease-in-out infinite;}
+  @keyframes po-swipe{ 0%{left:6%; opacity:0;} 15%{opacity:1;} 75%{left:94%; opacity:1;} 100%{left:94%; opacity:0;} }
+  .po-stage.cutting .po-finger, .po-stage.torn .po-finger, .po-stage.torn .po-cut{display:none;}
+  .po-stage.cutting .po-pack, .po-stage.torn .po-pack{animation:none;}
+  .po-stage.torn .po-top{transform:translate(calc(var(--dir, 1) * 160px), -150px) rotate(calc(var(--dir, 1) * 35deg)); opacity:0;}
+  .po-stage.torn .po-pack::after{content:""; position:absolute; left:0; right:0; top:var(--tear); height:30px; margin-top:-15px; pointer-events:none;
+    background:radial-gradient(ellipse at center, #fff, rgba(255,230,140,0.8) 30%, transparent 70%); animation:po-flash .6s ease-out forwards;}
+  @keyframes po-flash{ from{transform:scaleY(1); opacity:1;} to{transform:scaleY(8); opacity:0;} }
   .po-count{
-    position:absolute; right:-10px; top:calc(var(--tear) + 4px); z-index:2; transform:rotate(8deg);
+    position:absolute; right:-12px; top:calc(var(--tear) + 10px); z-index:2; transform:rotate(8deg);
     padding:4px 10px 2px; border-radius:5px; background:#F5D36B; color:#131A2E; box-shadow:0 3px 0 rgba(0,0,0,0.3);
     font-family:var(--display); font-size:17px; font-weight:900; text-transform:uppercase;
   }
-  @keyframes po-wobble{ 0%,100%{transform:rotate(-2deg);} 50%{transform:rotate(2deg) translateY(-6px);} }
-  .po-stage.torn .po-pack{animation:none;}
-  .po-stage.torn .po-top{transform:translate(70px, -120px) rotate(28deg); opacity:0;}
   .po-stage.torn .po-count{opacity:0; transition:opacity .2s;}
-  .po-stage.dealt .po-pack{transform:translateY(120%) scale(.8); opacity:0; pointer-events:none;}
-  .po-cards{
-    position:absolute; inset:0; display:flex; flex-wrap:wrap; justify-content:center; align-content:center; gap:12px;
-    pointer-events:none;
+  .po-stage.dealt .po-pack{transform:translateY(130%); opacity:0; pointer-events:none;}
+  /* Montón de cromos: el de arriba se aparta deslizando (o tocándolo) y aparece el siguiente. */
+  .po-deck{position:absolute; left:50%; top:50%; width:220px; height:306px; margin:-153px 0 0 -110px; pointer-events:none;}
+  .po-deck.wide{width:300px; height:216px; margin:-108px 0 0 -150px;}
+  .po-card{
+    position:absolute; inset:0; z-index:calc(100 - var(--i)); touch-action:none;
+    opacity:0; transform:translateY(60px) scale(.7);
+    transition:transform .45s cubic-bezier(.2,.8,.3,1.15), opacity .3s;
   }
-  .po-card{width:30%; max-width:130px; perspective:900px; opacity:0; transform:translateY(80px) scale(.6);
-    transition:transform .45s cubic-bezier(.2,.8,.3,1.2), opacity .3s; transition-delay:calc(var(--i) * 70ms);}
-  .po-card.wide{width:46%; max-width:200px;}
-  .po-cards.many .po-card{width:22%;}
-  .po-stage.dealt .po-cards{pointer-events:auto;}
-  .po-stage.dealt .po-card{opacity:1; transform:none;}
-  .po-inner{position:relative; transform-style:preserve-3d; transition:transform .55s cubic-bezier(.3,.7,.3,1);}
-  .po-card.flipped .po-inner{transform:rotateY(180deg);}
-  .po-back, .po-front{backface-visibility:hidden; -webkit-backface-visibility:hidden;}
-  .po-back{
-    position:absolute; inset:0; border-radius:7px; display:flex; align-items:center; justify-content:center;
-    background:
-      repeating-linear-gradient(45deg, rgba(255,255,255,0.08) 0 3px, transparent 3px 10px),
-      linear-gradient(160deg, #6A4BC4, #34217A);
-    box-shadow:inset 0 0 0 3px #F5D36B, 0 8px 18px rgba(0,0,0,0.45);
-  }
-  .po-back span{font-family:var(--display); font-weight:900; font-size:22px; text-transform:uppercase; color:#F5D36B; transform:rotate(-12deg);}
-  .po-front{position:relative; transform:rotateY(180deg);}
-  .po-front .sticker{cursor:default;}
-  .po-front .cap{display:none;}
+  .po-stage.dealt .po-deck{pointer-events:auto;}
+  .po-stage.dealt .po-card{opacity:1; transform:translateY(calc(min(var(--i), 3) * 7px)) scale(calc(1 - min(var(--i), 3) * 0.035));}
+  .po-stage.dealt .po-card.top{transform:none; cursor:grab;}
+  .po-stage.dealt .po-card.drag{transition:none;}
+  .po-stage.dealt .po-card.gone{opacity:0; pointer-events:none; transition:transform .4s ease-in, opacity .4s ease-in;
+    transform:translateX(calc(var(--dir, -1) * 135%)) rotate(calc(var(--dir, -1) * 22deg));}
+  .po-card .sticker{width:100%; height:100%; cursor:inherit; box-shadow:0 14px 30px rgba(0,0,0,0.5);}
+  .po-card .sticker .art{height:100%;}
+  .po-card .cap{display:none;}
+  .po-card.top.new .sticker{box-shadow:0 0 0 3px #F5D36B, 0 0 34px 8px rgba(245,211,107,0.6);}
+  .po-card.top.rare .sticker::after{content:""; position:absolute; inset:0; z-index:4; pointer-events:none; border-radius:inherit;
+    background:linear-gradient(115deg, transparent 30%, rgba(255,255,255,0.55) 45%, rgba(170,230,255,0.4) 52%, transparent 65%);
+    background-size:260% 100%; animation:po-shine 1.8s ease-in-out infinite;}
   .po-label{
-    position:absolute; left:50%; bottom:-10px; z-index:3; transform:translateX(-50%) rotate(-6deg); white-space:nowrap;
-    padding:4px 10px 2px; border-radius:5px; font-family:var(--display); font-weight:900; font-size:17px; text-transform:uppercase;
+    position:absolute; left:50%; bottom:-14px; z-index:5; transform:translateX(-50%) rotate(-6deg); white-space:nowrap;
+    padding:5px 14px 3px; border-radius:6px; font-family:var(--display); font-weight:900; font-size:21px; text-transform:uppercase;
     box-shadow:0 3px 0 rgba(0,0,0,0.3);
   }
+  .po-card:not(.top) .po-label{opacity:0;}
   .po-label.new{background:#1F8A4C; color:#fff;}
   .po-label.repe{background:#F5D36B; color:#131A2E;}
-  .po-card.flipped .po-front:has(.po-label.new) .sticker{box-shadow:0 0 0 3px #F5D36B, 0 0 26px 6px rgba(245,211,107,0.55);}
-  .po-hint{margin:0; min-height:1.3em; font-family:var(--display); font-weight:800; font-size:24px; text-transform:uppercase; text-align:center;}
-  .po-actions{display:flex; flex-direction:column; align-items:center; gap:4px; min-height:92px;}
+  /* Al final, todos juntos */
+  .po-grid{position:absolute; inset:0; display:flex; flex-wrap:wrap; justify-content:center; align-content:center; gap:16px 10px; pointer-events:none;}
+  .po-grid .po-mini{position:relative; width:30%; max-width:120px; opacity:0; transform:scale(.6); transition:transform .35s cubic-bezier(.2,.8,.3,1.3), opacity .25s; transition-delay:calc(var(--i) * 60ms);}
+  .po-grid .po-mini.wide{width:46%; max-width:180px;}
+  .po-grid .po-mini .cap{display:none;}
+  .po-grid .po-mini .po-label{font-size:15px; padding:3px 8px 1px; bottom:-10px;}
+  .po-stage.summary .po-deck{display:none;}
+  .po-stage.summary .po-grid{pointer-events:auto;}
+  .po-stage.summary .po-mini{opacity:1; transform:none;}
+  .po-hint{margin:0; min-height:1.3em; font-family:var(--display); font-weight:800; font-size:24px; text-transform:uppercase; text-align:center; position:relative;}
+  .po-actions{display:flex; flex-direction:column; align-items:center; gap:4px; min-height:92px; position:relative;}
   .po-actions .pdf-btn{min-height:48px; padding:12px 28px; font-size:16px;}
   .po-skip{min-height:44px; background:none; border:none; color:rgba(255,255,255,0.75); font:inherit; font-weight:600; font-size:15px; cursor:pointer;}
   .po-pack:focus-visible, .po-skip:focus-visible{outline:3px solid #F5D36B; outline-offset:4px;}
@@ -606,11 +631,11 @@
   /* ---------- Tanda 2 ---------- */
   .album-tools{display:flex; align-items:center; justify-content:space-between; gap:8px 12px; flex-wrap:wrap; margin:0 0 10px;}
   .pack-btn{
-    display:flex; align-items:center; gap:8px; min-height:46px; padding:8px 16px 6px; border:none; border-radius:10px; cursor:pointer;
-    background:var(--laliga-red); color:#fff; font-family:var(--display); font-weight:900; font-size:21px; text-transform:uppercase;
+    display:flex; align-items:center; gap:6px; min-height:40px; padding:5px 12px 3px; border:none; border-radius:9px; cursor:pointer;
+    background:var(--laliga-red); color:#fff; font-family:var(--display); font-weight:800; font-size:16.5px; text-transform:uppercase;
     box-shadow:0 3px 0 var(--laliga-red-dark);
   }
-  .pack-btn svg{width:22px; height:22px; margin-top:-2px; fill:none; stroke:currentColor; stroke-width:2.2; stroke-linejoin:round; stroke-linecap:round;}
+  .pack-btn svg{width:18px; height:18px; margin-top:-2px; fill:none; stroke:currentColor; stroke-width:2.2; stroke-linejoin:round; stroke-linecap:round;}
   .pack-btn:active{transform:translateY(2px); box-shadow:0 1px 0 var(--laliga-red-dark);}
   .switch{display:flex; align-items:center; gap:8px; min-height:44px; padding:0; background:none; border:none; cursor:pointer;
     font:inherit; font-size:14.5px; font-weight:600; color:var(--ink-soft);}
@@ -976,7 +1001,7 @@
 </div>
 
 <script>
-const APP_VERSION = '2026-10-21.5';
+const APP_VERSION = '2026-10-21.6';
 const STORAGE_KEY = 'laliga_2627_album_v5';
 
 /* Orden exacto de equipos indicado por el usuario */
@@ -2801,64 +2826,149 @@ document.getElementById('packSave').addEventListener('click', () => {
 });
 
 /* ---------- Abrir el sobre ----------
-   Se rasga el sobre, salen los cromos boca abajo y se giran uno a uno: el nuevo
-   brilla y el repetido recibe su sello. Con "reducir movimiento" no hay animación. */
+   Como en los juegos de cartas: deslizas el dedo por la línea de arriba (de un lado
+   a otro) y el sobre se corta. Salen los cromos en un montón y los vas pasando
+   deslizando o tocando; al final se ven todos juntos. Con "reducir movimiento" no
+   hay animación. El sobre ya está guardado antes de empezar. */
 let packDone = null, packTimers = [];
 function playPack(reveal, done){
   if(window.matchMedia('(prefers-reduced-motion: reduce)').matches){ done(); return; }
   packDone = done;
-  const nNew = reveal.filter(x => !x.repe).length;
+  const nNew = reveal.filter(x => !x.repe).length, nRep = reveal.length - nNew;
   const stage = document.getElementById('poStage');
+  const hint = document.getElementById('poHint');
+  const cards = reveal.map(x => {
+    const st = findSticker(x.id), sec = st && sectionOf(st);
+    return st && { ...x, st, sec };
+  }).filter(Boolean);
+  const label = x => `<span class="po-label ${x.repe ? 'repe' : 'new'}">${x.repe ? `Repe ×${x.dupes}` : '¡Nuevo!'}</span>`;
+  const face = x => `<div class="sticker has${rarityClass(x.st)}" style="--team:${readableColor(x.sec.color)}">${stickerFaceHTML(x.sec, x.st)}</div>`;
+  stage.className = 'po-stage';
   stage.innerHTML = `
     <button class="po-pack" id="poPack" aria-label="Abrir el sobre">
       <span class="po-top"></span>
       <span class="po-body"></span>
-      <span class="po-count">${reveal.length} cromo${reveal.length === 1 ? '' : 's'}</span>
+      <span class="po-cut"><i></i></span>
+      <span class="po-finger"></span>
+      <span class="po-count">${cards.length} cromo${cards.length === 1 ? '' : 's'}</span>
     </button>
-    <div class="po-cards${reveal.length > 6 ? ' many' : ''}">${reveal.map((x, i) => {
-      const st = findSticker(x.id), sec = st && sectionOf(st);
-      if(!st) return '';
-      return `<div class="po-card${isChicles(sec) ? ' wide' : ''}" style="--i:${i}">
-        <div class="po-inner">
-          <div class="po-back"><span>LaLiga</span></div>
-          <div class="po-front" style="--team:${readableColor(sec.color)}">
-            <div class="sticker has${rarityClass(st)}">${stickerFaceHTML(sec, st)}</div>
-            <span class="po-label ${x.repe ? 'repe' : 'new'}">${x.repe ? `Repe ×${x.dupes}` : '¡Nuevo!'}</span>
-          </div>
-        </div></div>`;
-    }).join('')}</div>`;
-  document.getElementById('poHint').textContent = 'Toca el sobre para abrirlo';
+    <div class="po-deck" id="poDeck">${cards.map((x, i) => `
+      <div class="po-card${x.repe ? '' : ' new'}${RARITY[x.st.tag] || /Oro|Plata/.test(x.st.tag || '') ? ' rare' : ''}" data-i="${i}" style="--i:${i}">${face(x)}${label(x)}</div>`).join('')}</div>
+    <div class="po-grid">${cards.map((x, i) => `
+      <div class="po-mini${isChicles(x.sec) ? ' wide' : ''}" style="--i:${i}">${face(x)}${label(x)}</div>`).join('')}</div>`;
+  hint.textContent = 'Desliza por la línea para abrirlo';
   document.getElementById('poDone').hidden = true;
   document.getElementById('poSkip').hidden = false;
   document.getElementById('packOpen').hidden = false;
-  document.getElementById('poPack').focus();
-  document.getElementById('poPack').addEventListener('click', () => {
-    stage.classList.add('torn');
-    const cards = [...stage.querySelectorAll('.po-card')];
-    packTimers.push(setTimeout(() => stage.classList.add('dealt'), 450));
-    cards.forEach((c, i) => packTimers.push(setTimeout(() => {
-      c.classList.add('flipped');
-      if(navigator.vibrate) navigator.vibrate(c.querySelector('.po-label.new') ? 18 : 8);
-    }, 1100 + i * 520)));
-    packTimers.push(setTimeout(finishReveal, 1100 + cards.length * 520 + 200));
-    document.getElementById('poHint').textContent = '';
-    function finishReveal(){
-      const nRep = reveal.length - nNew;
-      document.getElementById('poHint').textContent = `${nNew} nuevo${nNew === 1 ? '' : 's'} y ${nRep} repe${nRep === 1 ? '' : 's'}`;
-      document.getElementById('poSkip').hidden = true;
-      const btn = document.getElementById('poDone');
-      btn.hidden = false; btn.focus();
-    }
-  }, { once:true });
+
+  const pack = document.getElementById('poPack');
+  const cut = pack.querySelector('.po-cut i');
+  pack.focus();
+
+  // 1. Cortar el sobre deslizando de un lado a otro.
+  let startX = null, opened = false;
+  const cutTo = x => {
+    const r = pack.getBoundingClientRect();
+    const a = Math.min(startX, x), b = Math.max(startX, x);
+    const from = Math.max(0, (a - r.left) / r.width), to = Math.min(1, (b - r.left) / r.width);
+    cut.style.setProperty('--from', (from * 100) + '%');
+    cut.style.setProperty('--len', (Math.max(0, to - from) * 100) + '%');
+    return to - from;
+  };
+  pack.addEventListener('pointerdown', e => {
+    if(opened) return;
+    startX = e.clientX; stage.classList.add('cutting');
+    try { pack.setPointerCapture(e.pointerId); } catch(err) {}
+  });
+  pack.addEventListener('pointermove', e => {
+    if(startX === null || opened) return;
+    if(cutTo(e.clientX) >= 0.7) open(e.clientX < startX ? -1 : 1);
+  });
+  const release = () => {
+    if(opened || startX === null) return;
+    startX = null; stage.classList.remove('cutting');
+    cut.style.setProperty('--len', '0%');
+  };
+  pack.addEventListener('pointerup', release);
+  pack.addEventListener('pointercancel', release);
+  // Con teclado (Intro o espacio) se abre sin deslizar.
+  pack.addEventListener('click', e => { if(e.detail === 0) open(1); });
+
+  function open(dir){
+    if(opened) return;
+    opened = true; startX = null;
+    stage.style.setProperty('--dir', dir);
+    stage.classList.remove('cutting'); stage.classList.add('torn');
+    if(navigator.vibrate) navigator.vibrate(20);
+    hint.textContent = '';
+    packTimers.push(setTimeout(() => {
+      stage.classList.add('dealt');
+      showTop();
+    }, 650));
+  }
+
+  // 2. Pasar los cromos: arrastras el de arriba a un lado, o lo tocas.
+  let cur = 0;
+  const deckCards = [...stage.querySelectorAll('.po-card')];
+  function showTop(){
+    deckCards.forEach((c, i) => {
+      c.classList.toggle('top', i === cur);
+      c.style.setProperty('--i', Math.max(0, i - cur));
+    });
+    const top = deckCards[cur];
+    if(!top){ finish(); return; }
+    if(isChicles(cards[cur].sec)) document.getElementById('poDeck').classList.add('wide');
+    else document.getElementById('poDeck').classList.remove('wide');
+    hint.textContent = `${cur + 1} de ${cards.length}`;
+    if(navigator.vibrate) navigator.vibrate(top.classList.contains('new') ? 18 : 8);
+  }
+  function dismiss(card, dir){
+    card.style.setProperty('--dir', dir);
+    card.style.transform = '';
+    card.classList.remove('drag', 'top'); card.classList.add('gone');
+    cur++;
+    packTimers.push(setTimeout(showTop, 120));
+  }
+  deckCards.forEach(card => {
+    let x0 = null, dx = 0;
+    card.addEventListener('pointerdown', e => {
+      if(!card.classList.contains('top')) return;
+      x0 = e.clientX; dx = 0; card.classList.add('drag');
+      try { card.setPointerCapture(e.pointerId); } catch(err) {}
+    });
+    card.addEventListener('pointermove', e => {
+      if(x0 === null) return;
+      dx = e.clientX - x0;
+      card.style.transform = `translateX(${dx}px) rotate(${dx / 14}deg)`;
+    });
+    const up = () => {
+      if(x0 === null) return;
+      x0 = null; card.classList.remove('drag');
+      if(Math.abs(dx) > 60 || Math.abs(dx) < 8) dismiss(card, dx > 0 ? 1 : -1);
+      else card.style.transform = '';
+    };
+    card.addEventListener('pointerup', up);
+    card.addEventListener('pointercancel', () => { x0 = null; card.classList.remove('drag'); card.style.transform = ''; });
+  });
+
+  // 3. Todos juntos y el botón para volver.
+  function finish(){
+    stage.classList.add('summary');
+    hint.textContent = `${nNew} nuevo${nNew === 1 ? '' : 's'} y ${nRep} repe${nRep === 1 ? '' : 's'}`;
+    document.getElementById('poSkip').hidden = true;
+    const btn = document.getElementById('poDone');
+    btn.hidden = false; btn.focus();
+  }
 }
 function closePack(){
   packTimers.forEach(clearTimeout); packTimers = [];
   const stage = document.getElementById('poStage');
-  stage.className = 'po-stage';
+  stage.className = 'po-stage'; stage.innerHTML = '';
   document.getElementById('packOpen').hidden = true;
   const fn = packDone; packDone = null;
   if(fn) fn();
 }
+document.getElementById('packOpen').addEventListener('dragstart', e => e.preventDefault());
 document.getElementById('poDone').addEventListener('click', closePack);
 document.getElementById('poSkip').addEventListener('click', closePack);
 
