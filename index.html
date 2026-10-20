@@ -418,6 +418,68 @@
   .repe-ctrl .plus{border-color:var(--laliga-red); color:var(--laliga-red);}
   .repe-ctrl .n{font-family:var(--display); font-size:20px; font-weight:900; min-width:20px; text-align:center; color:#131A2E;}
 
+
+  /* Extra Sticker: cada cromo entero en su metal. El hueco lleva el borde del metal
+     y el cromo pegado, el marco metalizado con el escudo sobre un fondo más oscuro. */
+  .sticker:has(.metal-art-oro){--m1:#8A6510; --m2:#F7D774; --m3:#C9971C; --m4:#FFE9A3; --mdark:#4E3A08;}
+  .sticker:has(.metal-art-plata){--m1:#7E8792; --m2:#F4F6F9; --m3:#B4BCC6; --m4:#FFFFFF; --mdark:#3E454F;}
+  .sticker:has(.metal-art-bronce){--m1:#7A4520; --m2:#E7A974; --m3:#A9632F; --m4:#F2C49A; --mdark:#45240E;}
+  .sticker:has(.metal-art){box-shadow:inset 0 0 0 2px var(--m2);}
+  .sticker.has:has(.metal-art){
+    background:linear-gradient(135deg, var(--m1), var(--m2) 35%, var(--m3) 55%, var(--m4) 75%, var(--m1));
+    box-shadow:0 4px 10px rgba(0,0,0,0.3);
+  }
+  .sticker.has .metal-art{
+    background:
+      radial-gradient(circle, rgba(255,255,255,0.14) 1px, transparent 1.6px) 0 0/6px 6px,
+      radial-gradient(ellipse at 30% 20%, color-mix(in srgb, var(--m3) 70%, var(--mdark)), var(--mdark) 75%);
+  }
+  .sticker.has:has(.metal-art) .cap{color:#131A2E;}
+  .sticker.has:has(.metal-art-oro) .cap, .sticker.has:has(.metal-art-bronce) .cap{color:#1E1404;}
+  .sticker.has:has(.metal-art) .undo, .sticker.has:has(.metal-art) .repe-ctrl{border-color:rgba(0,0,0,0.15);}
+  .sticker.has:has(.metal-art) .undo{color:#1E1404;}
+
+  /* Chicles: cromos apaisados */
+  .chicles-grid{grid-template-columns:repeat(auto-fill, minmax(150px, 1fr));}
+  .sticker .chicle{aspect-ratio:1.55 / 1; border-radius:6px 6px 0 0; overflow:hidden;
+    font-family:var(--display); color:#fff; text-transform:uppercase;}
+  .sticker:not(.has) .chicle{filter:saturate(.35); opacity:.55;}
+  .sticker.has .chicle{border-radius:3px;}
+  .chicle .num{left:5px; top:5px; z-index:3;}
+  .chicle .ch-name{
+    position:absolute; left:0; bottom:0; z-index:2; max-width:78%; padding:3px 8px 2px 6px;
+    background:rgba(10,12,20,0.78); font-weight:800; font-size:13px; line-height:1.05;
+    clip-path:polygon(0 0, 92% 0, 100% 100%, 0 100%); overflow-wrap:anywhere;
+  }
+  .chicle .sil{left:auto; right:4%; width:52%; fill:rgba(255,255,255,0.55);}
+  .sticker:not(.has) .chicle .sil{fill:rgba(255,255,255,0.35);}
+  .sticker .art.chk-escudo, .sticker.has .art.chk-escudo{background:linear-gradient(160deg, color-mix(in srgb, var(--club) 55%, #fff), var(--club));}
+  .ch-vamos{
+    position:absolute; inset:-30% -20%; transform:rotate(-18deg); font-weight:900; font-size:17px; line-height:1;
+    color:rgba(255,255,255,0.32); word-spacing:2px; overflow:hidden;
+  }
+  .ch-crest-big{position:absolute; left:28%; top:10%; width:44%; height:74%; object-fit:contain;
+    filter:drop-shadow(0 2px 3px rgba(0,0,0,0.3));}
+  .sticker:not(.has) .ch-crest-big{filter:brightness(0); opacity:.35;}
+  .sticker .art.chk-master, .sticker.has .art.chk-master{background:linear-gradient(170deg, #20232F 0 55%, var(--club) 55% 78%, #20232F 78%);}
+  .ch-band{position:absolute; left:-10%; right:-10%; top:46%; height:22%; transform:rotate(-8deg);
+    background:color-mix(in srgb, var(--club) 70%, #fff); opacity:.55;}
+  .ch-title{
+    position:absolute; left:34px; top:5px; z-index:2; font-weight:900; font-size:15px; letter-spacing:.3px;
+    background:linear-gradient(180deg, #FFF1B8, #E2B53E 55%, #B8860B); -webkit-background-clip:text; background-clip:text;
+    color:transparent; text-transform:uppercase;
+  }
+  .ch-box{
+    position:absolute; right:-30%; top:-8%; width:95%; height:34%; transform:rotate(-28deg); z-index:1;
+    background:#fff; color:var(--club); font-weight:900; font-size:13px; line-height:1.6; white-space:nowrap; overflow:hidden;
+    padding-left:6px;
+  }
+  .sticker .art.chk-box, .sticker.has .art.chk-box{background:linear-gradient(160deg, color-mix(in srgb, var(--club) 45%, #fff), var(--club) 85%);}
+  .ch-crest-small{position:absolute; right:6px; top:5px; z-index:2; width:20px; height:20px; object-fit:contain;
+    background:#fff; border-radius:50%; padding:2px;}
+  .chk-box .ch-crest-small{right:auto; left:40px;}
+  .chicles-grid .sticker .cap{padding:4px 6px 6px;}
+  .chicles-grid .sticker .cap small{margin:0; font-size:12.5px;}
   .pdf-btn:disabled{opacity:.45; cursor:default; transform:none;}
   .repes-note{flex-basis:100%; margin:0; font-size:13px; color:var(--ink-soft);}
 
@@ -2045,9 +2107,8 @@ const CLUB_KEYS = [
 const METALS = { 'Bronce':'bronce', 'Plata':'plata', 'Oro':'oro' };
 function stickerCrest(section, club){
   if(section.type === 'team') return section.crest;
-  const c = club.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
-  const hit = c && CLUB_KEYS.find(([k]) => c.includes(k));
-  return hit ? 'escudos/' + hit[1] + '.png' : null;
+  const slug = clubSlug(club);
+  return slug ? 'escudos/' + slug + '.png' : null;
 }
 
 /* Nombre, posición y (en las secciones especiales) equipo, por separado:
@@ -2063,21 +2124,59 @@ function splitName(section, st){
   return { name, role, club };
 }
 
+/* Equipo (slug del escudo) a partir del nombre que va entre paréntesis. */
+function clubSlug(club){
+  const c = club.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+  const hit = c && CLUB_KEYS.find(([k]) => c.includes(k));
+  return hit ? hit[1] : null;
+}
+const SLUG_COLOR = {};
+Object.keys(CREST_SLUGS).forEach(t => { SLUG_COLOR[CREST_SLUGS[t]] = TEAM_COLORS[t]; });
+
+/* Sección Chicles: cromos apaisados como los de papel. El de escudo con "¡VAMOS!"
+   de fondo, Masterclass con su rótulo dorado y Box to Box con su franja, todos en el
+   color del equipo. */
+function isChicles(section){ return section.name === 'Chicles'; }
+function gridClass(section){ return isChicles(section) ? ' chicles-grid' : ''; }
+function chicleFaceHTML(section, st, extra){
+  const { name, role, club } = splitName(section, st);
+  const slug = clubSlug(club);
+  const crest = slug ? `escudos/${slug}.png` : null;
+  const color = SLUG_COLOR[slug] || section.color;
+  const kind = /^escudo/i.test(name) ? 'escudo' : /master/i.test(role) ? 'master' : 'box';
+  const crestImg = cls => crest ? `<img class="${cls}" src="${crest}" alt="" onerror="this.remove()">` : '';
+  let inner = '';
+  if(kind === 'escudo'){
+    inner = `<span class="ch-vamos" aria-hidden="true">${'¡VAMOS! ¡SÍ! '.repeat(14)}</span>${crestImg('ch-crest-big')}
+      <span class="ch-name">${escapeHTML(club)}</span>`;
+  } else {
+    inner = (kind === 'master'
+        ? `<span class="ch-title" aria-hidden="true">Masterclass</span><span class="ch-band"></span>`
+        : `<span class="ch-box" aria-hidden="true">${'BOX TO BOX '.repeat(6)}</span>`) +
+      `${crestImg('ch-crest-small')}${SIL_PLAYER}<span class="ch-name">${escapeHTML(name)}</span>`;
+  }
+  return `
+    <div class="art chicle chk-${kind}" style="--club:${color}">${inner}<span class="num">${escapeHTML(String(st.number))}</span>${extra || ''}</div>
+    <div class="cap"><small>${escapeHTML(kind === 'escudo' ? 'Escudo' : role)}${kind === 'escudo' ? '' : ' · ' + escapeHTML(club)}</small></div>`;
+}
+
 function stickerFaceHTML(section, st, extra){
+  if(isChicles(section)) return chicleFaceHTML(section, st, extra);
   const { name, role, club } = splitName(section, st);
   const badge = st.tag ? `<span class="tag-badge ${tagClass(st.tag)}">${escapeHTML(st.tag)}</span>` : '';
   const sub = [club, role].filter(Boolean).map(escapeHTML).join('<br>');
   const wm = section.crest ? `<img class="wm" src="${section.crest}" alt="" onerror="this.remove()">` : '';
   const crest = stickerCrest(section, club);
   const metal = METALS[st.tag];
-  let art = '', artClass = '';
+  let artClass = metal ? ` metal-art metal-art-${metal}` : '';
+  let art = '';
   if(/^escudo/i.test(name) && crest){
     // Cromo de escudo: su escudo en sombra mientras falta y en color cuando lo tienes.
-    artClass = ' crest-card';
+    artClass += ' crest-card';
     art = `<img class="crest-shape" src="${crest}" alt="" onerror="this.parentNode.classList.remove('crest-card'); this.remove()">${SIL_CREST}`;
   } else if(metal && crest){
     // Extra Sticker: al pegarlo, el escudo del equipo del jugador en bronce, plata u oro.
-    artClass = ' metal-card';
+    artClass += ' metal-card';
     art = `<span class="metal-crest metal-${metal}" style="--crest:url('${crest}')"><img src="${crest}" alt="" onerror="this.parentNode.remove()"></span>${wm}${SIL_PLAYER}`;
   } else {
     art = wm + (/^escudo/i.test(name) ? SIL_CREST : SIL_PLAYER);
@@ -2115,7 +2214,7 @@ function renderAlbum(){
   const main = document.getElementById('mainArea');
   main.innerHTML = `
     ${sectionHeadHTML(section, sub)}
-    <div class="sticker-grid" id="stickerGrid" style="--team:${readableColor(section.color)}">
+    <div class="sticker-grid${gridClass(section)}" id="stickerGrid" style="--team:${readableColor(section.color)}">
       ${missing.length ? missing.map(st => stickerCardHTML(section, st, false)).join('') :
         total ? doneCardHTML(section) : `<div class="empty-msg">No hay cromos en esta sección.</div>`}
     </div>
@@ -2154,7 +2253,7 @@ function renderCollection(){
   main.className = 'collection';
   main.innerHTML = `
     ${sectionHeadHTML(section, `${obtained.length} de ${section.stickers.length} pegados`)}
-    <div class="sticker-grid" style="--team:${readableColor(section.color)}">
+    <div class="sticker-grid${gridClass(section)}" style="--team:${readableColor(section.color)}">
       ${obtained.length ? obtained.map(st => stickerCardHTML(section, st, true)).join('') :
         `<div class="empty-msg">Aún no has pegado ningún cromo de esta sección. Tócalos en la pestaña Álbum para pegarlos.</div>`}
     </div>
@@ -2217,7 +2316,7 @@ function renderRepes(){
       ${total ? '' : '<p class="repes-note">Apunta repetidos con el botón + para crear la lista y el anuncio.</p>'}
     </div>
     ${sectionHeadHTML(section, `${sectionDupes} repetido${sectionDupes===1?'':'s'}`)}
-    <div class="sticker-grid" style="--team:${readableColor(section.color)}">
+    <div class="sticker-grid${gridClass(section)}" style="--team:${readableColor(section.color)}">
       ${obtained.length ? obtained.map(st => `
         <div class="sticker has${st.dupes ? ' dupe' : ''}">
           ${stickerFaceHTML(section, st, st.dupes ? `<span class="dupe-stamp">×${st.dupes}</span>` : '')}
