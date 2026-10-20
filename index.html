@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>Álbum LaLiga 2026-27</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -59,6 +59,7 @@
     background:var(--card-bg); border-top:1.5px solid var(--line);
     padding:6px 6px calc(6px + env(safe-area-inset-bottom, 0px));
     box-shadow:0 -3px 12px rgba(30,27,22,0.10);
+    transform:translateZ(0); -webkit-transform:translateZ(0);
   }
   .tabbtn{
     flex:1; display:flex; flex-direction:column; align-items:center; gap:3px;
@@ -68,6 +69,17 @@
   }
   .tabbtn svg{width:24px; height:24px; fill:none; stroke:currentColor; stroke-width:2; stroke-linecap:round; stroke-linejoin:round;}
   .tabbtn.active{color:var(--laliga-red); background:rgba(200,16,46,0.08);}
+
+  /* Botón para volver arriba (donde están las flechas de equipo) */
+  .to-top{
+    position:fixed; right:16px; bottom:calc(84px + env(safe-area-inset-bottom, 0px)); z-index:49;
+    width:48px; height:48px; border-radius:50%; border:none; cursor:pointer;
+    background:var(--laliga-red); color:#fff; font-family:'Oswald',system-ui,sans-serif; font-size:24px; line-height:1;
+    box-shadow:0 4px 12px rgba(30,27,22,0.28);
+    opacity:0; transform:translateY(12px) scale(0.9); pointer-events:none; transition:opacity .2s, transform .2s;
+  }
+  .to-top.show{opacity:1; transform:none; pointer-events:auto;}
+  .to-top:active{transform:scale(0.92);}
 
   .chip-row{
     display:flex; gap:8px; overflow-x:auto; padding:14px 18px; -webkit-overflow-scrolling:touch;
@@ -270,6 +282,7 @@
 <div class="chip-row" id="chipRow"></div>
 
 <main id="mainArea"></main>
+<button class="to-top" id="toTop" aria-label="Volver arriba">↑</button>
 </div>
 
 <script>
@@ -1052,7 +1065,7 @@ const CREST_SLUGS = {
 function stickersFor(sectionId, raw){
   const used = new Set();
   const stickers = parseRaw(raw).map(s => ({
-    id: makeId(sectionId, s.number, used), number: s.number, name: s.name, tag: s.tag, obtained:false
+    id: makeId(sectionId, s.number, used), number: s.number, name: s.name, tag: s.tag, obtained:false, dupes:0
   }));
   markDuplicates(stickers);
   return stickers;
@@ -1114,9 +1127,32 @@ function docRefFor(uid){
   return db.collection('albums').doc(uid);
 }
 
+/* Lo que se guarda en la nube. Los logos de las secciones especiales salen del
+   código y no se guardan: una versión anterior de la app abierta en otro móvil
+   vería el cambio y reescribiría el álbum una y otra vez. */
+function toStored(d){
+  return { sections: d.sections.map(s => ({ ...s, crest: s.type === 'special' ? null : s.crest })) };
+}
+
 function save(){
   if(!data || !auth.currentUser || suppressSave) return;
-  docRefFor(auth.currentUser.uid).set(data).catch(err => console.error('Error guardando:', err));
+  backupDupes();
+  docRefFor(auth.currentUser.uid).set(toStored(data)).catch(err => console.error('Error guardando:', err));
+}
+
+/* Copia local de los repetidos. Una versión antigua de la app (una pestaña que tu
+   amigo o tú tengáis abierta sin recargar) guarda el álbum sin repetidos y los
+   borraría; si llega un guardado así, se recuperan de aquí. */
+const DUPES_KEY = 'laliga_2627_dupes';
+let knownDupes = null;
+function backupDupes(){
+  knownDupes = {};
+  data.sections.forEach(s => s.stickers.forEach(st => { if(st.dupes) knownDupes[st.id] = st.dupes; }));
+  try { localStorage.setItem(DUPES_KEY, JSON.stringify(knownDupes)); } catch(e) {}
+}
+function restoredDupes(){
+  if(knownDupes) return knownDupes;
+  try { return JSON.parse(localStorage.getItem(DUPES_KEY)) || {}; } catch(e) { return {}; }
 }
 
 /* Cuando se actualiza el checklist (nueva edición con cromos nuevos), esto
@@ -1131,16 +1167,18 @@ function mergeWithFresh(existingData){
   freshSections.forEach(freshSection => {
     const old = oldSections.find(s => s.id === freshSection.id);
     if(!old){ changed = true; return; }
-    if(old.name !== freshSection.name || old.color !== freshSection.color ||
-       (old.crest || null) !== (freshSection.crest || null)) changed = true;
     if((old.stickers || []).length !== freshSection.stickers.length) changed = true;
 
     freshSection.stickers = freshSection.stickers.map(freshSt => {
       const olds = (old.stickers || []).filter(s => String(s.number) === String(freshSt.number));
       if(!olds.length){ changed = true; return freshSt; }
       const obtained = olds.some(s => s.obtained);
-      const dupes = Math.max(0, ...olds.map(s => s.dupes || 0));
       const o = olds[0];
+      let dupes = Math.max(0, ...olds.map(s => s.dupes || 0));
+      if(!('dupes' in o)){
+        dupes = restoredDupes()[freshSt.id] || 0;
+        if(dupes) changed = true;
+      }
       if(o.id !== freshSt.id || o.name !== freshSt.name || (o.tag || '') !== (freshSt.tag || '')) changed = true;
       return { ...freshSt, obtained, dupes };
     });
@@ -1155,11 +1193,12 @@ function startSync(uid){
     if(snap.exists){
       const { merged, changed } = mergeWithFresh(snap.data());
       data = merged;
-      if(changed) docRefFor(uid).set(data);
+      backupDupes();
+      if(changed) docRefFor(uid).set(toStored(data));
     } else {
       const sections = buildSections();
       data = { sections };
-      docRefFor(uid).set(data);
+      docRefFor(uid).set(toStored(data));
     }
     if(!activeTab) activeTab = 'album';
     renderAll();
@@ -1238,6 +1277,16 @@ auth.onAuthStateChanged(user => {
 
 function getSection(id){
   return data.sections.find(s => s.id === id);
+}
+
+/* Busca el cromo en los datos actuales. Cada vez que llega un cambio de la nube
+   "data" se reconstruye, así que no sirve una referencia guardada de antes. */
+function findSticker(id){
+  for(const s of data.sections){
+    const st = s.stickers.find(x => x.id === id);
+    if(st) return st;
+  }
+  return null;
 }
 
 function totalCounts(){
@@ -1408,7 +1457,8 @@ function renderCollection(){
 
   main.querySelectorAll('[data-undo]').forEach(btn => {
     btn.addEventListener('click', () => {
-      const st = section.stickers.find(s => s.id === btn.dataset.undo);
+      const st = findSticker(btn.dataset.undo);
+      if(!st) return;
       st.obtained = false;
       st.dupes = 0;
       save();
@@ -1460,7 +1510,8 @@ function renderRepes(){
   `;
 
   const change = (id, delta) => {
-    const st = section.stickers.find(s => s.id === id);
+    const st = findSticker(id);
+    if(!st) return;
     st.dupes = Math.max(0, (st.dupes || 0) + delta);
     save();
     renderAll();
@@ -1558,10 +1609,11 @@ function listPDF(groups, title, subtitle, qty, filename){
 }
 
 function markObtained(section, id, cardEl){
-  const st = section.stickers.find(s => s.id === id);
   cardEl.classList.add('has','pop');
   cardEl.querySelector('.del')?.remove();
   setTimeout(() => {
+    const st = findSticker(id);
+    if(!st) return;
     st.obtained = true;
     save();
     renderAll();
@@ -1575,6 +1627,12 @@ document.querySelectorAll('.tabbtn').forEach(btn => {
     renderAll();
   });
 });
+
+const toTopBtn = document.getElementById('toTop');
+toTopBtn.addEventListener('click', () => window.scrollTo({ top:0, behavior:'smooth' }));
+window.addEventListener('scroll', () => {
+  toTopBtn.classList.toggle('show', window.scrollY > 300);
+}, { passive:true });
 
 function renderAll(){
   if(!data) return;
