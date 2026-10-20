@@ -211,6 +211,17 @@
   .crest-btn.active .ring{transform:scale(1.12); box-shadow:0 0 0 2px var(--paper), 0 0 0 4px var(--ink);}
 
   main{padding:0 14px 30px;}
+  /* Dos páginas juntas, como el álbum abierto: cada una con su lomo hacia el centro. */
+  .spread{display:grid; grid-template-columns:1fr 1fr; gap:0 6px; align-items:start; max-width:1600px; margin:0 auto;
+    filter:drop-shadow(0 10px 18px rgba(19,26,46,0.16));}
+  .spread .album-page:first-child .section-head{border-top-right-radius:4px;}
+  .spread .album-page:first-child .sticker-grid{border-bottom-right-radius:4px; box-shadow:inset -14px 0 16px -12px rgba(0,0,0,0.35);}
+  .spread .album-page:last-child .section-head{border-top-left-radius:4px;}
+  .spread .album-page:last-child .sticker-grid{border-bottom-left-radius:4px; box-shadow:inset 14px 0 16px -12px rgba(0,0,0,0.35);}
+  .spread .album-page:first-child .head-arrow[data-nav="1"], .spread .album-page:last-child .head-arrow[data-nav="-1"]{visibility:hidden;}
+  .spread .sticker-grid{grid-template-columns:repeat(auto-fill, minmax(118px,1fr));}
+  .spread .chicles-grid{grid-template-columns:repeat(auto-fill, minmax(150px,1fr));}
+  @media (min-width:1100px){ .single .sticker-grid{grid-template-columns:repeat(auto-fill, minmax(130px,1fr));} }
 
   /* La página del equipo: impresa en su color, con rayas finas y un brillo arriba,
      como las páginas del álbum de papel. */
@@ -831,6 +842,17 @@
   .login-box .btn-secondary{background:var(--paper-dark); color:var(--ink);}
   .login-box .login-error{color:var(--link); font-size:14px; margin-top:10px; min-height:16px;}
   .login-box .login-loading{color:var(--ink-soft); font-size:14px; margin-top:10px;}
+  .login-box h1 .nw{white-space:nowrap;}
+  .login-box .login-error.ok{color:var(--ink);}
+  .pw-field{position:relative;}
+  .pw-field input{padding-right:52px;}
+  .login-box .pw-toggle{position:absolute; right:2px; top:2px; flex:none; width:44px; height:44px; padding:0; background:none; color:var(--ink-soft);
+    display:flex; align-items:center; justify-content:center; border-radius:6px;}
+  .pw-toggle svg{width:22px; height:22px; fill:none; stroke:currentColor; stroke-width:2; stroke-linecap:round;}
+  .pw-toggle[aria-pressed="true"] .slash{display:none;}
+  .login-box .forgot-btn{flex:none; margin-top:6px; min-height:44px; padding:8px 12px; background:none; color:var(--ink-soft);
+    font-weight:600; font-size:14.5px; text-decoration:underline; text-underline-offset:3px;}
+  .pw-toggle:focus-visible, .forgot-btn:focus-visible{outline:3px solid var(--gold); outline-offset:2px;}
 
   @media (max-width:360px){
     header h1{font-size:28px;}
@@ -844,15 +866,21 @@
 <div id="loginScreen">
   <div class="login-box">
     <div class="pack"><div class="pack-inner"><img src="icono.png.jpg" alt="Sobre de cromos de LaLiga 2026-27"></div></div>
-    <h1>Álbum LaLiga 2026-27</h1>
+    <h1>Álbum LaLiga <span class="nw">2026-27</span></h1>
     <p class="sub">Entra para marcar tus cromos desde cualquier móvil y cambiarlos con tus amigos.</p>
     <input type="email" id="loginEmail" placeholder="Email" autocomplete="username">
-    <input type="password" id="loginPassword" placeholder="Contraseña" autocomplete="current-password">
+    <div class="pw-field">
+      <input type="password" id="loginPassword" placeholder="Contraseña" autocomplete="current-password">
+      <button type="button" class="pw-toggle" id="pwToggle" aria-label="Ver la contraseña" aria-pressed="false">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/><path class="slash" d="M4 4l16 16"/></svg>
+      </button>
+    </div>
     <div class="btn-row">
       <button class="btn-primary" id="loginBtn">Iniciar sesión</button>
       <button class="btn-secondary" id="signupBtn">Crear cuenta</button>
     </div>
-    <div class="login-error" id="loginError"></div>
+    <div class="login-error" id="loginError" role="alert"></div>
+    <button type="button" class="forgot-btn" id="forgotBtn">He olvidado mi contraseña</button>
     <div class="login-loading" id="loginLoading" style="display:none;">Conectando…</div>
   </div>
 </div>
@@ -1005,7 +1033,7 @@
 </div>
 
 <script>
-const APP_VERSION = '2026-10-21.6';
+const APP_VERSION = '2026-10-21.7';
 const STORAGE_KEY = 'laliga_2627_album_v5';
 
 /* Orden exacto de equipos indicado por el usuario */
@@ -1998,6 +2026,7 @@ function stopSync(){
 }
 
 function showLoginError(msg){
+  document.getElementById('loginError').classList.remove('ok');
   document.getElementById('loginError').textContent = msg;
 }
 function setLoginLoading(on){
@@ -2012,6 +2041,31 @@ document.getElementById('loginBtn').onclick = () => {
   setLoginLoading(true);
   auth.signInWithEmailAndPassword(email, password)
     .catch(err => showLoginError(traducirErrorAuth(err)))
+    .finally(() => setLoginLoading(false));
+};
+
+document.getElementById('pwToggle').onclick = () => {
+  const input = document.getElementById('loginPassword'), btn = document.getElementById('pwToggle');
+  const show = input.type === 'password';
+  input.type = show ? 'text' : 'password';
+  btn.setAttribute('aria-pressed', show);
+  btn.setAttribute('aria-label', show ? 'Ocultar la contraseña' : 'Ver la contraseña');
+};
+
+/* Firebase manda un email con un enlace para poner una contraseña nueva. */
+document.getElementById('forgotBtn').onclick = () => {
+  const email = document.getElementById('loginEmail').value.trim();
+  const box = document.getElementById('loginError');
+  box.classList.remove('ok');
+  if(!email){ showLoginError('Escribe arriba tu email y vuelve a tocar "He olvidado mi contraseña".'); document.getElementById('loginEmail').focus(); return; }
+  setLoginLoading(true);
+  auth.sendPasswordResetEmail(email)
+    .then(() => { showLoginError(`Te hemos enviado un email a ${email} para poner una contraseña nueva. Si no lo ves, mira en correo no deseado.`); box.classList.add('ok'); })
+    .catch(err => {
+      // Por seguridad no decimos si la cuenta existe: el mensaje es el mismo.
+      if(err && err.code === 'auth/user-not-found'){ showLoginError(`Te hemos enviado un email a ${email} para poner una contraseña nueva. Si no lo ves, mira en correo no deseado.`); box.classList.add('ok'); }
+      else showLoginError(traducirErrorAuth(err));
+    })
     .finally(() => setLoginLoading(false));
 };
 
@@ -2424,7 +2478,7 @@ function sectionHeadHTML(section, subText){
 
 function bindSectionNav(main){
   main.querySelectorAll('[data-nav]').forEach(btn => {
-    btn.addEventListener('click', () => goToSection(parseInt(btn.dataset.nav, 10)));
+    btn.addEventListener('click', () => goToSection(parseInt(btn.dataset.nav, 10) * (main.querySelector('.spread') ? 2 : 1)));
   });
 }
 
@@ -2592,39 +2646,59 @@ try { onlyMissing = localStorage.getItem('laliga_2627_only_missing') === '1'; } 
 
 const PACK_ICON = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 6.5 7 3h10l2 3.5"/><rect x="5" y="6.5" width="14" height="14.5" rx="1.5"/><path d="M5 10h14M9.5 14.5h5"/></svg>';
 
-function renderAlbum(){
+/* En ordenador o tableta en horizontal se ven dos páginas a la vez, como el álbum
+   abierto, y las flechas pasan de dos en dos. */
+const WIDE = window.matchMedia('(min-width:1100px)');
+WIDE.addEventListener('change', () => { if(data && activeTab === 'album') renderAll(); });
+function albumPair(){
   const section = currentSection();
+  if(!WIDE.matches) return [section];
+  const list = orderedSections(), idx = list.findIndex(s => s.id === section.id);
+  return idx + 1 < list.length ? [section, list[idx + 1]] : [list[idx - 1], section];
+}
+function albumPageHTML(section, gridId){
   const all = groupBySlot(section.stickers);
   const shown = onlyMissing ? all.filter(st => !st.obtained) : all;
   const total = section.stickers.length, have = section.stickers.filter(st => st.obtained).length, left = total - have;
   const sub = `${have} de ${total} pegados` + (left > 0 && left <= 3 ? ` · solo te falta${left === 1 ? '' : 'n'} ${left}` : '');
+  return `<div class="album-page" data-section="${section.id}">
+    ${sectionHeadHTML(section, sub)}
+    ${clubBarHTML(section)}
+    <div class="sticker-grid${gridClass(section)}"${gridId ? ` id="${gridId}"` : ''} style="--team:${readableColor(section.color)}">
+      ${total && !left ? doneCardHTML(section) : ''}
+      ${shown.map(st => stickerCardHTML(section, st)).join('')}
+      ${total ? '' : `<div class="empty-msg">No hay cromos en esta sección.</div>`}
+    </div>
+  </div>`;
+}
 
+function renderAlbum(){
+  const pages = albumPair();
   const main = document.getElementById('mainArea');
   main.innerHTML = `
     <div class="album-tools">
       <button class="pack-btn" id="packBtn">${PACK_ICON}Apuntar sobre</button>
       <button class="switch" id="onlyMissing" role="switch" aria-checked="${onlyMissing}"><span class="knob"></span>Solo los que me faltan</button>
     </div>
-    ${sectionHeadHTML(section, sub)}
-    ${clubBarHTML(section)}
-    <div class="sticker-grid${gridClass(section)}" id="stickerGrid" style="--team:${readableColor(section.color)}">
-      ${total && !left ? doneCardHTML(section) : ''}
-      ${shown.map(st => stickerCardHTML(section, st)).join('')}
-      ${total ? '' : `<div class="empty-msg">No hay cromos en esta sección.</div>`}
+    <div class="${pages.length > 1 ? 'spread' : 'single'}">
+      ${pages.map(s => albumPageHTML(s, s.id === currentSection().id ? 'stickerGrid' : '')).join('')}
     </div>
   `;
 
-  bindCards(document.getElementById('stickerGrid'));
+  main.querySelectorAll('.album-page .sticker-grid').forEach(bindCards);
   document.getElementById('packBtn').addEventListener('click', () => openPack());
   document.getElementById('onlyMissing').addEventListener('click', () => {
     onlyMissing = !onlyMissing;
     try { localStorage.setItem('laliga_2627_only_missing', onlyMissing ? '1' : '0'); } catch(e) {}
     renderAll();
   });
-  const fav = document.getElementById('favBtn');
-  if(fav) fav.addEventListener('click', () => toggleFav(section.id));
-  const more = document.getElementById('clubMore');
-  if(more) more.addEventListener('click', () => openClub(section.id));
+  main.querySelectorAll('.album-page').forEach(pg => {
+    const id = pg.dataset.section;
+    const fav = pg.querySelector('.fav-btn');
+    if(fav) fav.addEventListener('click', () => toggleFav(id));
+    const more = pg.querySelector('.club-more');
+    if(more) more.addEventListener('click', () => openClub(id));
+  });
   bindSectionNav(main);
 }
 
@@ -2655,8 +2729,8 @@ function clubBarHTML(section){
   const have = groups.reduce((m, g) => m + g.its.filter(st => st.obtained).length, 0);
   const fav = section.id === favTeam;
   return `<div class="club-bar" style="--team:${readableColor(section.color)}">
-      ${n ? `<button class="club-more" id="clubMore">En las especiales: <b>${have} de ${n}</b> pegados <span aria-hidden="true">›</span></button>` : '<span></span>'}
-      <button class="fav-btn" id="favBtn" aria-pressed="${fav}">${fav ? '★ Mi equipo' : '☆ Es mi equipo'}</button>
+      ${n ? `<button class="club-more">En las especiales: <b>${have} de ${n}</b> pegados <span aria-hidden="true">›</span></button>` : '<span></span>'}
+      <button class="fav-btn" aria-pressed="${fav}">${fav ? '★ Mi equipo' : '☆ Es mi equipo'}</button>
     </div>`;
 }
 /* Hoja con una lista de cromos agrupados por página (tu equipo en las especiales,
