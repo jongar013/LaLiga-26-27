@@ -300,7 +300,7 @@
   }
   .sticker .art .tag-badge{position:absolute; right:5px; top:7px; z-index:2;}
   .sticker .cap{padding:6px 7px 8px; line-height:1.05;}
-  .sticker .cap b{display:block; font-family:var(--display); font-weight:800; font-size:17px; text-transform:uppercase; overflow-wrap:anywhere;}
+  .sticker .cap b{display:block; font-family:var(--display); font-weight:800; font-size:17px; text-transform:uppercase; overflow-wrap:anywhere; hyphens:auto;}
   .sticker .cap small{display:block; margin-top:2px; font-size:12.5px; font-weight:600; opacity:.85;}
 
   .sticker.has{
@@ -484,6 +484,33 @@
   .sticker:not(.has) .chicle{border-radius:6px;}
   .pdf-btn:disabled{opacity:.45; cursor:default; transform:none;}
 
+
+  /* ---------- Proponer cambio ---------- */
+  .tab-badge{
+    position:absolute; top:4px; left:calc(50% + 8px); min-width:18px; height:18px; padding:0 5px; border-radius:9px;
+    background:var(--laliga-red); color:#fff; font-size:11.5px; font-weight:700; line-height:18px; text-align:center;
+  }
+  .propose-btn{width:100%; min-height:44px; margin-top:10px;}
+  .trade-prop{margin-top:10px; padding:10px 12px; border-radius:10px; background:var(--field-bg); border:1.5px solid var(--line);}
+  .trade-prop.in{border-color:var(--laliga-red);}
+  .trade-prop p{margin:0 0 6px; font-size:15px;}
+  .tp-side{margin-top:6px;}
+  .tp-side small{display:block; margin-bottom:4px; font-size:12.5px; font-weight:700; color:var(--ink-soft); text-transform:uppercase; letter-spacing:.3px;}
+  .tp-btns{display:flex; gap:8px; margin-top:10px;}
+  .tp-btns .pdf-btn{flex:1; min-height:44px;}
+  .trade-sheet h4{display:flex; align-items:baseline; gap:8px; margin:12px 0 2px; font-size:20px; font-weight:900; text-transform:uppercase;}
+  .trade-sheet h4 small{font-family:var(--text); font-size:13px; font-weight:600; text-transform:none; color:var(--ink-soft);}
+  .trade-sheet h5{margin:8px 0 4px; font-size:13px; font-weight:700; color:var(--ink-soft);}
+  .pick-list{display:flex; flex-wrap:wrap; gap:6px;}
+  .pick{
+    display:flex; align-items:center; gap:6px; min-height:40px; padding:6px 10px; border-radius:8px; cursor:pointer;
+    border:1.5px solid var(--line); background:var(--field-bg); color:var(--ink); font:inherit; font-size:14px; font-weight:600;
+  }
+  .pick b{font-family:var(--display); font-weight:900; font-size:17px; color:var(--laliga-red);}
+  .pick[aria-pressed="true"]{background:var(--laliga-red); border-color:var(--laliga-red); color:#fff;}
+  .pick[aria-pressed="true"] b{color:#fff;}
+  .pick[aria-pressed="true"]::before{content:"✓"; font-weight:700;}
+  .t-sum{margin:10px 0 0; font-weight:700; font-size:15px;}
   /* ---------- Tanda 3: abrir el sobre ---------- */
   .pack-open{
     position:fixed; inset:0; z-index:65; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:14px;
@@ -844,7 +871,7 @@
   <button class="tabbtn" data-tab="vitrina">
     <svg viewBox="0 0 24 24"><path d="M8 4h8v5a4 4 0 0 1-8 0z"/><path d="M8 6H5a3 3 0 0 0 3 4M16 6h3a3 3 0 0 1-3 4"/><path d="M12 13v4M8.5 20h7l-1-3h-5z"/></svg>Vitrina</button>
   <button class="tabbtn" data-tab="trades">
-    <svg viewBox="0 0 24 24"><path d="M4 8h13l-3-3"/><path d="M20 16H7l3 3"/></svg>Cambios</button>
+    <svg viewBox="0 0 24 24"><path d="M4 8h13l-3-3"/><path d="M20 16H7l3 3"/></svg>Cambios<span class="tab-badge" id="tradeBadge" hidden></span></button>
 </div>
 
 <div class="chip-row" id="chipRow"></div>
@@ -943,6 +970,22 @@
   </div>
 </div>
 
+<div class="sheet-backdrop" id="tradeSheet" hidden>
+  <div class="sheet trade-sheet" role="dialog" aria-labelledby="tradeTitle">
+    <h3 id="tradeTitle">Cambio</h3>
+    <p class="hint">Marca lo que le das y lo que te da. Cuando lo acepte, se apunta solo en los dos álbumes.</p>
+    <h4>Le das <small>tus repes que le faltan</small></h4>
+    <div id="tGive"></div>
+    <h4>Te da <small>sus repes que te faltan</small></h4>
+    <div id="tGet"></div>
+    <p class="t-sum" id="tSum"></p>
+    <div class="sheet-actions">
+      <button class="pdf-btn" id="tSend" disabled>Enviar propuesta</button>
+      <button class="pdf-btn alt" data-close>Cancelar</button>
+    </div>
+  </div>
+</div>
+
 <div class="pack-open" id="packOpen" role="dialog" aria-label="Abrir el sobre" hidden>
   <div class="po-stage" id="poStage"></div>
   <p class="po-hint" id="poHint" aria-live="polite"></p>
@@ -966,7 +1009,7 @@
 </div>
 
 <script>
-const APP_VERSION = '2026-10-21.2';
+const APP_VERSION = '2026-10-21.3';
 const STORAGE_KEY = 'laliga_2627_album_v5';
 
 /* Orden exacto de equipos indicado por el usuario */
@@ -1810,6 +1853,15 @@ let activeTab = 'album';
                                request.resource.data.to == resource.data.to;
               allow delete: if signedIn() && (request.auth.uid == resource.data.from || request.auth.uid == resource.data.to);
             }
+            match /trades/{id} {
+              allow read, delete: if signedIn() && (request.auth.uid == resource.data.from || request.auth.uid == resource.data.to);
+              allow create: if signedIn() && request.resource.data.from == request.auth.uid &&
+                               request.resource.data.status == 'pending' &&
+                               (friends(request.auth.uid, request.resource.data.to) || friends(request.resource.data.to, request.auth.uid));
+              allow update: if signedIn() && (request.auth.uid == resource.data.from || request.auth.uid == resource.data.to) &&
+                               request.resource.data.from == resource.data.from && request.resource.data.to == resource.data.to &&
+                               request.resource.data.give == resource.data.give && request.resource.data.get == resource.data.get;
+            }
           }
         }
    ================================================================================================ */
@@ -1947,6 +1999,7 @@ function startSync(uid){
     renderAll();
     suppressSave = false;
     checkNewStickers();
+    settleTrades();
   }, err => {
     console.error('Error de sincronización:', err);
   });
@@ -2033,6 +2086,7 @@ auth.onAuthStateChanged(user => {
 let myProfile = null, friendsError = '', tradeMsg = '';
 let reqsFrom = [], reqsTo = [];
 let friendAlbums = {}, albumUnsubs = {}, friendUnsubs = [];
+let tradesFrom = [], tradesTo = [], tradesError = false;
 
 async function ensureProfile(user){
   const email = (user.email || '').toLowerCase();
@@ -2052,6 +2106,14 @@ function startFriends(user){
     friendUnsubs.push(col.where('to', '==', user.uid).onSnapshot(snap => {
       reqsTo = snap.docs.map(d => ({ id:d.id, ...d.data() })); syncFriendAlbums();
     }, onFriendsError));
+    const trades = db.collection('trades');
+    const onTradesError = err => { console.error('Cambios:', err); tradesError = true; rerenderTrades(); };
+    friendUnsubs.push(trades.where('from', '==', user.uid).onSnapshot(snap => {
+      tradesFrom = snap.docs.map(d => ({ id:d.id, ...d.data() })); tradesError = false; settleTrades(); rerenderTrades();
+    }, onTradesError));
+    friendUnsubs.push(trades.where('to', '==', user.uid).onSnapshot(snap => {
+      tradesTo = snap.docs.map(d => ({ id:d.id, ...d.data() })); tradesError = false; rerenderTrades(); updateTradeBadge();
+    }, onTradesError));
     rerenderTrades();
   }).catch(onFriendsError);
 }
@@ -2060,6 +2122,7 @@ function stopFriends(){
   friendUnsubs.forEach(u => u()); friendUnsubs = [];
   Object.values(albumUnsubs).forEach(u => u()); albumUnsubs = {};
   friendAlbums = {}; reqsFrom = []; reqsTo = []; myProfile = null; friendsError = ''; tradeMsg = '';
+  tradesFrom = []; tradesTo = []; tradesError = false;
 }
 
 function onFriendsError(err){
@@ -2207,6 +2270,9 @@ function renderTrades(){
           <div><b>${t.nGive}</b>le puedes dar</div>
           <div><b>${t.nGet}</b>te puede dar</div>
         </div>
+        ${pendingTradesHTML(f)}
+        ${tradesError ? '<p class="trade-empty">Para proponer cambios falta activar las reglas nuevas de Firebase.</p>' :
+          `<button class="pdf-btn propose-btn" data-propose="${f.uid}"${t.nGive || t.nGet ? '' : ' disabled'}>Proponer cambio</button>`}
         <details data-key="give-${f.uid}" ${open['give-' + f.uid] ? 'open' : ''}><summary>Le puedes dar (${t.nGive})</summary>
           ${tradeListHTML(t.give, 'Ninguno de tus repetidos le falta.')}</details>
         <details data-key="get-${f.uid}" ${open['get-' + f.uid] ? 'open' : ''}><summary>Te puede dar (${t.nGet})</summary>
@@ -2215,6 +2281,8 @@ function renderTrades(){
     }).join('') : `<div class="trade-card"><p class="trade-empty">Añade a un amigo con su email y verás qué cromos os podéis cambiar.</p></div>`}
   `;
 
+  main.querySelectorAll('[data-propose]').forEach(b => b.addEventListener('click', () => openTrade(b.dataset.propose)));
+  main.querySelectorAll('[data-trade]').forEach(b => b.addEventListener('click', () => tradeAction(b.dataset.trade, b.dataset.act)));
   const input = document.getElementById('friendCode');
   input.value = typed;
   document.getElementById('addFriend').addEventListener('click', () => sendFriendRequest(input.value));
@@ -2232,6 +2300,162 @@ function renderTrades(){
   }));
 }
 /* ================================================================================================ */
+
+/* ---------- Proponer un cambio ----------
+   Eliges qué le das (tus repes que le faltan) y qué te da (sus repes que te faltan).
+   Tu amigo lo acepta en su móvil y cada uno apunta su parte en su propio álbum:
+   él al aceptar y tú en cuanto tu app ve que lo ha aceptado. Una marca en la
+   propuesta evita que se apunte dos veces (por ejemplo con la cuenta abierta en
+   dos móviles). */
+function stickerLabel(id){
+  const st = findSticker(id);
+  if(!st) return '';
+  const sec = sectionOf(st);
+  return `${sec.name} ${st.number} ${splitName(sec, st).name}`;
+}
+function tradeNamesHTML(ids){
+  return ids.map(id => `<span class="trade-item">${escapeHTML(stickerLabel(id))}</span>`).join('');
+}
+function pendingTradesHTML(f){
+  const rows = [];
+  tradesTo.filter(t => t.from === f.uid && t.status === 'pending').forEach(t => rows.push(`
+    <div class="trade-prop in">
+      <p><b>${escapeHTML(t.fromName || f.name || '')}</b> te propone un cambio</p>
+      <div class="tp-side"><small>Te da ${t.give.length}</small><div class="trade-list">${tradeNamesHTML(t.give)}</div></div>
+      <div class="tp-side"><small>Le das ${t.get.length}</small><div class="trade-list">${tradeNamesHTML(t.get)}</div></div>
+      <div class="tp-btns"><button class="pdf-btn" data-trade="${t.id}" data-act="accept">Aceptar</button>
+        <button class="pdf-btn alt" data-trade="${t.id}" data-act="decline">Rechazar</button></div>
+    </div>`));
+  tradesFrom.filter(t => t.to === f.uid && (t.status === 'pending' || t.status === 'declined')).forEach(t => rows.push(`
+    <div class="trade-prop out">
+      <p>${t.status === 'declined' ? `<b>${escapeHTML(f.name || '')}</b> ha rechazado tu cambio` : `Esperando a que <b>${escapeHTML(f.name || '')}</b> acepte`}</p>
+      <div class="tp-side"><small>Le das ${t.give.length}</small><div class="trade-list">${tradeNamesHTML(t.give)}</div></div>
+      <div class="tp-side"><small>Te da ${t.get.length}</small><div class="trade-list">${tradeNamesHTML(t.get)}</div></div>
+      <div class="tp-btns"><button class="pdf-btn alt" data-trade="${t.id}" data-act="cancel">${t.status === 'declined' ? 'Vale' : 'Cancelar propuesta'}</button></div>
+    </div>`));
+  return rows.join('');
+}
+function updateTradeBadge(){
+  const n = tradesTo.filter(t => t.status === 'pending').length;
+  const b = document.getElementById('tradeBadge');
+  if(!b) return;
+  b.textContent = n; b.hidden = !n;
+}
+
+let tradeFriend = null, tradePick = { give:new Set(), get:new Set() };
+function openTrade(uid){
+  tradeFriend = friendsList().find(f => f.uid === uid);
+  if(!tradeFriend) return;
+  tradePick = { give:new Set(), get:new Set() };
+  document.getElementById('tradeTitle').textContent = `Cambio con ${tradeFriend.name || 'tu amigo'}`;
+  renderTradeSheet();
+  openSheet('tradeSheet');
+}
+function renderTradeSheet(){
+  if(!tradeFriend) return;
+  const t = tradesWith(friendAlbums[tradeFriend.uid]);
+  const list = (groups, side) => groups.length ? groups.map(({ s, its }) => `
+    <h5>${escapeHTML(s.name)}</h5>
+    <div class="pick-list">${its.map(st => `<button class="pick" data-side="${side}" data-id="${st.id}" aria-pressed="${tradePick[side].has(st.id)}">
+      <b>${escapeHTML(String(st.number))}</b>${escapeHTML(splitName(s, st).name)}</button>`).join('')}</div>`).join('')
+    : `<p class="trade-empty">${side === 'give' ? 'Ninguno de tus repetidos le falta.' : 'No tiene repetidos que te falten.'}</p>`;
+  document.getElementById('tGive').innerHTML = list(t.give, 'give');
+  document.getElementById('tGet').innerHTML = list(t.get, 'get');
+  document.querySelectorAll('#tradeSheet .pick').forEach(b => b.addEventListener('click', () => {
+    const set = tradePick[b.dataset.side];
+    set.has(b.dataset.id) ? set.delete(b.dataset.id) : set.add(b.dataset.id);
+    renderTradeSheet();
+  }));
+  const g = tradePick.give.size, r = tradePick.get.size;
+  document.getElementById('tSum').textContent = g || r ? `Le das ${g} y te da ${r}.` : 'Marca al menos un cromo.';
+  document.getElementById('tSend').disabled = !(g || r);
+}
+document.getElementById('tSend').addEventListener('click', async () => {
+  const me = auth.currentUser.uid, f = tradeFriend;
+  if(!f) return;
+  const btn = document.getElementById('tSend');
+  btn.disabled = true;
+  try {
+    await db.collection('trades').doc(me + '_' + Date.now()).set({
+      from:me, to:f.uid, fromName:myProfile.name, toName:f.name || '', status:'pending',
+      give:[...tradePick.give], get:[...tradePick.get], appliedFrom:false, appliedTo:false, created:Date.now()
+    });
+    closeSheet('tradeSheet');
+    showNote(`Propuesta enviada a ${f.name || 'tu amigo'}. Cuando la acepte se apuntará sola.`);
+  } catch(e){
+    console.error(e);
+    btn.disabled = false;
+    document.getElementById('tSum').textContent = e.code === 'permission-denied'
+      ? 'Para proponer cambios falta activar las reglas nuevas de Firebase.'
+      : 'No se ha enviado. Revisa la conexión y vuelve a probar.';
+  }
+});
+
+/* Apunta tu parte del cambio: lo que recibes se pega (o suma un repe) y lo que das resta un repe. */
+function applyTrade(receive, hand){
+  const touch = {};
+  const get = id => { const st = findSticker(id); return st && (touch[id] || (touch[id] = { st, o:st.obtained, d:st.dupes || 0 })); };
+  receive.forEach(id => { const c = get(id); if(!c) return; if(c.o) c.d++; else c.o = true; });
+  hand.forEach(id => { const c = get(id); if(c) c.d = Math.max(0, c.d - 1); });
+  setStickers(Object.values(touch).map(c => [c.st, c.o, c.d]));
+}
+async function tradeAction(id, act){
+  const t = [...tradesTo, ...tradesFrom].find(x => x.id === id);
+  if(!t || !data) return;
+  const ref = db.collection('trades').doc(id);
+  tradeMsg = '';
+  try {
+    if(act === 'decline'){ await ref.update({ status:'declined' }); return; }
+    if(act === 'cancel'){ await ref.delete(); return; }
+    // Aceptar: tienes que seguir teniendo repetidos los que das.
+    const gone = t.get.filter(x => { const st = findSticker(x); return !st || !st.obtained || !(st.dupes > 0); });
+    if(gone.length){
+      tradeMsg = `Ya no tienes repetido: ${gone.map(stickerLabel).join(', ')}. Rechaza este cambio y que te proponga otro.`;
+      rerenderTrades();
+      return;
+    }
+    const ok = await db.runTransaction(async tx => {
+      const snap = await tx.get(ref);
+      if(!snap.exists || snap.data().status !== 'pending' || snap.data().appliedTo) return false;
+      tx.update(ref, { status:'accepted', appliedTo:true });
+      return true;
+    });
+    if(!ok) return;
+    const before = totalCounts().have;
+    applyTrade(t.give, t.get);
+    renderAll();
+    const nuevos = totalCounts().have - before;
+    showNote(`Cambio hecho con ${t.fromName || 'tu amigo'}: ${t.give.length} cromo${t.give.length === 1 ? '' : 's'} para ti` + (nuevos ? ` (${nuevos} nuevo${nuevos === 1 ? '' : 's'})` : '') + '.');
+  } catch(e){
+    console.error(e);
+    tradeMsg = 'No se ha podido completar. Revisa la conexión y vuelve a probar.';
+    rerenderTrades();
+  }
+}
+/* Tu amigo ha aceptado: tu app apunta tu parte una sola vez y borra la propuesta. */
+const settling = new Set();
+function settleTrades(){
+  if(!data) return;
+  tradesFrom.filter(t => t.status === 'accepted' && !t.appliedFrom && !settling.has(t.id)).forEach(async t => {
+    settling.add(t.id);
+    const ref = db.collection('trades').doc(t.id);
+    try {
+      const ok = await db.runTransaction(async tx => {
+        const snap = await tx.get(ref);
+        if(!snap.exists || snap.data().appliedFrom) return false;
+        tx.update(ref, { appliedFrom:true });
+        return true;
+      });
+      if(ok){
+        applyTrade(t.get, t.give);
+        renderAll();
+        showNote(`${t.toName || 'Tu amigo'} ha aceptado el cambio: ya está apuntado en tu álbum.`);
+        ref.delete().catch(() => {});
+      }
+    } catch(e){ console.error(e); }
+    settling.delete(t.id);
+  });
+}
 
 function getSection(id){
   return data.sections.find(s => s.id === id);
@@ -3003,6 +3227,8 @@ function refreshOpenSheets(){
   if(!document.getElementById('cardSheet').hidden) renderCard();
   if(!document.getElementById('clubSheet').hidden) renderClub();
   if(!document.getElementById('packSheet').hidden) renderPack();
+  if(!document.getElementById('tradeSheet').hidden) renderTradeSheet();
+  updateTradeBadge();
 }
 
 /* Despegar pregunta antes y avisa si se borran repetidos; después se puede deshacer. */
