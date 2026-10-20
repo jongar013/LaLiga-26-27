@@ -67,25 +67,30 @@
   h1,h2,h3, .num, .stat-num{font-family:var(--display);}
 
   /* Cabecera: el marcador del álbum. Tranquila, para que manden las páginas de equipo. */
+  /* Cabecera compacta: título y total en una sola fila para dejar sitio a los cromos. */
   header{
-    padding:calc(18px + env(safe-area-inset-top, 0px)) 18px 14px;
+    padding:calc(12px + env(safe-area-inset-top, 0px)) 10px 10px 18px;
   }
-  .hd{display:flex; align-items:flex-end; justify-content:space-between; gap:12px;}
-  header h1{margin:0; font-size:34px; line-height:.9; font-weight:900; text-transform:uppercase; letter-spacing:.2px;}
-  header .season{margin-top:6px; font-size:14px; color:var(--ink-soft); font-weight:500; display:flex; gap:10px; align-items:center; flex-wrap:wrap;}
+  .hd{display:flex; align-items:center; gap:10px;}
+  .hd-title{flex:1; min-width:0;}
+  header h1{margin:0; font-size:26px; line-height:.95; font-weight:900; text-transform:uppercase; letter-spacing:.2px; white-space:nowrap;}
+  header .season{margin-top:3px; font-size:13px; color:var(--ink-soft); font-weight:500;}
   .tally{font-family:var(--display); font-weight:800; text-align:right; line-height:.85; white-space:nowrap;}
-  .tally b{font-size:44px; font-weight:900;}
-  .tally span{font-size:20px; color:var(--ink-soft);}
+  .tally b{font-size:34px; font-weight:900;}
+  .tally span{font-size:17px; color:var(--ink-soft);}
+  .menu-btn{
+    flex:0 0 auto; width:44px; height:44px; border-radius:50%; border:none; background:none; color:var(--ink);
+    display:flex; align-items:center; justify-content:center; cursor:pointer; padding:0;
+  }
+  .menu-btn svg{width:24px; height:24px; fill:currentColor;}
+  .menu-btn:active{background:var(--paper-dark);}
   .progress-bar{
-    margin-top:12px; height:8px; border-radius:4px; overflow:hidden;
+    margin:8px 8px 0 0; height:8px; border-radius:4px; overflow:hidden;
     background:repeating-linear-gradient(90deg, var(--paper-dark) 0 calc(5% - 2px), transparent calc(5% - 2px) 5%);
   }
   .progress-fill{height:100%; background:var(--laliga-red); transition:width .5s ease;}
-  .progress-labels{display:flex; justify-content:space-between; font-size:13px; margin-top:6px; color:var(--ink-soft); font-weight:600;}
-  .logout-btn{
-    background:none; border:none; padding:0; color:var(--ink-soft); font:inherit; font-size:13px;
-    text-decoration:underline; text-underline-offset:2px; cursor:pointer;
-  }
+  .progress-labels{display:flex; justify-content:space-between; gap:8px; font-size:13px; margin:5px 8px 0 0; color:var(--ink-soft); font-weight:600;}
+  .progress-labels #progressTeams{flex:1; text-align:center;}
 
   /* Barra de pestañas fija abajo, como en las apps de móvil */
   .tabs{
@@ -103,7 +108,8 @@
   .tabbtn svg{width:24px; height:24px; fill:none; stroke:currentColor; stroke-width:2; stroke-linecap:round; stroke-linejoin:round;}
   .tabbtn.active{color:var(--laliga-red);}
   .tabbtn.active::before{content:""; position:absolute; top:0; left:28%; right:28%; height:3px; border-radius:0 0 3px 3px; background:var(--laliga-red);}
-  .tabbtn:focus-visible, .crest-btn:focus-visible, .head-arrow:focus-visible{outline:2px solid var(--laliga-red); outline-offset:2px;}
+  .tabbtn:focus-visible, .crest-btn:focus-visible, .head-arrow:focus-visible, .sticker:focus-visible,
+  .menu-btn:focus-visible, .tag-badge:focus-visible{outline:3px solid var(--gold); outline-offset:2px;}
 
   /* Botón para volver arriba (donde están las flechas de equipo) */
   .to-top{
@@ -216,7 +222,7 @@
   }
   .section-head{
     position:relative; overflow:hidden; display:flex; align-items:center; justify-content:space-between; gap:8px;
-    padding:18px 12px 16px; border-radius:14px 14px 0 0; color:#fff; margin-top:4px;
+    padding:18px 8px 16px; border-radius:14px 14px 0 0; color:#fff; margin-top:4px;
     background:
       radial-gradient(ellipse at 88% -20%, rgba(255,255,255,0.28), transparent 60%),
       var(--print),
@@ -252,10 +258,10 @@
   .update-bar button{background:var(--gold); color:#131A2E; border:none; border-radius:6px; padding:7px 12px; font:inherit; font-weight:700; cursor:pointer;}
 
   .head-arrow{
-    flex:0 0 auto; width:34px; height:34px; border-radius:50%; border:1.5px solid rgba(255,255,255,0.45); cursor:pointer;
+    flex:0 0 auto; width:44px; height:44px; border-radius:50%; border:1.5px solid rgba(255,255,255,0.45); cursor:pointer;
     background:rgba(0,0,0,0.12); color:#fff; display:flex; align-items:center; justify-content:center; padding:0;
   }
-  .head-arrow svg{width:18px; height:18px; fill:none; stroke:currentColor; stroke-width:2.6; stroke-linecap:round; stroke-linejoin:round;}
+  .head-arrow svg{width:20px; height:20px; fill:none; stroke:currentColor; stroke-width:2.6; stroke-linecap:round; stroke-linejoin:round;}
   .head-arrow:active{transform:scale(0.92); background:rgba(0,0,0,0.25);}
 
   .sticker-grid{
@@ -346,9 +352,11 @@
   .tag-3ed{background:#13A39A; color:#fff;}
   .tag-num{background:#fff; color:#131A2E;}
   .collection .sticker .undo{
-    margin:2px 3px 3px; align-self:flex-start; font:inherit; font-size:13px; background:none; border:none;
-    color:var(--laliga-red-dark); font-weight:600; cursor:pointer; padding:0; text-decoration:underline; text-underline-offset:2px;
+    margin:auto 0 0; min-height:40px; width:100%; font:inherit; font-size:14px; background:none;
+    border:none; border-top:1px solid #E1E4EA; border-radius:0 0 3px 3px;
+    color:var(--laliga-red-dark); font-weight:700; cursor:pointer; padding:0;
   }
+  .collection .sticker .undo:active{background:#F1F2F5;}
 
   /* Repetidos */
   .repes-bar{
@@ -375,12 +383,42 @@
   }
   .repe-ctrl{display:flex; align-items:center; justify-content:space-between; gap:4px; margin-top:auto; padding:4px 3px 3px;}
   .repe-ctrl button{
-    width:30px; height:30px; border-radius:50%; border:1.5px solid #C2C8D4; background:#fff; padding:0;
+    position:relative; width:36px; height:36px; border-radius:50%; border:1.5px solid #C2C8D4; background:#fff; padding:0;
     font-family:var(--display); font-size:20px; font-weight:800; line-height:1; cursor:pointer; color:#131A2E;
   }
+  .repe-ctrl button::before{content:""; position:absolute; inset:-5px;}
   .repe-ctrl button:disabled{opacity:0.35; cursor:default;}
   .repe-ctrl .plus{border-color:var(--laliga-red); color:var(--laliga-red);}
   .repe-ctrl .n{font-family:var(--display); font-size:20px; font-weight:900; min-width:20px; text-align:center; color:#131A2E;}
+
+  .pdf-btn:disabled{opacity:.45; cursor:default; transform:none;}
+  .repes-note{flex-basis:100%; margin:0; font-size:13px; color:var(--ink-soft);}
+
+  /* Las etiquetas se pueden tocar para ver qué significan */
+  button.tag-badge{border:none; cursor:pointer; font-family:var(--display);}
+  .legend{list-style:none; margin:0; padding:0; display:flex; flex-direction:column; gap:10px;}
+  .legend li{display:flex; align-items:flex-start; gap:10px; font-size:15px; line-height:1.3;}
+  .legend .tag-badge{flex:0 0 74px; text-align:center; padding:4px 6px 3px; font-size:13px;}
+  .legend li.here{font-weight:700;}
+
+  /* Equipo completo en la pestaña Álbum */
+  .done-card{grid-column:1/-1; text-align:center; color:#fff; padding:26px 12px 22px;}
+  .done-card .seal{font-size:22px; padding:4px 14px 2px;}
+  .done-card p{margin:0 0 4px; font-size:18px; font-weight:700;}
+  .done-card small{display:block; font-size:14px; opacity:.9;}
+  .done-card button{
+    margin-top:16px; min-height:44px; padding:10px 18px; border-radius:8px; border:2px solid #fff; background:transparent;
+    color:#fff; font:inherit; font-weight:700; font-size:15px; cursor:pointer;
+  }
+  .seal.big{align-self:center; font-size:30px; padding:6px 18px 3px;}
+  .done-sheet{align-items:center; text-align:center; padding-top:28px;}
+  .done-sheet h3{font-size:34px;}
+  .done-sheet .pdf-btn{min-height:44px; width:100%; margin-top:6px;}
+  .sheet-actions .pdf-btn{min-height:44px;}
+  .sheet-close{min-height:44px;}
+
+  /* Equipo del cromo en las secciones especiales, debajo del nombre */
+  .sticker .cap small .club{opacity:.8;}
 
   .collection-empty{
     text-align:center; padding:60px 20px; color:var(--ink-soft);
@@ -468,15 +506,18 @@
 <div id="appRoot" class="hidden">
 <header>
   <div class="hd">
-    <div>
-      <h1>LaLiga<br>2026-27</h1>
-      <div class="season">Álbum Panini, 3ª edición <button class="logout-btn" id="logoutBtn">Cerrar sesión</button></div>
+    <div class="hd-title">
+      <h1>LaLiga 2026-27</h1>
+      <div class="season">Álbum Panini, 3ª edición</div>
     </div>
     <div class="tally"><b id="progressHave">0</b><span id="progressTotal">/0</span></div>
+    <button class="menu-btn" id="menuBtn" aria-label="Más opciones" aria-haspopup="dialog">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="5" cy="12" r="1.6"/><circle cx="12" cy="12" r="1.6"/><circle cx="19" cy="12" r="1.6"/></svg></button>
   </div>
   <div class="progress-bar"><div class="progress-fill" id="progressFill" style="width:0%"></div></div>
   <div class="progress-labels">
     <span id="progressLabel">Te faltan 0</span>
+    <span id="progressTeams"></span>
     <span id="progressPct">0%</span>
   </div>
 </header>
@@ -515,10 +556,53 @@
     <button class="sheet-close" id="vClose">Cerrar</button>
   </div>
 </div>
+
+<div class="sheet-backdrop" id="menuSheet" hidden>
+  <div class="sheet" role="dialog" aria-labelledby="menuTitle">
+    <h3 id="menuTitle">Opciones</h3>
+    <p class="hint" id="menuWho"></p>
+    <div class="sheet-actions">
+      <button class="pdf-btn alt" id="legendOpen">Qué significa cada etiqueta</button>
+      <button class="pdf-btn alt" id="backupBtn">Descargar copia de mi álbum</button>
+      <small>Guarda en tu móvil un archivo con todos tus cromos y repetidos, por si algún día hace falta recuperarlos.</small>
+      <button class="pdf-btn" id="logoutBtn">Cerrar sesión</button>
+    </div>
+    <button class="sheet-close" data-close>Cerrar</button>
+  </div>
+</div>
+
+<div class="sheet-backdrop" id="confirmSheet" hidden>
+  <div class="sheet" role="alertdialog" aria-labelledby="confirmTitle" aria-describedby="confirmText">
+    <h3 id="confirmTitle"></h3>
+    <p class="hint" id="confirmText"></p>
+    <div class="sheet-actions">
+      <button class="pdf-btn" id="confirmOk"></button>
+      <button class="pdf-btn alt" data-close>Cancelar</button>
+    </div>
+  </div>
+</div>
+
+<div class="sheet-backdrop" id="legendSheet" hidden>
+  <div class="sheet" role="dialog" aria-labelledby="legendTitle">
+    <h3 id="legendTitle">Etiquetas de los cromos</h3>
+    <p class="hint">Toca la etiqueta de cualquier cromo para volver a ver esto.</p>
+    <ul class="legend" id="legendList"></ul>
+    <button class="sheet-close" data-close>Cerrar</button>
+  </div>
+</div>
+
+<div class="sheet-backdrop" id="doneSheet" hidden>
+  <div class="sheet done-sheet" role="dialog" aria-labelledby="doneTitle">
+    <span class="seal big" id="doneSeal"></span>
+    <h3 id="doneTitle">¡Álbum completo!</h3>
+    <p class="hint" id="doneText"></p>
+    <button class="pdf-btn" data-close>Ver mi álbum</button>
+  </div>
+</div>
 </div>
 
 <script>
-const APP_VERSION = '2026-10-20.2';
+const APP_VERSION = '2026-10-20.3';
 const STORAGE_KEY = 'laliga_2627_album_v5';
 
 /* Orden exacto de equipos indicado por el usuario */
@@ -1391,10 +1475,41 @@ function toStored(d){
   return { sections: d.sections.map(s => ({ ...s, crest: s.type === 'special' ? null : s.crest })) };
 }
 
+/* Cambios de cromos que todavía no están confirmados en la nube (id → {obtained, dupes}).
+   Se guardan leyendo antes lo que hay en la nube y aplicando solo estos cambios, para
+   que si otro móvil acaba de marcar un cromo no se pierda al guardar este. */
+let pendingOps = {};
+function setSticker(st, obtained, dupes){
+  st.obtained = obtained;
+  st.dupes = dupes;
+  pendingOps[st.id] = { obtained, dupes };
+  save();
+}
+function applyOps(d, ops){
+  d.sections.forEach(s => s.stickers.forEach(st => {
+    const op = ops[st.id];
+    if(op){ st.obtained = op.obtained; st.dupes = op.dupes; }
+  }));
+}
+function clearOps(ops){
+  Object.keys(ops).forEach(id => { if(pendingOps[id] === ops[id]) delete pendingOps[id]; });
+}
+
 function save(){
   if(!data || !auth.currentUser || suppressSave) return;
   backupDupes();
-  docRefFor(auth.currentUser.uid).set(toStored(data)).catch(err => console.error('Error guardando:', err));
+  const ref = docRefFor(auth.currentUser.uid), ops = { ...pendingOps };
+  db.runTransaction(async tx => {
+    const snap = await tx.get(ref);
+    const base = snap.exists ? mergeWithFresh(snap.data()).merged : { sections: buildSections() };
+    applyOps(base, ops);
+    tx.set(ref, toStored(base));
+  }).then(() => clearOps(ops)).catch(err => {
+    // Sin conexión las transacciones no funcionan: se guarda entero, como antes, y
+    // Firebase lo sube cuando vuelva la conexión.
+    console.warn('Guardado con lectura previa no disponible, se guarda entero:', err);
+    ref.set(toStored(data)).then(() => clearOps(ops)).catch(e => console.error('Error guardando:', e));
+  });
 }
 
 /* Copia local de los repetidos. Una versión antigua de la app (una pestaña que tu
@@ -1450,6 +1565,7 @@ function startSync(uid){
     if(snap.exists){
       const { merged, changed } = mergeWithFresh(snap.data());
       data = merged;
+      applyOps(data, pendingOps);
       backupDupes();
       if(changed) docRefFor(uid).set(toStored(data));
     } else {
@@ -1500,8 +1616,11 @@ document.getElementById('signupBtn').onclick = () => {
     .finally(() => setLoginLoading(false));
 };
 
-document.getElementById('logoutBtn').onclick = () => {
-  auth.signOut();
+document.getElementById('logoutBtn').onclick = async () => {
+  closeSheet('menuSheet');
+  const ok = await askConfirm({ title:'¿Cerrar sesión?', ok:'Cerrar sesión',
+    text:'Tus cromos están guardados en la nube. Cuando vuelvas a entrar con tu email los tendrás igual.' });
+  if(ok) auth.signOut();
 };
 
 function traducirErrorAuth(err){
@@ -1512,9 +1631,10 @@ function traducirErrorAuth(err){
     'auth/invalid-credential': 'Email o contraseña incorrectos.',
     'auth/email-already-in-use': 'Ya existe una cuenta con ese email. Usa "Iniciar sesión".',
     'auth/weak-password': 'La contraseña debe tener al menos 6 caracteres.',
-    'auth/network-request-failed': 'Sin conexión a internet.'
+    'auth/network-request-failed': 'No hay conexión a internet. Conéctate y vuelve a probar.',
+    'auth/too-many-requests': 'Demasiados intentos seguidos. Espera unos minutos y vuelve a probar.'
   };
-  return map[err.code] || 'No se pudo completar la operación. Inténtalo de nuevo.';
+  return map[err.code] || 'No hemos podido entrar. Revisa la conexión y vuelve a probar.';
 }
 
 auth.onAuthStateChanged(user => {
@@ -1574,8 +1694,8 @@ function stopFriends(){
 function onFriendsError(err){
   console.error('Amigos:', err);
   friendsError = err && err.code === 'permission-denied'
-    ? 'Para usar los cambios con amigos hay que actualizar las reglas de Firebase (las tienes al principio del código, en el paso 5).'
-    : 'No se pudieron cargar tus amigos. Revisa la conexión.';
+    ? 'Los cambios con amigos no están disponibles ahora mismo. (Para quien administra la app: faltan por publicar las reglas de Firebase del paso 5.)'
+    : 'No hemos podido cargar tus amigos. Revisa la conexión y vuelve a probar.';
   rerenderTrades();
 }
 
@@ -1629,7 +1749,7 @@ async function sendFriendRequest(rawEmail){
     setMsg(`Solicitud enviada a ${c.data().name}. Cuando la acepte, verás aquí los cambios.`);
   } catch(e){
     console.error(e);
-    setMsg(e.code === 'permission-denied' ? 'Faltan por actualizar las reglas de Firebase.' : 'No se pudo enviar la solicitud.');
+    setMsg(e.code === 'permission-denied' ? 'Los cambios con amigos no están disponibles ahora mismo.' : 'No se ha enviado la solicitud. Revisa la conexión y vuelve a probar.');
   }
 }
 
@@ -1721,7 +1841,7 @@ function renderTrades(){
         <details data-key="get-${f.uid}" ${open['get-' + f.uid] ? 'open' : ''}><summary>Te puede dar (${t.nGet})</summary>
           ${tradeListHTML(t.get, 'No tiene repetidos que te falten.')}</details>
       </div>`;
-    }).join('') : `<div class="trade-card"><p class="trade-empty">Todavía no tienes amigos añadidos.</p></div>`}
+    }).join('') : `<div class="trade-card"><p class="trade-empty">Añade a un amigo con su email y verás qué cromos os podéis cambiar.</p></div>`}
   `;
 
   const input = document.getElementById('friendCode');
@@ -1734,8 +1854,10 @@ function renderTrades(){
   }));
   main.querySelectorAll('[data-del]').forEach(b => b.addEventListener('click', () => {
     const r = all.find(x => x.id === b.dataset.del); if(!r) return;
-    if(b.dataset.name && !confirm(`¿Quitar a ${b.dataset.name} de tus amigos?`)) return;
-    deleteRequest(r);
+    if(!b.dataset.name){ deleteRequest(r); return; }
+    askConfirm({ title:`¿Quitar a ${b.dataset.name}?`, ok:'Quitar amigo',
+      text:'Dejaréis de ver los cromos que os podéis cambiar. Podéis volver a ser amigos cuando queráis.' })
+      .then(ok => { if(ok) deleteRequest(r); });
   }));
 }
 /* ================================================================================================ */
@@ -1763,12 +1885,18 @@ function totalCounts(){
   return {total, have};
 }
 
+function isComplete(s){
+  return s.stickers.length > 0 && s.stickers.every(st => st.obtained);
+}
+
 function renderHeader(){
   const {total, have} = totalCounts();
   const pct = total ? Math.round((have/total)*100) : 0;
+  const teams = data.sections.filter(s => s.type === 'team');
   document.getElementById('progressHave').textContent = have;
   document.getElementById('progressTotal').textContent = '/' + total;
   document.getElementById('progressLabel').textContent = have === total ? '¡Álbum completo!' : `Te faltan ${total - have}`;
+  document.getElementById('progressTeams').textContent = `${teams.filter(isComplete).length} de ${teams.length} equipos completos`;
   document.getElementById('progressPct').textContent = pct + '%';
   document.getElementById('progressFill').style.width = pct + '%';
 }
@@ -1806,6 +1934,7 @@ function renderChips(){
     chip.style.setProperty('--team', s.color);
     chip.style.setProperty('--p', s.stickers.length ? Math.round(have / s.stickers.length * 100) : 0);
     chip.setAttribute('aria-label', `${s.name}: ${have} de ${s.stickers.length}`);
+    if(isActive) chip.setAttribute('aria-current', 'true');
     const initial = escapeHTML(s.name.charAt(0));
     const marker = s.crest
       ? `<img src="${s.crest}" alt="" onerror="this.outerHTML='${initial}'">`
@@ -1820,6 +1949,22 @@ function renderChips(){
   }
 }
 
+/* Color de fondo de la página con contraste suficiente para el texto blanco (4,5 a 1).
+   Los equipos de color claro (Celta, Valencia, Elche…) se oscurecen un poco; los
+   anillos de los escudos siguen con el color original. */
+const readableCache = {};
+function readableColor(hex){
+  if(readableCache[hex]) return readableCache[hex];
+  const rgb = [1, 3, 5].map(i => parseInt(hex.slice(i, i + 2), 16));
+  const lum = c => {
+    const l = c.map(v => { v /= 255; return v <= 0.03928 ? v / 12.92 : Math.pow((v + 0.055) / 1.055, 2.4); });
+    return 0.2126 * l[0] + 0.7152 * l[1] + 0.0722 * l[2];
+  };
+  let c = rgb, k = 0;
+  while(1.05 / (lum(c) + 0.05) < 4.5 && k < 20){ k++; c = rgb.map(v => Math.round(v * (1 - k * 0.04))); }
+  return readableCache[hex] = '#' + c.map(v => v.toString(16).padStart(2, '0')).join('');
+}
+
 function sectionHeadHTML(section, subText){
   const crest = section.crest
     ? `<img class="crest" src="${section.crest}" alt="" onerror="this.remove()">`
@@ -1827,7 +1972,7 @@ function sectionHeadHTML(section, subText){
   const have = section.stickers.filter(st => st.obtained).length, total = section.stickers.length;
   const complete = total > 0 && have === total;
   return `
-    <div class="section-head${complete ? ' complete' : ''}" style="--team:${section.color}">
+    <div class="section-head${complete ? ' complete' : ''}" style="--team:${readableColor(section.color)}">
       <button class="head-arrow" data-nav="-1" aria-label="Equipo anterior"><svg viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7"/></svg></button>
       <div class="head-main">
         ${crest}
@@ -1881,24 +2026,37 @@ const SIL_CREST = '<svg class="sil" viewBox="0 0 100 100" aria-hidden="true"><pa
 
 /* Parte de cada cromo: la ilustración (silueta, escudo de fondo, número y
    etiqueta) y la cartela con el nombre y la posición. */
-function stickerFaceHTML(section, st, extra){
+/* Nombre, posición y (en las secciones especiales) equipo, por separado:
+   "Lamine Yamal (Barcelona) — Delantero" → Lamine Yamal / Delantero · Barcelona. */
+function splitName(section, st){
   const full = String(st.name);
   const cut = full.lastIndexOf(' — ');
-  const name = cut > 0 ? full.slice(0, cut) : full;
+  let name = cut > 0 ? full.slice(0, cut) : full;
   const role = cut > 0 ? full.slice(cut + 3) : '';
-  const badge = st.tag ? `<span class="tag-badge ${tagClass(st.tag)}">${escapeHTML(st.tag)}</span>` : '';
+  let club = '';
+  const m = section.type === 'special' && name.match(/^(.*\S)\s*\(([^)]+)\)$/);
+  if(m){ name = m[1]; club = m[2]; }
+  return { name, role, club };
+}
+
+function stickerFaceHTML(section, st, extra, inButton){
+  const { name, role, club } = splitName(section, st);
+  const badge = st.tag ? `<button class="tag-badge ${tagClass(st.tag)}" data-tag="${escapeHTML(st.tag)}"${inButton ? ' tabindex="-1"' : ''} aria-label="Etiqueta ${escapeHTML(st.tag)}: qué significa">${escapeHTML(st.tag)}</button>` : '';
+  const sub = [club, role].filter(Boolean).map(escapeHTML).join('<br>');
   const wm = section.crest ? `<img class="wm" src="${section.crest}" alt="" onerror="this.remove()">` : '';
   return `
     <div class="art">${wm}${/^escudo/i.test(name) ? SIL_CREST : SIL_PLAYER}<span class="num">${escapeHTML(String(st.number))}</span>${badge}${extra || ''}</div>
-    <div class="cap"><b>${escapeHTML(name)}</b>${role ? `<small>${escapeHTML(role)}</small>` : ''}</div>`;
+    <div class="cap"><b>${escapeHTML(name)}</b>${sub ? `<small>${sub}</small>` : ''}</div>`;
 }
 
 function stickerCardHTML(section, st, collectionMode){
   const cls = 'sticker' + (st.obtained ? ' has' : '');
+  const { name } = splitName(section, st);
+  const label = `Pegar el número ${st.number}, ${st.name.replace(' — ', ', ')}`;
   return `
-    <div class="${cls}" data-id="${st.id}">
-      ${stickerFaceHTML(section, st)}
-      ${collectionMode ? `<button class="undo" data-undo="${st.id}" aria-label="Marcar ${escapeHTML(st.name)} como que falta">Despegar</button>` : ''}
+    <div class="${cls}" data-id="${st.id}"${collectionMode ? '' : ` role="button" tabindex="0" aria-label="${escapeHTML(label)}"`}>
+      ${stickerFaceHTML(section, st, '', !collectionMode)}
+      ${collectionMode ? `<button class="undo" data-undo="${st.id}" aria-label="Despegar ${escapeHTML(name)}">Despegar</button>` : ''}
     </div>`;
 }
 
@@ -1913,21 +2071,42 @@ function renderAlbum(){
   const missing = groupBySlot(section.stickers).filter(st => !st.obtained);
   const have = section.stickers.filter(st => st.obtained).length;
 
+  const total = section.stickers.length, left = total - have;
+  const sub = `${have} de ${total} pegados` + (left > 0 && left <= 3 ? ` · solo te falta${left === 1 ? '' : 'n'} ${left}` : '');
+
   const main = document.getElementById('mainArea');
   main.innerHTML = `
-    ${sectionHeadHTML(section, `${have}/${section.stickers.length} conseguidos`)}
-    <div class="sticker-grid" id="stickerGrid" style="--team:${section.color}">
+    ${sectionHeadHTML(section, sub)}
+    <div class="sticker-grid" id="stickerGrid" style="--team:${readableColor(section.color)}">
       ${missing.length ? missing.map(st => stickerCardHTML(section, st, false)).join('') :
-        `<div class="empty-msg">${section.stickers.length ? '¡Los tienes todos de esta sección! 🎉' : 'No hay cromos en esta sección.'}</div>`}
+        total ? doneCardHTML(section) : `<div class="empty-msg">No hay cromos en esta sección.</div>`}
     </div>
   `;
 
   document.getElementById('stickerGrid').querySelectorAll('.sticker').forEach(card => {
-    card.addEventListener('click', () => {
+    card.addEventListener('click', () => markObtained(section, card.dataset.id, card));
+    card.addEventListener('keydown', e => {
+      if(e.target !== card || (e.key !== 'Enter' && e.key !== ' ')) return;
+      e.preventDefault();
       markObtained(section, card.dataset.id, card);
     });
   });
+  const seePage = document.getElementById('seePage');
+  if(seePage) seePage.addEventListener('click', () => switchTab('collection'));
+  bindTags(main);
   bindSectionNav(main);
+}
+
+/* Página completa en la pestaña Álbum: sello y cuánto queda. */
+function doneCardHTML(section){
+  const same = data.sections.filter(s => s.type === section.type);
+  const left = same.filter(s => !isComplete(s)).length;
+  const word = section.type === 'team' ? ['equipo', 'equipos'] : ['sección especial', 'secciones especiales'];
+  return `<div class="done-card">
+      <p>Tienes los ${section.stickers.length} cromos de ${escapeHTML(section.name)}.</p>
+      <small>${left ? `Te queda${left === 1 ? '' : 'n'} ${left} ${word[left === 1 ? 0 : 1]} por completar.` : `Has completado ${section.type === 'team' ? 'todos los equipos' : 'todas las secciones especiales'}.`}</small>
+      <button id="seePage">Ver la página en Mi colección</button>
+    </div>`;
 }
 
 function renderCollection(){
@@ -1937,24 +2116,41 @@ function renderCollection(){
   const main = document.getElementById('mainArea');
   main.className = 'collection';
   main.innerHTML = `
-    ${sectionHeadHTML(section, `${obtained.length} cromo${obtained.length===1?'':'s'}`)}
-    <div class="sticker-grid" style="--team:${section.color}">
+    ${sectionHeadHTML(section, `${obtained.length} de ${section.stickers.length} pegados`)}
+    <div class="sticker-grid" style="--team:${readableColor(section.color)}">
       ${obtained.length ? obtained.map(st => stickerCardHTML(section, st, true)).join('') :
-        `<div class="empty-msg">Todavía no tienes cromos conseguidos en esta sección.</div>`}
+        `<div class="empty-msg">Aún no has pegado ningún cromo de esta sección. Tócalos en la pestaña Álbum para pegarlos.</div>`}
     </div>
   `;
 
   main.querySelectorAll('[data-undo]').forEach(btn => {
-    btn.addEventListener('click', () => {
-      const st = findSticker(btn.dataset.undo);
-      if(!st) return;
-      st.obtained = false;
-      st.dupes = 0;
-      save();
-      renderAll();
-    });
+    btn.addEventListener('click', () => unstick(btn.dataset.undo));
   });
+  bindTags(main);
   bindSectionNav(main);
+}
+
+/* Despegar pregunta antes y avisa si se borran repetidos; después se puede deshacer. */
+async function unstick(id){
+  const st = findSticker(id);
+  if(!st) return;
+  const section = data.sections.find(s => s.stickers.includes(st));
+  const { name } = splitName(section, st);
+  const dupes = st.dupes || 0;
+  const ok = await askConfirm({
+    title: `¿Despegar a ${name}?`, ok: 'Despegar',
+    text: `Volverá a salir como que te falta en ${section.name}.` +
+          (dupes ? ` También se borra${dupes === 1 ? '' : 'n'} ${dupes === 1 ? 'su repetido' : `sus ${dupes} repetidos`}.` : '')
+  });
+  if(!ok) return;
+  const cur = findSticker(id);
+  if(!cur) return;
+  setSticker(cur, false, 0);
+  renderAll();
+  showUndo(`${name} despegado`, () => {
+    const again = findSticker(id);
+    if(again){ setSticker(again, true, dupes); renderAll(); }
+  });
 }
 
 function totalDupes(){
@@ -1976,33 +2172,33 @@ function renderRepes(){
   main.innerHTML = `
     <div class="repes-bar">
       <div class="total">${total} repetido${total===1?'':'s'} en total
-        <small>Descarga las listas para vender o cambiar</small></div>
+        <small>Descarga las listas en PDF para vender o cambiar</small></div>
       <div class="pdf-btns">
-        <button class="pdf-btn" id="pdfBtn">PDF repetidos</button>
-        <button class="pdf-btn alt" id="pdfFaltanBtn">PDF me faltan</button>
-        <button class="pdf-btn vinted" id="vintedBtn">Anunciar en Vinted</button>
+        <button class="pdf-btn" id="pdfBtn"${total ? '' : ' disabled'}>Lista de repetidos</button>
+        <button class="pdf-btn alt" id="pdfFaltanBtn"${faltanList().n ? '' : ' disabled'}>Lista de los que me faltan</button>
+        <button class="pdf-btn vinted" id="vintedBtn"${total ? '' : ' disabled'}>Anunciar en Vinted</button>
       </div>
+      ${total ? '' : '<p class="repes-note">Apunta repetidos con el botón + para crear la lista y el anuncio.</p>'}
     </div>
     ${sectionHeadHTML(section, `${sectionDupes} repetido${sectionDupes===1?'':'s'}`)}
-    <div class="sticker-grid" style="--team:${section.color}">
+    <div class="sticker-grid" style="--team:${readableColor(section.color)}">
       ${obtained.length ? obtained.map(st => `
         <div class="sticker has${st.dupes ? ' dupe' : ''}">
           ${stickerFaceHTML(section, st, st.dupes ? `<span class="dupe-stamp">×${st.dupes}</span>` : '')}
           <div class="repe-ctrl">
-            <button data-dec="${st.id}" ${st.dupes ? '' : 'disabled'} aria-label="Quitar repetido">−</button>
-            <span class="n">${st.dupes || 0}</span>
-            <button class="plus" data-inc="${st.id}" aria-label="Añadir repetido">+</button>
+            <button data-dec="${st.id}" ${st.dupes ? '' : 'disabled'} aria-label="Quitar un repetido de ${escapeHTML(splitName(section, st).name)}">−</button>
+            <span class="n" aria-live="polite">${st.dupes || 0}</span>
+            <button class="plus" data-inc="${st.id}" aria-label="Añadir un repetido de ${escapeHTML(splitName(section, st).name)}">+</button>
           </div>
         </div>`).join('') :
-        `<div class="empty-msg">Marca primero en el Álbum los cromos que tienes; aquí podrás apuntar sus repetidos.</div>`}
+        `<div class="empty-msg">Pega primero en el Álbum los cromos que tienes; aquí podrás apuntar sus repetidos.</div>`}
     </div>
   `;
 
   const change = (id, delta) => {
     const st = findSticker(id);
     if(!st) return;
-    st.dupes = Math.max(0, (st.dupes || 0) + delta);
-    save();
+    setSticker(st, st.obtained, Math.max(0, (st.dupes || 0) + delta));
     renderAll();
   };
   main.querySelectorAll('[data-inc]').forEach(b => b.addEventListener('click', () => change(b.dataset.inc, 1)));
@@ -2010,6 +2206,7 @@ function renderRepes(){
   document.getElementById('pdfBtn').addEventListener('click', downloadRepesPDF);
   document.getElementById('pdfFaltanBtn').addEventListener('click', downloadFaltanPDF);
   document.getElementById('vintedBtn').addEventListener('click', openVinted);
+  bindTags(main);
   bindSectionNav(main);
 }
 
@@ -2033,13 +2230,13 @@ function faltanList(){
 
 function downloadRepesPDF(){
   const l = repesList();
-  if(!l.groups.length){ alert('Todavía no has apuntado ningún repetido.'); return; }
+  if(!l.groups.length) return;
   listPDF(l.groups, l.title, l.subtitle, l.qty, 'cromos-repetidos.pdf');
 }
 
 function downloadFaltanPDF(){
   const l = faltanList();
-  if(!l.groups.length){ alert('¡No te falta ninguno! Álbum completo.'); return; }
+  if(!l.groups.length) return;
   listPDF(l.groups, l.title, l.subtitle, l.qty, 'cromos-me-faltan.pdf');
 }
 
@@ -2049,7 +2246,7 @@ function downloadFaltanPDF(){
 let vintedFiles = [];
 function openVinted(){
   const r = repesList(), f = faltanList();
-  if(!r.groups.length){ alert('Apunta primero algún repetido.'); return; }
+  if(!r.groups.length) return;
   document.getElementById('vTitle').value = `Cromos repetidos LaLiga 2026-27 Panini (${r.distinct} cromos)`;
   document.getElementById('vDesc').value =
 `Vendo ${r.distinct} cromos repetidos del álbum LaLiga 2026-27 de Panini (3ª edición), ${r.units} unidades en total.
@@ -2189,7 +2386,7 @@ function canvasDrawer(){
 }
 
 function listPDF(groups, title, subtitle, qty, filename){
-  if(!window.jspdf){ alert('No se pudo cargar el generador de PDF. Revisa la conexión.'); return; }
+  if(!window.jspdf){ showNote('No se ha podido crear el PDF. Revisa la conexión y vuelve a probar.'); return; }
   const d = pdfDrawer();
   drawList(d, groups, title, subtitle, qty);
   d.doc.save(filename);
@@ -2210,12 +2407,17 @@ function markObtained(section, id, cardEl){
   setTimeout(() => {
     const st = findSticker(id);
     if(!st) return;
-    st.obtained = true;
-    save();
+    setSticker(st, true, st.dupes || 0);
     renderAll();
-    showUndo(st);
     const sec = data.sections.find(s => s.stickers.includes(st));
-    if(sec && sec.stickers.every(x => x.obtained)) celebrate(sec);
+    const { name } = splitName(sec, st);
+    showUndo(`${name} pegado en ${sec.name}`, () => {
+      const again = findSticker(id);
+      if(again){ setSticker(again, false, again.dupes || 0); renderAll(); }
+    });
+    const { total, have } = totalCounts();
+    if(have === total) celebrateAlbum(total);
+    else if(isComplete(sec)) celebrate(sec);
   }, reduced ? 150 : 1050);
 }
 
@@ -2251,35 +2453,147 @@ function celebrate(section){
   })(start);
 }
 
-/* Tras marcar un cromo aparece unos segundos un aviso con "Deshacer". */
-let undoId = null, undoTimer = null;
-function showUndo(st){
-  undoId = st.id;
-  document.getElementById('undoText').textContent = `Nº ${st.number} ${st.name.split(' — ')[0]} marcado`;
+/* Álbum completo: confeti dorado y una hoja que lo celebra. */
+function celebrateAlbum(total){
+  celebrate({ color:'#D6A21E' });
+  document.getElementById('doneSeal').textContent = `${total}/${total}`;
+  document.getElementById('doneText').textContent = `Has pegado los ${total} cromos de LaLiga 2026-27. Ya puedes presumir de álbum.`;
+  openSheet('doneSheet');
+}
+
+/* Tras pegar o despegar un cromo aparece unos segundos un aviso con "Deshacer".
+   Si el dedo o el ratón están encima, espera a que se aparten. */
+let undoFn = null, undoTimer = null;
+function showUndo(text, fn){
+  undoFn = fn;
+  document.getElementById('undoText').textContent = text;
+  document.getElementById('undoBtn').hidden = !fn;
   document.getElementById('undoToast').hidden = false;
   clearTimeout(undoTimer);
-  undoTimer = setTimeout(hideUndo, 5000);
+  undoTimer = setTimeout(hideUndo, fn ? 8000 : 4000);
 }
+function showNote(text){ showUndo(text, null); }
 function hideUndo(){
-  undoId = null;
+  undoFn = null;
   document.getElementById('undoToast').hidden = true;
 }
 document.getElementById('undoBtn').addEventListener('click', () => {
-  const st = undoId && findSticker(undoId);
+  const fn = undoFn;
   hideUndo();
-  if(!st) return;
-  st.obtained = false;
-  save();
-  renderAll();
+  if(fn) fn();
 });
 
-document.querySelectorAll('.tabbtn').forEach(btn => {
-  btn.addEventListener('click', () => {
-    activeTab = btn.dataset.tab;
-    document.querySelectorAll('.tabbtn').forEach(b => b.classList.toggle('active', b === btn));
-    renderAll();
+function switchTab(tab){
+  activeTab = tab;
+  document.querySelectorAll('.tabbtn').forEach(b => {
+    const on = b.dataset.tab === tab;
+    b.classList.toggle('active', on);
+    if(on) b.setAttribute('aria-current', 'page'); else b.removeAttribute('aria-current');
   });
+  renderAll();
+  window.scrollTo(0, 0);
+}
+document.querySelectorAll('.tabbtn').forEach(btn => {
+  btn.addEventListener('click', () => switchTab(btn.dataset.tab));
 });
+document.querySelector('.tabbtn.active').setAttribute('aria-current', 'page');
+
+/* ---------- Hojas (menú, confirmar, etiquetas) ---------- */
+let sheetReturnFocus = null;
+function openSheet(id){
+  sheetReturnFocus = document.activeElement;
+  const el = document.getElementById(id);
+  el.hidden = false;
+  const first = el.querySelector('button, input, textarea, a');
+  if(first) first.focus();
+}
+function closeSheet(id){
+  document.getElementById(id).hidden = true;
+  if(sheetReturnFocus && document.body.contains(sheetReturnFocus)) sheetReturnFocus.focus();
+}
+document.querySelectorAll('.sheet-backdrop').forEach(bd => {
+  bd.addEventListener('click', e => { if(e.target === bd || e.target.closest('[data-close]')) closeSheet(bd.id); });
+});
+document.addEventListener('keydown', e => {
+  if(e.key !== 'Escape') return;
+  const open = [...document.querySelectorAll('.sheet-backdrop')].find(b => !b.hidden);
+  if(open) closeSheet(open.id);
+});
+
+/* Pregunta de confirmación dentro de la app (en vez de la ventana del navegador). */
+let confirmResolve = null;
+function askConfirm({ title, text, ok }){
+  if(confirmResolve) confirmResolve(false);
+  document.getElementById('confirmTitle').textContent = title;
+  document.getElementById('confirmText').textContent = text;
+  document.getElementById('confirmOk').textContent = ok;
+  openSheet('confirmSheet');
+  document.querySelector('#confirmSheet [data-close]').focus();
+  return new Promise(res => { confirmResolve = res; });
+}
+document.getElementById('confirmOk').addEventListener('click', () => {
+  const r = confirmResolve; confirmResolve = null;
+  closeSheet('confirmSheet');
+  if(r) r(true);
+});
+document.getElementById('confirmSheet').addEventListener('click', e => {
+  if((e.target.id === 'confirmSheet' || e.target.closest('[data-close]')) && confirmResolve){
+    const r = confirmResolve; confirmResolve = null; r(false);
+  }
+});
+
+/* Menú de la cabecera */
+document.getElementById('menuBtn').addEventListener('click', () => {
+  const u = auth.currentUser;
+  document.getElementById('menuWho').textContent = u && u.email ? `Has entrado como ${u.email}.` : '';
+  openSheet('menuSheet');
+});
+document.getElementById('legendOpen').addEventListener('click', () => { closeSheet('menuSheet'); openLegend(null); });
+
+/* Copia de seguridad: un archivo con el álbum tal como se guarda en la nube. */
+document.getElementById('backupBtn').addEventListener('click', async () => {
+  if(!data) return;
+  const today = new Date().toISOString().slice(0, 10);
+  const u = auth.currentUser;
+  const body = JSON.stringify({ app:'album-laliga-2026-27', version:APP_VERSION, date:today,
+                                email: u && u.email, ...toStored(data) }, null, 1);
+  const file = new File([body], `copia-album-laliga-${today}.json`, { type:'application/json' });
+  if(navigator.canShare && navigator.canShare({ files:[file] })){
+    try { await navigator.share({ files:[file] }); return; }
+    catch(e){ if(e.name === 'AbortError') return; }
+  }
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(file); a.download = file.name;
+  document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(() => URL.revokeObjectURL(a.href), 4000);
+  showNote('Copia descargada');
+});
+
+/* Leyenda de etiquetas */
+const LEGEND = [
+  ['COLOCA', 'Cromo que se pega encima de otro hueco, normalmente por un fichaje (en el número lleva BIS).'],
+  ['2ª ed.', 'Salió en la segunda tanda de cromos de la temporada.'],
+  ['3ª ed.', 'Salió en la tercera tanda de cromos de la temporada.'],
+  ['Kromix', 'Versión Kromix de la sección Draft 23.'],
+  ['Masterclass', 'Cromo de la sección Chicles dedicado a la estrella del equipo.'],
+  ['Box to Box', 'Cromo de la sección Chicles dedicado al centrocampista del equipo.'],
+  ['Bronce', 'Extra Sticker en bronce.'],
+  ['Plata', 'Extra Sticker en plata, más difícil que el bronce.'],
+  ['Oro', 'Extra Sticker en oro, el más difícil de conseguir.'],
+  ['Nº 1', 'Cuando dos cromos de una sección se llaman igual, el número indica cuál es.']
+];
+function openLegend(tag){
+  const here = tag && (tag.startsWith('Nº') ? 'Nº 1' : tag);
+  document.getElementById('legendList').innerHTML = LEGEND.map(([t, d]) =>
+    `<li${t === here ? ' class="here"' : ''}><span class="tag-badge ${tagClass(t)}">${escapeHTML(t.startsWith('Nº') ? 'Nº' : t)}</span><span>${escapeHTML(d)}</span></li>`).join('');
+  openSheet('legendSheet');
+}
+function bindTags(main){
+  main.querySelectorAll('[data-tag]').forEach(b => b.addEventListener('click', e => {
+    e.stopPropagation();
+    openLegend(b.dataset.tag);
+  }));
+}
 
 /* Aviso de versión nueva. Al publicar cambios hay que subir APP_VERSION. Si al
    volver a la app ya hay una versión nueva, se recarga sola; si sale mientras la
