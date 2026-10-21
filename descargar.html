@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Descargar · Álbum de cromos 2026-27</title>
+<meta name="description" content="Instala el álbum de cromos 2026-27 en Android, iPhone o el ordenador. Gratis.">
+<meta name="theme-color" content="#E6E8EE" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#0E1220" media="(prefers-color-scheme: dark)">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icons/icon-192.png">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@800;900&family=Barlow+Semi+Condensed:wght@500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper:#E6E8EE; --card:#F6F7FA; --ink:#131A2E; --soft:#586178; --line:#C2C8D4;
+    --red:#D3132F; --red-dark:#9E0C22; --link:#9E0C22;
+    --display:"Big Shoulders Display", Impact, sans-serif;
+  }
+  @media (prefers-color-scheme: dark){
+    :root{ --paper:#0E1220; --card:#161B2B; --ink:#E9ECF4; --soft:#A3ABBF; --line:#2B3247; --link:#FF8A9A; }
+  }
+  *{box-sizing:border-box;}
+  body{margin:0; background:var(--paper); color:var(--ink); font:17px/1.45 "Barlow Semi Condensed", system-ui, sans-serif;}
+  main{max-width:560px; margin:0 auto; padding:28px 16px 40px;}
+  .hero{display:flex; gap:16px; align-items:center;}
+  .hero img{width:84px; height:84px; border-radius:20px; box-shadow:0 4px 14px rgba(0,0,0,.18); flex:0 0 auto;}
+  h1{font-family:var(--display); font-weight:900; font-size:38px; line-height:.95; text-transform:uppercase; margin:0;}
+  .hero p{margin:6px 0 0; color:var(--soft);}
+  .tabs{display:flex; gap:6px; margin:26px 0 12px; background:var(--card); border:1px solid var(--line); border-radius:12px; padding:4px;}
+  .tabs button{flex:1; border:none; background:none; color:var(--soft); font:inherit; font-weight:700; padding:10px 4px; border-radius:9px; cursor:pointer; min-height:44px;}
+  .tabs button[aria-selected="true"]{background:var(--red); color:#fff;}
+  .panel{background:var(--card); border:1px solid var(--line); border-radius:14px; padding:18px;}
+  .panel[hidden]{display:none;}
+  .panel h2{font-family:var(--display); font-weight:900; font-size:26px; text-transform:uppercase; margin:0 0 8px;}
+  .btn{display:flex; align-items:center; justify-content:center; gap:8px; width:100%; min-height:50px; border:none; border-radius:10px;
+       background:var(--red); color:#fff; font:inherit; font-weight:700; font-size:18px; text-decoration:none; cursor:pointer; box-shadow:0 3px 0 var(--red-dark);}
+  .btn.alt{background:none; color:var(--link); box-shadow:inset 0 0 0 1.5px currentColor;}
+  .btn[hidden]{display:none;}
+  ol{margin:10px 0 0; padding-left:22px;}
+  li{margin:0 0 10px;}
+  .note{margin:12px 0 0; font-size:15px; color:var(--soft);}
+  .ico{display:inline-block; vertical-align:-4px; width:20px; height:20px;}
+  .stack{display:flex; flex-direction:column; gap:10px; margin-top:12px;}
+  .done{margin:10px 0 0; font-weight:700; color:#1F7A47;}
+  footer{margin-top:28px; font-size:14px; color:var(--soft); text-align:center;}
+  footer a{color:var(--link); font-weight:700;}
+  .kofi{margin-top:18px;}
+</style>
+</head>
+<body>
+<main>
+  <div class="hero">
+    <img src="icons/icon-192.png" alt="">
+    <div>
+      <h1>Álbum de cromos 2026-27</h1>
+      <p>Apunta tus cromos, mira tus repetidos y cámbialos con tus amigos. Gratis.</p>
+    </div>
+  </div>
+
+  <div class="tabs" role="tablist">
+    <button role="tab" id="t-android" aria-controls="p-android">Android</button>
+    <button role="tab" id="t-iphone" aria-controls="p-iphone">iPhone</button>
+    <button role="tab" id="t-pc" aria-controls="p-pc">Ordenador</button>
+  </div>
+
+  <section class="panel" id="p-android" role="tabpanel" aria-labelledby="t-android" hidden>
+    <h2>Android</h2>
+    <a class="btn" id="apkBtn" href="https://github.com/jongar013/LaLiga-26-27/releases/latest/download/album-cromos.apk">Descargar la app (APK)</a>
+    <ol class="note" style="color:var(--ink)">
+      <li>Toca el botón y abre el archivo cuando termine de bajar.</li>
+      <li>La primera vez, el móvil dirá que no deja instalar apps de fuera de Google Play. Toca <b>Ajustes</b>, activa <b>Permitir de esta fuente</b> y vuelve atrás.</li>
+      <li>Toca <b>Instalar</b>. Ya la tienes con su icono.</li>
+    </ol>
+    <p class="note">¿Prefieres no instalar archivos? También puedes instalarla desde Chrome:</p>
+    <div class="stack"><button class="btn alt install-btn" hidden>Instalar desde Chrome</button></div>
+    <p class="note manual-chrome">En Chrome, abre el menú <b>⋮</b> y toca <b>Añadir a pantalla de inicio</b> o <b>Instalar app</b>.</p>
+  </section>
+
+  <section class="panel" id="p-iphone" role="tabpanel" aria-labelledby="t-iphone" hidden>
+    <h2>iPhone y iPad</h2>
+    <p class="not-safari" hidden><b>Primero abre esta página en Safari.</b> Desde otros navegadores no se puede instalar.</p>
+    <ol>
+      <li>Toca el botón <b>Compartir</b>
+        <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v12M8 7l4-4 4 4"/><path d="M6 11H5a1 1 0 0 0-1 1v8a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-8a1 1 0 0 0-1-1h-1"/></svg>
+        abajo (o arriba en el iPad).</li>
+      <li>Baja y toca <b>Añadir a pantalla de inicio</b>
+        <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><rect x="4" y="4" width="16" height="16" rx="3"/><path d="M12 8v8M8 12h8"/></svg>.</li>
+      <li>Toca <b>Añadir</b>. Aparecerá el icono y se abrirá a pantalla completa, como cualquier app.</li>
+    </ol>
+    <p class="note">Apple no deja instalar apps desde una web, por eso se hace así. Se actualiza sola.</p>
+  </section>
+
+  <section class="panel" id="p-pc" role="tabpanel" aria-labelledby="t-pc" hidden>
+    <h2>Ordenador</h2>
+    <div class="stack"><button class="btn install-btn" hidden>Instalar en este ordenador</button></div>
+    <p class="note manual-pc">Con Chrome o Edge: pulsa el icono de instalar <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><rect x="3" y="4" width="18" height="13" rx="2"/><path d="M12 8v6M9 11l3 3 3-3M8 21h8"/></svg> a la derecha de la barra de direcciones, o abre el menú y elige <b>Instalar</b>. Quedará con su icono, como un programa más.</p>
+    <p class="note">¿Usas Firefox o Safari? Puedes usarla igual en el navegador.</p>
+  </section>
+  <p class="done" id="installed" hidden>¡Instalada! Búscala entre tus apps.</p>
+
+  <div class="stack">
+    <a class="btn alt" href="./">Usarla ahora en el navegador</a>
+    <a class="btn alt kofi" id="kofiBtn" href="#" target="_blank" rel="noopener" hidden>Invítame a un café ☕</a>
+  </div>
+
+  <footer>
+    App no oficial, sin relación con Panini, LaLiga ni los clubes.<br>
+    <a href="privacidad.html">Privacidad y condiciones</a>
+  </footer>
+</main>
+<script>
+/* Enlace para donaciones (Ko-fi, PayPal...). Vacío = no se muestra el botón. */
+const KOFI_URL = '';
+if(KOFI_URL){ const k = document.getElementById('kofiBtn'); k.href = KOFI_URL; k.hidden = false; }
+
+const ua = navigator.userAgent;
+const isIOS = /iPhone|iPad|iPod/.test(ua) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+const isAndroid = /Android/.test(ua);
+const isSafari = /Safari/.test(ua) && !/CriOS|FxiOS|EdgiOS|OPiOS|GSA/.test(ua);
+
+function show(name){
+  ['android', 'iphone', 'pc'].forEach(n => {
+    document.getElementById('p-' + n).hidden = n !== name;
+    document.getElementById('t-' + n).setAttribute('aria-selected', n === name);
+  });
+}
+['android', 'iphone', 'pc'].forEach(n => document.getElementById('t-' + n).onclick = () => show(n));
+show(isIOS ? 'iphone' : isAndroid ? 'android' : 'pc');
+if(isIOS && !isSafari) document.querySelector('.not-safari').hidden = false;
+
+/* Chrome y Edge avisan cuando se puede instalar: entonces sale el botón. */
+let installEvent = null;
+window.addEventListener('beforeinstallprompt', e => {
+  e.preventDefault();
+  installEvent = e;
+  document.querySelectorAll('.install-btn').forEach(b => b.hidden = false);
+  document.querySelectorAll('.manual-pc, .manual-chrome').forEach(p => p.hidden = true);
+});
+document.querySelectorAll('.install-btn').forEach(b => b.onclick = async () => {
+  if(!installEvent) return;
+  installEvent.prompt();
+  await installEvent.userChoice;
+  installEvent = null;
+  document.querySelectorAll('.install-btn').forEach(x => x.hidden = true);
+});
+window.addEventListener('appinstalled', () => { document.getElementById('installed').hidden = false; });
+</script>
+</body>
+</html>

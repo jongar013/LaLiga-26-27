@@ -836,6 +836,17 @@
   .login-box .login-error{color:var(--link); font-size:14px; margin-top:10px; min-height:16px;}
   .login-box .login-loading{color:var(--ink-soft); font-size:14px; margin-top:10px;}
 
+  .in-app .only-web{display:none;}
+  .login-legal{margin:14px 0 0; font-size:13px; line-height:1.45; color:var(--ink-soft);}
+  .login-legal a{color:var(--link); font-weight:700;}
+
+  /* Hoja de la cuenta */
+  .acc-email{margin:0; font-size:15px; font-weight:700; overflow-wrap:anywhere;}
+  .acc-legal{margin:6px 0 0; font-size:12.5px; line-height:1.4; color:var(--ink-soft); text-align:center;}
+  .acc-legal a{color:var(--link); font-weight:700;}
+  .del-error{min-height:18px; margin:0; font-size:14px; color:var(--link);}
+  .pdf-btn.danger{background:var(--laliga-red-dark);}
+
   @media (max-width:360px){
     header h1{font-size:28px;}
     .section-head h2{font-size:30px;}
@@ -858,6 +869,8 @@
     </div>
     <div class="login-error" id="loginError"></div>
     <div class="login-loading" id="loginLoading" style="display:none;">Conectando…</div>
+    <p class="login-legal">Al crear una cuenta aceptas la <a href="privacidad.html">política de privacidad y las condiciones</a>. Hay que tener 14 años o más.<br>
+    App no oficial, sin relación con Panini, LaLiga ni los clubes. <a href="descargar.html" class="only-web">Instalar la app</a></p>
   </div>
 </div>
 
@@ -867,7 +880,7 @@
   <div class="hd">
     <div class="hd-title">
       <h1>LaLiga 2026-27</h1>
-      <div class="season">Álbum Panini, 3ª edición <button class="logout-btn" id="logoutBtn">Cerrar sesión</button></div>
+      <div class="season">Álbum Panini, 3ª edición <button class="logout-btn" id="accountBtn">Cuenta</button></div>
     </div>
     <div class="tally"><b id="progressHave">0</b><span id="progressTotal">/0</span></div>
   </div>
@@ -926,6 +939,35 @@
   </div>
 </div>
 
+
+<div class="sheet-backdrop" id="accountSheet" hidden>
+  <div class="sheet" role="dialog" aria-labelledby="accountTitle">
+    <h3 id="accountTitle">Tu cuenta</h3>
+    <p class="acc-email" id="accEmail"></p>
+    <div class="sheet-actions">
+      <a class="pdf-btn alt only-web" href="descargar.html">Instalar la app en el móvil o el ordenador</a>
+      <a class="pdf-btn alt" id="accKofi" href="#" target="_blank" rel="noopener" hidden>Invítame a un café ☕</a>
+      <button class="pdf-btn" id="logoutBtn">Cerrar sesión</button>
+      <button class="sheet-close danger" id="accDelete">Borrar mi cuenta</button>
+    </div>
+    <p class="acc-legal"><a href="privacidad.html">Privacidad y condiciones</a> · App no oficial, sin relación con Panini, LaLiga ni los clubes.</p>
+    <button class="sheet-close" data-close>Cerrar</button>
+  </div>
+</div>
+
+<div class="sheet-backdrop" id="deleteSheet" hidden>
+  <div class="sheet" role="alertdialog" aria-labelledby="deleteTitle">
+    <h3 id="deleteTitle">¿Borrar tu cuenta?</h3>
+    <p class="hint">Se borran para siempre tu álbum, tus repetidos, tus amigos y tu cuenta. No se puede deshacer. Si solo quieres salir, usa "Cerrar sesión".</p>
+    <label for="delPassword">Escribe tu contraseña para confirmar</label>
+    <input type="password" id="delPassword" autocomplete="current-password">
+    <p class="del-error" id="delError" aria-live="polite"></p>
+    <div class="sheet-actions">
+      <button class="pdf-btn danger" id="delOk">Borrar mi cuenta para siempre</button>
+      <button class="pdf-btn alt" data-close>Cancelar</button>
+    </div>
+  </div>
+</div>
 
 <div class="sheet-backdrop" id="doneSheet" hidden>
   <div class="sheet done-sheet" role="dialog" aria-labelledby="doneTitle">
@@ -1009,7 +1051,7 @@
 </div>
 
 <script>
-const APP_VERSION = '2026-10-21.8';
+const APP_VERSION = '2026-10-21.9';
 const STORAGE_KEY = 'laliga_2627_album_v5';
 
 /* Orden exacto de equipos indicado por el usuario */
@@ -1839,8 +1881,9 @@ let activeTab = 'album';
             }
             match /users/{email} {
               allow get: if signedIn();
-              allow write: if signedIn() && request.resource.data.uid == request.auth.uid &&
-                              email == request.auth.token.email.lower();
+              allow create, update: if signedIn() && request.resource.data.uid == request.auth.uid &&
+                                       email == request.auth.token.email.lower();
+              allow delete: if signedIn() && resource.data.uid == request.auth.uid;
             }
             match /friendRequests/{id} {
               allow read: if signedIn() && (request.auth.uid == resource.data.from || request.auth.uid == resource.data.to);
@@ -1865,6 +1908,11 @@ const firebaseConfig = {
   appId: "1:783786036356:web:d993fe88a2650e674606d1"
 };
 firebase.initializeApp(firebaseConfig);
+
+/* Enlace para donaciones (Ko-fi, PayPal...). Vacío = no se muestra el botón. */
+const KOFI_URL = '';
+/* Dentro de la app de Android no tiene sentido "Instalar la app". */
+if(window.Capacitor) document.documentElement.classList.add('in-app');
 const auth = firebase.auth();
 const db = firebase.firestore();
 
@@ -2031,10 +2079,63 @@ document.getElementById('signupBtn').onclick = () => {
     .finally(() => setLoginLoading(false));
 };
 
+document.getElementById('accountBtn').onclick = () => {
+  document.getElementById('accEmail').textContent = (auth.currentUser && auth.currentUser.email) || '';
+  const kofi = document.getElementById('accKofi');
+  kofi.hidden = !KOFI_URL;
+  if(KOFI_URL) kofi.href = KOFI_URL;
+  openSheet('accountSheet');
+};
+
 document.getElementById('logoutBtn').onclick = async () => {
+  closeSheet('accountSheet');
   const ok = await askConfirm({ title:'¿Cerrar sesión?', ok:'Cerrar sesión',
     text:'Tus cromos están guardados en la nube. Cuando vuelvas a entrar con tu email los tendrás igual.' });
   if(ok) auth.signOut();
+};
+
+document.getElementById('accDelete').onclick = () => {
+  closeSheet('accountSheet');
+  document.getElementById('delPassword').value = '';
+  document.getElementById('delError').textContent = '';
+  openSheet('deleteSheet');
+  document.getElementById('delPassword').focus();
+};
+
+/* Borrar la cuenta: primero lo que hay en la nube (ficha de usuario, amistades y
+   álbum) y al final la cuenta. La ficha va primero porque es lo único que necesita
+   las reglas nuevas de Firebase: si faltan, no se borra nada a medias. */
+document.getElementById('delOk').onclick = async () => {
+  const user = auth.currentUser, btn = document.getElementById('delOk');
+  const errEl = document.getElementById('delError');
+  const password = document.getElementById('delPassword').value;
+  if(!user) return;
+  if(!password){ errEl.textContent = 'Escribe tu contraseña.'; return; }
+  errEl.textContent = ''; btn.disabled = true; btn.textContent = 'Borrando…';
+  try {
+    const cred = firebase.auth.EmailAuthProvider.credential(user.email, password);
+    await user.reauthenticateWithCredential(cred);
+    const uid = user.uid, email = (user.email || '').toLowerCase();
+    await db.collection('users').doc(email).delete();
+    stopFriends();
+    stopSync();
+    pendingOps = {};
+    const col = db.collection('friendRequests');
+    const reqs = [...(await col.where('from', '==', uid).get()).docs, ...(await col.where('to', '==', uid).get()).docs];
+    await Promise.all(reqs.map(d => d.ref.delete()));
+    await docRefFor(uid).delete();
+    await user.delete();
+    try { Object.keys(localStorage).filter(k => k.startsWith('laliga_')).forEach(k => localStorage.removeItem(k)); } catch(e) {}
+    closeSheet('deleteSheet');
+    showLoginError('Tu cuenta y tus cromos se han borrado.');
+  } catch(err) {
+    console.error('Borrar cuenta:', err);
+    errEl.textContent = err.code === 'permission-denied'
+      ? 'Ahora mismo no se puede borrar la cuenta. Escríbenos y la borramos nosotros (el correo está en Privacidad).'
+      : traducirErrorAuth(err);
+  } finally {
+    btn.disabled = false; btn.textContent = 'Borrar mi cuenta para siempre';
+  }
 };
 
 function traducirErrorAuth(err){
@@ -2046,7 +2147,8 @@ function traducirErrorAuth(err){
     'auth/email-already-in-use': 'Ya existe una cuenta con ese email. Usa "Iniciar sesión".',
     'auth/weak-password': 'La contraseña debe tener al menos 6 caracteres.',
     'auth/network-request-failed': 'No hay conexión a internet. Conéctate y vuelve a probar.',
-    'auth/too-many-requests': 'Demasiados intentos seguidos. Espera unos minutos y vuelve a probar.'
+    'auth/too-many-requests': 'Demasiados intentos seguidos. Espera unos minutos y vuelve a probar.',
+    'auth/requires-recent-login': 'Por seguridad, cierra sesión, vuelve a entrar y prueba otra vez.'
   };
   return map[err.code] || 'No hemos podido entrar. Revisa la conexión y vuelve a probar.';
 }

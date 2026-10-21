@@ -1,0 +1,16 @@
+{
+  "name": "album-cromos-android",
+  "private": true,
+  "description": "App de Android: abre la web del álbum dentro de una app (se actualiza sola con la web).",
+  "scripts": {
+    "sync": "cap sync android"
+  },
+  "dependencies": {
+    "@capacitor/android": "8.5.3",
+    "@capacitor/core": "8.5.3"
+  },
+  "devDependencies": {
+    "@capacitor/assets": "3.0.5",
+    "@capacitor/cli": "8.5.3"
+  }
+}

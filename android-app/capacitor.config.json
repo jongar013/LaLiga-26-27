@@ -1,0 +1,12 @@
+{
+  "appId": "io.github.jongar013.albumcromos",
+  "appName": "Álbum 26-27",
+  "webDir": "www",
+  "server": {
+    "url": "https://jongar013.github.io/LaLiga-26-27/",
+    "errorPath": "sin-conexion.html"
+  },
+  "android": {
+    "backgroundColor": "#E6E8EE"
+  }
+}
