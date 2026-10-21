@@ -1,0 +1,67 @@
+# Construye la app de Android (APK). La app solo abre la web del álbum, así que
+# solo hace falta volver a construirla si cambia algo de android-app/.
+# En main se publica en Releases como "album-cromos.apk", que es lo que enlaza descargar.html.
+# Para firmar siempre con la misma clave (y que las actualizaciones se instalen encima),
+# añade en Settings > Secrets > Actions: ANDROID_KEYSTORE (en base64) y ANDROID_KEYSTORE_PASSWORD.
+name: App de Android
+
+on:
+  push:
+    branches: [main]
+    paths: ['android-app/**', '.github/workflows/apk.yml']
+  pull_request:
+    paths: ['android-app/**', '.github/workflows/apk.yml']
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  apk:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 21
+      - name: Preparar el proyecto
+        working-directory: android-app
+        run: |
+          npm ci
+          npx cap sync android
+      - name: Construir el APK
+        working-directory: android-app/android
+        env:
+          KS: ${{ secrets.ANDROID_KEYSTORE }}
+          KS_PASS: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+        run: |
+          chmod +x gradlew
+          if [ -n "$KS" ]; then
+            ./gradlew assembleRelease --no-daemon
+            echo "$KS" | base64 -d > ks.jks
+            BT=$(ls -d "$ANDROID_HOME"/build-tools/* | sort -V | tail -1)
+            "$BT/zipalign" -f 4 app/build/outputs/apk/release/app-release-unsigned.apk aligned.apk
+            "$BT/apksigner" sign --ks ks.jks --ks-pass env:KS_PASS --key-pass env:KS_PASS --out ../../album-cromos.apk aligned.apk
+            rm ks.jks
+          else
+            echo "::warning::Sin clave de firma: se firma con una clave de pruebas"
+            ./gradlew assembleDebug --no-daemon
+            cp app/build/outputs/apk/debug/app-debug.apk ../../album-cromos.apk
+          fi
+      - uses: actions/upload-artifact@v4
+        with:
+          name: album-cromos
+          path: album-cromos.apk
+      - name: Publicar en Releases
+        if: github.ref == 'refs/heads/main'
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: apk
+          name: App de Android
+          body: Descarga album-cromos.apk e instálalo en tu móvil Android. Instrucciones en la página de descarga.
+          files: album-cromos.apk
+          make_latest: true
