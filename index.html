@@ -377,6 +377,8 @@
   .tag-oro{background:var(--gold); color:#131A2E;}
   .tag-2ed{background:#5A6275; color:#fff;}
   .tag-3ed{background:#13A39A; color:#fff;}
+  .tag-4ed{background:#D9622B; color:#fff;}
+  .tag-top{background:#131A2E; color:#F7D774;}
   .tag-num{background:#fff; color:#131A2E;}
   .collection .sticker .undo{
     margin:auto 0 0; min-height:40px; width:100%; font:inherit; font-size:14px; background:none;
@@ -731,7 +733,7 @@
   .pitem.repe em{background:var(--gold); color:#131A2E;}
   .pitem button{width:40px; height:40px; border:none; background:none; color:var(--ink-soft); font-size:22px; cursor:pointer;}
 
-  /* Raros que se notan. Kromix: marco y reflejo arcoíris. Coloca y 2ª/3ª ed.: cinta en la esquina. */
+  /* Raros que se notan. Kromix: marco y reflejo arcoíris. Coloca, 2ª/3ª/4ª ed. y Top fichaje: cinta en la esquina. */
   .sticker.rar-kromix:not(.has){
     border:2px solid transparent; box-shadow:none;
     background:
@@ -747,10 +749,12 @@
     background-size:300% 300%; animation:holo 7s linear infinite;
   }
   @keyframes holo{ from{background-position:0% 50%;} to{background-position:300% 50%;} }
-  .sticker .art .tag-badge.tag-colocas, .sticker .art .tag-badge.tag-2ed, .sticker .art .tag-badge.tag-3ed{
+  .sticker .art .tag-badge.tag-colocas, .sticker .art .tag-badge.tag-2ed, .sticker .art .tag-badge.tag-3ed,
+  .sticker .art .tag-badge.tag-4ed, .sticker .art .tag-badge.tag-top{
     right:-26px; top:9px; width:92px; padding:3px 0 2px; border-radius:0; text-align:center; transform:rotate(40deg);
     font-size:10.5px; letter-spacing:.4px; box-shadow:0 1px 2px rgba(0,0,0,0.25);
   }
+  .sticker .art .tag-badge.tag-top{font-size:9px; letter-spacing:.1px;}
   /* El oro, la plata y el bronce brillan de vez en cuando, como el papel metalizado. */
   @keyframes shine5{ 0%,70%{background-position:100% 0;} 100%{background-position:-60% 0;} }
   .sticker.has:has(.metal-art)::after{animation:shine5 5s ease-in-out infinite;}
@@ -867,7 +871,7 @@
   <div class="hd">
     <div class="hd-title">
       <h1>LaLiga 2026-27</h1>
-      <div class="season">Álbum Panini, 3ª edición <button class="logout-btn" id="logoutBtn">Cerrar sesión</button></div>
+      <div class="season">Álbum Panini, 4ª edición <button class="logout-btn" id="logoutBtn">Cerrar sesión</button></div>
     </div>
     <div class="tally"><b id="progressHave">0</b><span id="progressTotal">/0</span></div>
   </div>
@@ -1009,7 +1013,7 @@
 </div>
 
 <script>
-const APP_VERSION = '2026-10-21.8';
+const APP_VERSION = '2026-10-30.1';
 const STORAGE_KEY = 'laliga_2627_album_v5';
 
 /* Orden exacto de equipos indicado por el usuario */
@@ -1069,6 +1073,7 @@ const TEAMS_RAW = {
 3|Unai Simón|portero
 4|Padilla|portero
 5|Areso|defensa
+5BIS|Hugo Rincón|defensa|4ª ed.
 6A|Paredes|defensa
 6B|Yeray|defensa
 7|Vivian|defensa
@@ -1078,6 +1083,7 @@ const TEAMS_RAW = {
 10|Jauregizar|medio
 11|Ruiz de Galarreta|medio
 12|Rego|medio
+12BIS|Gerenabarrena|medio|4ª ed.
 13|Unai Gómez|medio
 13BIS|Prados|medio|2
 14|Sancet|medio
@@ -1095,6 +1101,7 @@ const TEAMS_RAW = {
 4|Musso|portero
 5|Marcos Llorente|defensa
 6|Nahuel Molina|defensa
+6BIS|Dani Martínez|defensa|4ª ed.
 7|Pubill|defensa
 8A|Le Normand|defensa
 8B|Giménez|defensa
@@ -1125,6 +1132,7 @@ const TEAMS_RAW = {
 8|Gerard Martín|defensa
 9|Joao Cancelo|defensa
 10|Balde|defensa
+10BIS|Xavi Espart|defensa|4ª ed.
 11|Eric García|defensa
 12|De Jong|medio
 13|Gavi|medio
@@ -1148,6 +1156,7 @@ const TEAMS_RAW = {
 7|Bartra|defensa
 8|Natan|defensa
 9|Valentín Gómez|defensa
+9BIS|Junior|defensa|4ª ed.
 10|Marc Roca|medio
 11|Amrabat|medio
 11BIS|Deossa|medio|3ª ed.
@@ -1165,6 +1174,7 @@ const TEAMS_RAW = {
 2|Claudio Giráldez|entrenador
 3|Radu|portero
 4|Iván Villar|portero
+4BIS|Bayindir|portero|4ª ed.
 5|Álvaro Núñez|defensa
 6|Javi Rueda|defensa
 7|Javi Rodríguez|defensa
@@ -1177,7 +1187,9 @@ const TEAMS_RAW = {
 13|Hugo Álvarez|medio
 14|Sotelo|medio
 14BIS|Vecino|medio|2
+14BIS|Burcio|medio|4ª ed.
 15|Fer López|medio
+15BIS|Driouech|delantero|4ª ed.
 16|Swedberg|medio
 17|Iago Aspas|delantero
 18A|Pablo Durán|delantero
@@ -1203,6 +1215,7 @@ const TEAMS_RAW = {
 13|Mario Soriano|medio
 14|José Ángel|medio
 14BIS|Gijselhat|medio|3ª ed.
+14BIS|Casadó|medio|4ª ed.
 15|Luismi Cruz|medio
 16|Mella|medio
 17|Asp Jensen|delantero|3ª ed.
@@ -1215,9 +1228,11 @@ const TEAMS_RAW = {
 3|Dituro|portero
 4|Iturbe|portero|2
 5|Pétrot|defensa
+5BIS|Rubén Sánchez|defensa|4ª ed.
 6|Chust|defensa
 7|Bigas|defensa
 8|Affengruber|defensa
+8BIS|Revivo|defensa|4ª ed.
 9A|Pedrosa|defensa
 9B|Sangaré|defensa
 10|Germán Valera|medio
@@ -1227,6 +1242,7 @@ const TEAMS_RAW = {
 13B|Jon Chetauya|medio
 14|Marc Aguado|medio
 15|Josan|medio
+15BIS|Lemar|medio|4ª ed.
 16|Morente|medio
 17|Ali Houary|delantero|2
 18|Cepeda|delantero
@@ -1269,11 +1285,13 @@ const TEAMS_RAW = {
 10|Davinchi|defensa
 11|Mario Martín|medio
 12|Javi Muñoz|medio
+12BIS|Uche|delantero|4ª ed.
 13|Francho|medio|3ª ed.
 14|Terrats|medio|2
 15|Mangala|medio|3ª ed.
 16|Juanmi|delantero|2
 17|Álex Sancris|delantero
+17BIS|Iván Azón|delantero|4ª ed.
 18|Borja Mayoral|delantero
 19|Luis Vázquez|delantero
 19BIS|Ünal|delantero|3ª ed.
@@ -1290,12 +1308,14 @@ const TEAMS_RAW = {
 8|Mandi|defensa|2
 9|Manu Sánchez|defensa
 10|Arriaga|medio
+10BIS|Ndukwe|defensa|4ª ed.
 11|Oriol Rey|medio
 12|Olasagasti|medio
 13|Dani Requena|medio|2
 14A|Victor García|medio
 14B|Paco Cortés|medio
 15|Carlos Álvarez|medio
+15BIS|Ratkov|delantero|4ª ed.
 16|Tunde|delantero
 16BIS|Thiago Fernández|delantero|3ª ed.
 17|Brugué|delantero
@@ -1327,6 +1347,7 @@ const TEAMS_RAW = {
 17|Gonzalo|delantero
 17BIS|Carlos Espí|delantero|2
 18|Rodrygo|delantero
+18BIS|Endrick|delantero|4ª ed.
 19|Vinícius|delantero
 20|Mbappé|delantero`,
 "Málaga CF": `
@@ -1339,6 +1360,7 @@ const TEAMS_RAW = {
 6BIS|Recio|defensa|3ª ed.
 7|Calero|defensa|2
 8|Einar Galilea|defensa
+8BIS|Berrocal|defensa|4ª ed.
 9|Rafita|defensa
 10|Salinas|defensa|2
 11|Izan Mérino|medio
@@ -1347,6 +1369,7 @@ const TEAMS_RAW = {
 13B|Juanpe|medio
 14|Dotor|medio
 15|Aarón Ochoa|medio
+15BIS|Cajuste|medio|4ª ed.
 16|Larrubia|delantero
 17|Lobete|delantero
 18|Adrián Niño|delantero
@@ -1361,8 +1384,10 @@ const TEAMS_RAW = {
 5B|Arguibide|defensa
 6|Boyomo|defensa
 7|Herrando|defensa
+7BIS|Yeboah|defensa|4ª ed.
 8|Catena|defensa
 9|Abel Bretones|defensa
+9BIS|Diego Rico|defensa|4ª ed.
 10|Osambela|medio
 11|Torró|medio
 12|Moncayola|medio
@@ -1390,23 +1415,28 @@ const TEAMS_RAW = {
 9A|Manu Hernando|defensa
 9B|Mario García|defensa
 10|Jorge Salinas|defensa
+10BIS|Aarón Martín|defensa|4ª ed.
 11|Maguette|medio
 12|Gustavo Puerta|medio
+12BIS|Prati|medio|4ª ed.
 13|Íñigo|medio
 13BIS|Sergio Martínez|medio|3ª ed.
 14|Aldasoro|medio
+14BIS|André Almeida|medio|4ª ed.
 15|Suleiman|delantero
 15BIS|Zabiri|delantero|3ª ed.
 16|Andrés Martín|delantero
 17|Guliashvili|delantero
 18|Íñigo Vicente|delantero
 19|Arana|delantero
+19BIS|Iker Luque|delantero|4ª ed.
 20|Villalibre|delantero`,
 "Rayo Vallecano": `
 1|Escudo
 2|Beñat San José|entrenador
 3|Batalla|portero
 4|Cárdenas|portero
+4BIS|Audero|portero|4ª ed.
 5|Ratiu|defensa
 6|Balliu|defensa
 7|Nobel Mendy|defensa
@@ -1418,11 +1448,13 @@ const TEAMS_RAW = {
 11A|Pedro Díaz|medio
 11B|Nteka|medio
 12|Pathé Ciss|medio
+12BIS|Bouare|medio|4ª ed.
 13|Óscar Valentín|medio
 14|Unai López|medio
 15|Isi|medio
 16|De Frutos|delantero
 17|Fran Pérez|delantero
+17BIS|Tsitaishvili|delantero|4ª ed.
 18|Álvaro García|delantero
 19|Camello|delantero
 20|Alemao|delantero`,
@@ -1443,6 +1475,7 @@ const TEAMS_RAW = {
 13B|Zakharyan|medio|2
 14|Carlos Soler|medio
 15|Sucic|medio
+15BIS|Ochieng|delantero|4ª ed.
 16|Barrenetxea|delantero
 17|Kubo|delantero
 18|Guedes|delantero
@@ -1463,11 +1496,14 @@ const TEAMS_RAW = {
 9B|Marcao|defensa
 10|Suazo|defensa
 11|Oso|medio
+11BIS|Fofana|medio|4ª ed.
 12|Agoumé|medio
 13|Guridi|medio|2
 14|Sow|medio
+14BIS|Nico Guillén|medio|4ª ed.
 15|Vargas|medio
 16|Manu Bueno|medio
+16BIS|Alfon|delantero|4ª ed.
 17|Peque|delantero
 18|Ejuke|delantero
 19|Akor Adams|delantero
@@ -1476,8 +1512,10 @@ const TEAMS_RAW = {
 "Valencia CF": `
 1|Escudo
 2|Carlos Corberán|entrenador
+2BIS|Javier Aguirre|entrenador|4ª ed.
 3|Dimitrievski|portero
 4|Rivero|portero
+4BIS|Van Oevelen|portero|4ª ed.
 5|Foulquier|defensa
 6|Copete|defensa
 7|Tárrega|defensa
@@ -1494,6 +1532,7 @@ const TEAMS_RAW = {
 16BIS|Dieng|medio|2
 17|Hugo Duro|delantero
 18|Diego López|delantero
+18BIS|Otorbi|delantero|4ª ed.
 19|Ramazani|delantero
 19BIS|Danjuma|delantero|2
 20A|Sadiq|delantero
@@ -1510,6 +1549,7 @@ const TEAMS_RAW = {
 7A|Foyth|defensa
 7B|Freeman|defensa
 8A|Kambwala|defensa
+8BIS|Diatta|defensa|4ª ed.
 8B|Rafa Marín|defensa
 9|Renato Veiga|defensa
 10|Sergi Cardona|defensa
@@ -1519,6 +1559,7 @@ const TEAMS_RAW = {
 14|Moleiro|medio
 15|Buchanan|delantero
 16|Oluwaseyi|delantero
+16BIS|Ilias|delantero|4ª ed.
 17|Ayoze|delantero
 18|Pépé|delantero
 19|Mikautadze|delantero
@@ -1641,7 +1682,36 @@ UF36|KOCHORASHVILI (Sevilla)|medio|3ª ed.
 UF37|GALÁN (Celta)|defensa|3ª ed.
 UF38|PARROTT (Betis)|delantero|3ª ed.
 UF39|DIOMANDE (Real Madrid)|delantero|3ª ed.
-UF40|RODRI (Barcelona)|medio|3ª ed.`},
+UF40|RODRI (Barcelona)|medio|3ª ed.
+UF41|EZEQUIEL PONCE|delantero|4ª ed.
+UF42|GUDELJ|medio|4ª ed.
+UF43|SARR|defensa|4ª ed.
+UF44|MIGUEL RODRÍGUEZ|delantero|4ª ed.
+UF45|PABLO MARTÍNEZ|medio|4ª ed.
+UF46|DEL CASTILLO|delantero|4ª ed.
+UF47|BELOCIAN|defensa|4ª ed.
+UF48|STASSIN|delantero|4ª ed.
+UF49|SADICK|defensa|4ª ed.
+UF50|BRYAN ZARAGOZA|delantero|4ª ed.
+UF51|SALIBA|medio|4ª ed.
+UF52|GIMÉNEZ|defensa|4ª ed.
+UF53|PEDROSA|defensa|4ª ed.
+UF54|CÁCERES|defensa|4ª ed.
+UF55|LIVAKOVIC|portero|4ª ed.
+UF56|PABLO GARCÍA|delantero|4ª ed.
+UF57|ARNAU|defensa|4ª ed.
+UF58|OSORIO|delantero|4ª ed.
+UF59|HÉCTOR FORT|defensa|4ª ed.
+UF60|ROMERO|defensa|4ª ed.
+UF61|FÉLIX CORREIA|delantero|4ª ed.
+UF62|ADAMA TRAORÉ|delantero|4ª ed.
+UF63|GABRIEL JESUS|delantero|4ª ed.
+UF64|ELLIOTT|medio|4ª ed.
+UF65|DANI CEBALLOS|medio|4ª ed.
+UF66|JONATHAN DAVID|delantero|4ª ed.
+UF67|RODRI (Barcelona)|medio|Top fichaje
+UF68|CUCURELLA (Real Madrid)|defensa|Top fichaje
+UF69|KANG-IN LEE (Atlético de Madrid)|medio|Top fichaje`},
 { name:"Chicles", crest:"escudos/chicles.png", color:"#E85D9E", raw:`
 1|Escudo (D. Alavés)
 2|Boyé (D. Alavés)|Masterclass
@@ -1709,16 +1779,22 @@ B2|Mbappé (Real Madrid)|delantero|Bronce
 B3|Nico Williams (Athletic)|delantero|Bronce
 B4|Pedri (Barcelona)|medio|Bronce
 B5|Oblak (Atlético de Madrid)|portero|Bronce
+B6|Rodri (Barcelona)|medio|Bronce
+B7|Bellingham (Real Madrid)|medio|Bronce
 P1|Lamine Yamal (Barcelona)|delantero|Plata
 P2|Mbappé (Real Madrid)|delantero|Plata
 P3|Nico Williams (Athletic)|delantero|Plata
 P4|Pedri (Barcelona)|medio|Plata
 P5|Oblak (Atlético de Madrid)|portero|Plata
+P6|Rodri (Barcelona)|medio|Plata
+P7|Bellingham (Real Madrid)|medio|Plata
 O1|Lamine Yamal (Barcelona)|delantero|Oro
 O2|Mbappé (Real Madrid)|delantero|Oro
 O3|Nico Williams (Athletic)|delantero|Oro
 O4|Pedri (Barcelona)|medio|Oro
-O5|Oblak (Atlético de Madrid)|portero|Oro`}
+O5|Oblak (Atlético de Madrid)|portero|Oro
+O6|Rodri (Barcelona)|medio|Oro
+O7|Bellingham (Real Madrid)|medio|Oro`}
 ];
 
 function buildBaseName(name, role){
@@ -1955,7 +2031,11 @@ function mergeWithFresh(existingData){
     if((old.stickers || []).length !== freshSection.stickers.length) changed = true;
 
     freshSection.stickers = freshSection.stickers.map(freshSt => {
-      const olds = (old.stickers || []).filter(s => String(s.number) === String(freshSt.number));
+      // Primero por id: hay números repetidos (dos 14BIS en Celta y en Deportivo) y el
+      // cromo nuevo no debe heredar si tenías pegado el otro. Si no hay id, por número.
+      const byId = (old.stickers || []).filter(s => s.id === freshSt.id);
+      const olds = byId.length ? byId : (old.stickers || []).filter(s =>
+        String(s.number) === String(freshSt.number) && !freshSection.stickers.some(f => f.id === s.id));
       if(!olds.length){ changed = true; return freshSt; }
       const obtained = olds.some(s => s.obtained);
       const o = olds[0];
@@ -2439,7 +2519,9 @@ const TAG_CLASSES = {
   'Plata':'tag-plata',
   'Oro':'tag-oro',
   '2ª ed.':'tag-2ed',
-  '3ª ed.':'tag-3ed'
+  '3ª ed.':'tag-3ed',
+  '4ª ed.':'tag-4ed',
+  'Top fichaje':'tag-top'
 };
 function tagClass(tag){
   return TAG_CLASSES[tag] || 'tag-num';
@@ -2449,13 +2531,15 @@ function tagClass(tag){
    (p. ej. el Nº1 normal junto a su K1 Kromix, o Lamine Yamal en Bronce/Plata/Oro),
    conservando el orden general para el resto de cromos. */
 function groupBySlot(stickers){
+  // Los Top fichajes (UF67-69) repiten jugador de otro fichaje pero van aparte, al final.
+  const slotKey = x => x.name.toLowerCase() + (x.tag === 'Top fichaje' ? '|top' : '');
   const seen = new Set();
   const ordered = [];
   stickers.forEach(s => {
-    const key = s.name.toLowerCase();
+    const key = slotKey(s);
     if(seen.has(key)) return;
     seen.add(key);
-    stickers.filter(x => x.name.toLowerCase() === key).forEach(x => ordered.push(x));
+    stickers.filter(x => slotKey(x) === key).forEach(x => ordered.push(x));
   });
   return ordered;
 }
@@ -2557,9 +2641,9 @@ function stickerFaceHTML(section, st, extra){
     <div class="cap"><b>${escapeHTML(name)}</b>${sub ? `<small>${sub}</small>` : ''}</div>`;
 }
 
-/* Clase por rareza para el marco: Kromix con reflejo arcoíris, y Coloca o 2ª/3ª ed.
+/* Clase por rareza para el marco: Kromix con reflejo arcoíris, y Coloca, 2ª/3ª/4ª ed. o Top fichaje
    con su cinta en la esquina. */
-const RARITY = { 'Kromix':'kromix', 'COLOCA':'coloca', '2ª ed.':'ed', '3ª ed.':'ed' };
+const RARITY = { 'Kromix':'kromix', 'COLOCA':'coloca', '2ª ed.':'ed', '3ª ed.':'ed', '4ª ed.':'ed', 'Top fichaje':'ed' };
 function rarityClass(st){ return RARITY[st.tag] ? ' rar-' + RARITY[st.tag] : ''; }
 
 /* En el Álbum, tocar un hueco pega el cromo y tocar un cromo pegado abre su ficha. */
@@ -3274,7 +3358,7 @@ function openVinted(){
   if(!r.groups.length) return;
   document.getElementById('vTitle').value = `Cromos repetidos LaLiga 2026-27 Panini (${r.distinct} cromos)`;
   document.getElementById('vDesc').value =
-`Vendo ${r.distinct} cromos repetidos del álbum LaLiga 2026-27 de Panini (3ª edición), ${r.units} unidades en total.
+`Vendo ${r.distinct} cromos repetidos del álbum LaLiga 2026-27 de Panini (4ª edición), ${r.units} unidades en total.
 
 En las fotos tienes la lista completa de los que tengo repetidos${f.groups.length ? ' y la de los que me faltan' : ''}.
 
