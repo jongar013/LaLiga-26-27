@@ -840,6 +840,37 @@
   .login-box .login-error{color:var(--link); font-size:14px; margin-top:10px; min-height:16px;}
   .login-box .login-loading{color:var(--ink-soft); font-size:14px; margin-top:10px;}
 
+
+  /* ---------- Tutorial de bienvenida ----------
+     Cuatro paneles oscuros y borrosos rodean el apartado que se explica; el hueco
+     del centro queda nítido. Los paneles y el hueco tapan los toques: durante el
+     tutorial no se pega nada sin querer. */
+  .tour{position:fixed; inset:0; z-index:90;}
+  .tour[hidden]{display:none;}
+  html.touring .to-top{display:none;}
+  .tour-shade{position:fixed; background:rgba(8,11,20,0.62); -webkit-backdrop-filter:blur(5px); backdrop-filter:blur(5px);
+    transition:all .3s ease;}
+  .tour-hole{position:fixed; border-radius:12px; box-shadow:0 0 0 3px var(--gold), 0 0 24px 4px rgba(214,162,30,.45);
+    transition:all .3s ease; pointer-events:auto;}
+  .tour.no-target .tour-hole{opacity:0;}
+  .tour-card{
+    position:fixed; left:16px; right:16px; max-width:420px; margin:0 auto;
+    background:var(--paper); color:var(--ink); border-radius:14px; padding:16px 16px 14px;
+    box-shadow:0 18px 40px rgba(0,0,0,.45); transition:top .3s ease, opacity .2s ease;
+  }
+  .tour-card .tour-step{font-size:12.5px; font-weight:700; letter-spacing:.6px; text-transform:uppercase; color:var(--laliga-red);}
+  .tour-card h3{margin:2px 0 6px; font-size:26px; font-weight:900; line-height:.95; text-transform:uppercase;}
+  .tour-card p{margin:0; font-size:15.5px; line-height:1.35; color:var(--ink);}
+  .tour-dots{display:flex; gap:5px; margin:12px 0 0;}
+  .tour-dots i{flex:1; height:4px; border-radius:2px; background:var(--line);}
+  .tour-dots i.on{background:var(--laliga-red);}
+  .tour-btns{display:flex; align-items:center; gap:8px; margin-top:12px;}
+  .tour-btns .tour-skip{margin-right:auto; background:none; border:none; padding:10px 4px; font:inherit; font-size:14px;
+    color:var(--ink-soft); text-decoration:underline; text-underline-offset:2px; cursor:pointer;}
+  .tour-btns .pdf-btn{min-height:44px; padding:10px 18px; font-size:15px;}
+  .tour-btns .pdf-btn:focus-visible, .tour-skip:focus-visible{outline:3px solid var(--gold); outline-offset:2px;}
+  @media (prefers-reduced-motion: reduce){ .tour-shade, .tour-hole, .tour-card{transition:none;} }
+
   @media (max-width:360px){
     header h1{font-size:28px;}
     .section-head h2{font-size:30px;}
@@ -865,13 +896,30 @@
   </div>
 </div>
 
+<div class="tour" id="tour" role="dialog" aria-modal="true" aria-labelledby="tourTitle" hidden>
+  <div class="tour-shade" data-s="t"></div><div class="tour-shade" data-s="b"></div>
+  <div class="tour-shade" data-s="l"></div><div class="tour-shade" data-s="r"></div>
+  <div class="tour-hole" id="tourHole"></div>
+  <div class="tour-card" id="tourCard">
+    <span class="tour-step" id="tourStep"></span>
+    <h3 id="tourTitle"></h3>
+    <p id="tourText" aria-live="polite"></p>
+    <div class="tour-dots" id="tourDots" aria-hidden="true"></div>
+    <div class="tour-btns">
+      <button class="tour-skip" id="tourSkip">Saltar</button>
+      <button class="pdf-btn alt" id="tourBack">Atrás</button>
+      <button class="pdf-btn" id="tourNext">Siguiente</button>
+    </div>
+  </div>
+</div>
+
 <div class="update-bar" id="updateBar" hidden><span>Hay una versión nueva de la app.</span><button id="updateBtn">Actualizar</button></div>
 <div id="appRoot" class="hidden">
 <header>
   <div class="hd">
     <div class="hd-title">
       <h1>LaLiga 2026-27</h1>
-      <div class="season">Álbum Panini, 4ª edición <button class="logout-btn" id="logoutBtn">Cerrar sesión</button></div>
+      <div class="season">Álbum Panini, 4ª edición <button class="logout-btn" id="tourBtn">Cómo funciona</button><button class="logout-btn" id="logoutBtn">Cerrar sesión</button></div>
     </div>
     <div class="tally"><b id="progressHave">0</b><span id="progressTotal">/0</span></div>
   </div>
@@ -1013,7 +1061,7 @@
 </div>
 
 <script>
-const APP_VERSION = '2026-10-30.1';
+const APP_VERSION = '2026-11-06.1';
 const STORAGE_KEY = 'laliga_2627_album_v5';
 
 /* Orden exacto de equipos indicado por el usuario */
@@ -2064,12 +2112,14 @@ function startSync(uid){
     } else {
       const sections = buildSections();
       data = { sections };
+      newAccount = true;
       docRefFor(uid).set(toStored(data));
     }
     if(!activeTab) activeTab = 'album';
     renderAll();
     suppressSave = false;
     checkNewStickers();
+    maybeStartTour();
   }, err => {
     console.error('Error de sincronización:', err);
   });
@@ -2079,6 +2129,8 @@ function stopSync(){
   if(unsubscribeDoc){ unsubscribeDoc(); unsubscribeDoc = null; }
   data = null;
   newsChecked = false;
+  newAccount = false; justSignedUp = false; tourChecked = false;
+  endTour(false);
 }
 
 function showLoginError(msg){
@@ -2106,7 +2158,9 @@ document.getElementById('signupBtn').onclick = () => {
   if(!email || !password){ showLoginError('Escribe email y contraseña.'); return; }
   if(password.length < 6){ showLoginError('La contraseña debe tener al menos 6 caracteres.'); return; }
   setLoginLoading(true);
+  justSignedUp = true;
   auth.createUserWithEmailAndPassword(email, password)
+    .catch(err => { justSignedUp = false; throw err; })
     .catch(err => showLoginError(traducirErrorAuth(err)))
     .finally(() => setLoginLoading(false));
 };
@@ -2160,7 +2214,12 @@ let friendAlbums = {}, albumUnsubs = {}, friendUnsubs = [];
 async function ensureProfile(user){
   const email = (user.email || '').toLowerCase();
   const prof = { email, name: email.split('@')[0] || 'Amigo' };
-  await db.collection('users').doc(email).set({ uid:user.uid, name:prof.name });
+  const ref = db.collection('users').doc(email);
+  // Se lee antes para saber si quedó el tutorial a medias, y se guarda con merge para
+  // no borrar ese dato al entrar.
+  const snap = await ref.get().catch(() => null);
+  prof.tour = snap && snap.exists ? snap.data().tour || null : null;
+  await ref.set({ uid:user.uid, name:prof.name }, { merge:true });
   return prof;
 }
 
@@ -2168,6 +2227,7 @@ function startFriends(user){
   stopFriends();
   ensureProfile(user).then(p => {
     myProfile = p;
+    maybeStartTour();
     const col = db.collection('friendRequests');
     friendUnsubs.push(col.where('from', '==', user.uid).onSnapshot(snap => {
       reqsFrom = snap.docs.map(d => ({ id:d.id, ...d.data() })); syncFriendAlbums();
@@ -3685,6 +3745,172 @@ toTopBtn.addEventListener('click', () => window.scrollTo({ top:0, behavior:'smoo
 window.addEventListener('scroll', () => {
   toTopBtn.classList.toggle('show', window.scrollY > 300);
 }, { passive:true });
+
+/* ======================= TUTORIAL DE BIENVENIDA =======================
+   Sale una sola vez, a las cuentas nuevas: todo se oscurece y se emborrona menos
+   el apartado que se explica, y se avanza paso a paso por las cuatro pestañas.
+   Que ya se ha visto se guarda en la cuenta (users/{email}.tour = 'done') y en este
+   móvil. Si se cierra la app a medias queda 'pending' y sale otra vez al entrar.
+   Las cuentas de antes no lo ven solas; lo tienen en «Cómo funciona». */
+const TOUR_KEY = 'laliga_2627_tour';
+let justSignedUp = false, newAccount = false, tourChecked = false;
+let tourIdx = -1, tourAuto = false;
+
+const TOUR_STEPS = [
+  { title:'¡Bienvenido!', text:'Te enseño en un minuto cómo funciona tu álbum. Puedes saltarlo cuando quieras y volver a verlo desde «Cómo funciona», arriba del todo.', next:'Empezar' },
+  { tab:'album', sel:'header', title:'Tu marcador', text:'Aquí ves cuántos cromos llevas pegados, cuántos te faltan y cuántos equipos has completado.' },
+  { tab:'album', sel:'#chipRow', title:'Los escudos', text:'Toca un escudo para ir a la página de ese equipo. El círculo se va llenando según pegas sus cromos.' },
+  { tab:'album', sel:'.section-head', title:'La página', text:'Este es el equipo que estás viendo. Con las flechas pasas al anterior o al siguiente.' },
+  { tab:'album', sel:'#stickerGrid .sticker', title:'Pegar un cromo', text:'Toca un hueco para pegar ese cromo. Si ya está pegado, al tocarlo se abre su ficha: ahí apuntas los repetidos o lo despegas.' },
+  { tab:'album', sel:'#packBtn', title:'Apuntar sobre', text:'¿Has abierto un sobre? Apunta todos los cromos de golpe y te digo cuáles son nuevos y cuáles repetidos.' },
+  { tab:'album', sel:'#onlyMissing', title:'Solo los que me faltan', text:'Esconde los cromos que ya tienes para ver de un vistazo lo que te falta.' },
+  { tab:'album', sel:'#favBtn', title:'Tu equipo', text:'Márcalo como tu equipo y su escudo saldrá el primero de la fila.' },
+  { tab:'repes', sel:'.repes-bar', title:'Repetidos', text:'En esta pestaña cuentas tus repetidos con + y −. Desde aquí descargas en PDF la lista de repetidos o la de los que te faltan, y preparas un anuncio para Vinted.' },
+  { tab:'vitrina', sel:'.vt-day', title:'Cromo del día', text:'En la Vitrina cada día sale un cromo del álbum. Si te falta, te avisa si algún amigo lo tiene repetido.' },
+  { tab:'vitrina', sel:'.vt-seals', title:'Logros', text:'Medallas que vas ganando: tu primer cromo, los 100, los 500, equipos completos…' },
+  { tab:'vitrina', sel:'.vt-cols', title:'Colecciones', text:'Cromos repartidos por todo el álbum: todos los escudos, los porteros, los entrenadores… Toca una para ver cuáles tienes.' },
+  { tab:'trades', sel:'#mainArea .trade-card', title:'Cambios con amigos', text:'Añade a un amigo con el email con el que entra en la app. Cuando acepte, verás qué cromos le puedes dar y cuáles te puede dar a ti.' },
+  { tab:'trades', sel:'.tabs', title:'Las pestañas', text:'Desde aquí te mueves entre Álbum, Repetidos, Vitrina y Cambios.' },
+  { tab:'album', title:'¡Listo!', text:'Ya puedes empezar a pegar cromos. Si quieres repasarlo, toca «Cómo funciona» arriba del todo.', next:'Empezar a pegar' }
+];
+
+function tourSeenHere(){
+  try { return localStorage.getItem(TOUR_KEY) === 'done'; } catch(e) { return false; }
+}
+function saveTourState(state){
+  if(state === 'done'){ try { localStorage.setItem(TOUR_KEY, 'done'); } catch(e) {} }
+  const user = auth.currentUser;
+  if(myProfile) myProfile.tour = state;
+  if(!user || !user.email) return;
+  db.collection('users').doc(user.email.toLowerCase()).set({ uid:user.uid, tour:state }, { merge:true })
+    .catch(e => console.warn('No se ha podido guardar el tutorial:', e));
+}
+
+/* Se llama cuando llegan el álbum y el perfil; arranca cuando están los dos. */
+function maybeStartTour(){
+  if(tourChecked || !data || !myProfile) return;
+  tourChecked = true;
+  if(myProfile.tour === 'done' || tourSeenHere()) return;
+  if(!(newAccount || justSignedUp || myProfile.tour === 'pending')) return;
+  if(myProfile.tour !== 'pending') saveTourState('pending');
+  setTimeout(() => {
+    if(!data || document.querySelector('.sheet-backdrop:not([hidden]), .pack-open:not([hidden])')) return;
+    startTour(true);
+  }, 500);
+}
+
+function startTour(auto){
+  if(!data) return;
+  tourAuto = auto;
+  document.getElementById('tour').hidden = false;
+  document.documentElement.style.overflow = 'hidden';
+  document.documentElement.classList.add('touring');
+  showTourStep(0);
+}
+
+function endTour(finished){
+  const box = document.getElementById('tour');
+  if(tourIdx < 0) return;
+  tourIdx = -1;
+  box.hidden = true;
+  document.documentElement.style.overflow = '';
+  document.documentElement.classList.remove('touring');
+  if(finished !== false) saveTourState('done');
+  if(data && activeTab !== 'album') switchTab('album');
+  const btn = document.getElementById('tourBtn');
+  if(btn && document.activeElement && box.contains(document.activeElement)) btn.focus();
+}
+
+function tourTarget(step){
+  if(!step.sel) return null;
+  const el = document.querySelector(step.sel);
+  if(!el) return null;
+  const r = el.getBoundingClientRect();
+  return r.width && r.height ? el : null;
+}
+
+function showTourStep(i){
+  const step = TOUR_STEPS[i];
+  tourIdx = i;
+  if(step.tab && activeTab !== step.tab) switchTab(step.tab);
+  const el = tourTarget(step);
+  if(el && !el.closest('.tabs')){
+    // Antes de medir, el apartado se coloca a la vista (un poco por encima del centro,
+    // para que quepa la explicación debajo).
+    document.documentElement.style.overflow = '';
+    const tall = el.getBoundingClientRect().height > window.innerHeight * 0.45;
+    el.scrollIntoView({ block: tall ? 'start' : 'center' });
+    const r = el.getBoundingClientRect();
+    if(r.top < 80 && step.sel !== 'header') window.scrollBy(0, r.top - 80);
+    if(step.sel === 'header') window.scrollTo(0, 0);
+    document.documentElement.style.overflow = 'hidden';
+  }
+  document.getElementById('tourStep').textContent = i === 0 || i === TOUR_STEPS.length - 1 ? '' : `Paso ${i} de ${TOUR_STEPS.length - 2}`;
+  document.getElementById('tourTitle').textContent = step.title;
+  document.getElementById('tourText').textContent = step.text;
+  document.getElementById('tourDots').innerHTML = TOUR_STEPS.map((_, k) => `<i class="${k <= i ? 'on' : ''}"></i>`).join('');
+  document.getElementById('tourNext').textContent = step.next || 'Siguiente';
+  document.getElementById('tourBack').hidden = i === 0;
+  document.getElementById('tourSkip').hidden = i === TOUR_STEPS.length - 1;
+  placeTour();
+  document.getElementById('tourNext').focus({ preventScroll:true });
+}
+
+function placeTour(){
+  if(tourIdx < 0) return;
+  const box = document.getElementById('tour'), card = document.getElementById('tourCard');
+  const hole = document.getElementById('tourHole');
+  const W = window.innerWidth, H = window.innerHeight, pad = 6;
+  const el = tourTarget(TOUR_STEPS[tourIdx]);
+  const shade = k => box.querySelector(`[data-s="${k}"]`);
+  const setBox = (n, x, y, w, h) => Object.assign(n.style, { left:x + 'px', top:y + 'px', width:Math.max(0, w) + 'px', height:Math.max(0, h) + 'px' });
+  box.classList.toggle('no-target', !el);
+  let x1, y1, x2, y2;
+  if(el){
+    const r = el.getBoundingClientRect();
+    x1 = Math.max(4, r.left - pad); y1 = Math.max(4, r.top - pad);
+    x2 = Math.min(W - 4, r.right + pad); y2 = Math.min(H - 4, r.bottom + pad);
+  } else {
+    x1 = x2 = W / 2; y1 = y2 = H / 2;
+  }
+  setBox(shade('t'), 0, 0, W, y1);
+  setBox(shade('b'), 0, y2, W, H - y2);
+  setBox(shade('l'), 0, y1, x1, y2 - y1);
+  setBox(shade('r'), x2, y1, W - x2, y2 - y1);
+  setBox(hole, x1, y1, x2 - x1, y2 - y1);
+
+  const ch = card.offsetHeight, gap = 14, safe = 12;
+  // Un apartado muy alto (logros, colecciones) se recorta para que quepa la explicación debajo.
+  if(el && y2 - y1 + ch + gap + safe * 2 > H && y1 + 120 < H - ch - gap - safe){
+    y2 = H - ch - gap - safe;
+    setBox(shade('b'), 0, y2, W, H - y2);
+    setBox(shade('l'), 0, y1, x1, y2 - y1);
+    setBox(shade('r'), x2, y1, W - x2, y2 - y1);
+    setBox(hole, x1, y1, x2 - x1, y2 - y1);
+  }
+  let top;
+  if(!el) top = (H - ch) / 2;
+  else if(H - y2 - gap >= ch + safe) top = y2 + gap;          // debajo
+  else if(y1 - gap >= ch + safe) top = y1 - gap - ch;         // encima
+  else top = H - ch - safe;                                    // no cabe: abajo del todo
+  card.style.top = Math.max(safe, top) + 'px';
+}
+
+document.getElementById('tourNext').addEventListener('click', () => {
+  if(tourIdx >= TOUR_STEPS.length - 1) endTour(true); else showTourStep(tourIdx + 1);
+});
+document.getElementById('tourBack').addEventListener('click', () => { if(tourIdx > 0) showTourStep(tourIdx - 1); });
+document.getElementById('tourSkip').addEventListener('click', () => endTour(true));
+document.getElementById('tourBtn').addEventListener('click', () => startTour(false));
+document.addEventListener('keydown', e => {
+  if(tourIdx < 0) return;
+  if(e.key === 'Escape') endTour(true);
+  else if(e.key === 'ArrowRight') document.getElementById('tourNext').click();
+  else if(e.key === 'ArrowLeft') document.getElementById('tourBack').click();
+});
+window.addEventListener('resize', placeTour);
+window.addEventListener('scroll', placeTour, { passive:true });
+/* ================================================================================================ */
 
 function renderAll(){
   if(!data) return;
